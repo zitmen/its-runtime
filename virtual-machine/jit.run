@@ -1,0 +1,26 @@
+000: LDCI (INTEGER: 0)
+001: ST  (Variable i [] false null)
+002: LDCI (INTEGER: 1000)
+003: LD  (Variable i [] false null)
+004: SUB
+005: POP
+006: LDSF
+007: JZ  18 + 1
+008: LD  (Variable i [] false null)
+009: CALL sqr
+010: LDCS (STRING: ^2=)
+011: ADD
+012: LD  (Variable i [] false null)
+013: ADD
+014: INVOKE println
+015: LD  (Variable i [] false null)
+016: INC
+017: POP
+018: JMP 2 + 0
+019: RET
+020: ST  (Variable x [] false null)
+021: LD  (Variable x [] false null)
+022: LD  (Variable x [] false null)
+023: MUL
+024: RETV
+025: RET

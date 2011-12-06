@@ -1,0 +1,20 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual Studio 2010
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "virtual-machine", "virtual-machine.vcxproj", "{88122E0B-978A-41DA-88C9-1993E4CED8D2}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		Release|Win32 = Release|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{88122E0B-978A-41DA-88C9-1993E4CED8D2}.Debug|Win32.ActiveCfg = Debug|Win32
+		{88122E0B-978A-41DA-88C9-1993E4CED8D2}.Debug|Win32.Build.0 = Debug|Win32
+		{88122E0B-978A-41DA-88C9-1993E4CED8D2}.Release|Win32.ActiveCfg = Release|Win32
+		{88122E0B-978A-41DA-88C9-1993E4CED8D2}.Release|Win32.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

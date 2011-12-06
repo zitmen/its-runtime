@@ -1,0 +1,72 @@
+function main()
+{
+	println("Input file: ");
+	infp = input();
+	println("Output file: ");
+	outfp = input();
+	//
+	f = openRFile(infp);
+	n = integer(inputFile(f));
+	M = integer(inputFile(f));
+	for(i = 0; i < n; i++)
+	{
+		w = integer(inputFile(f));
+		c = integer(inputFile(f));
+		stuff[i] = ['weight': w, 'cost': c];
+	}
+	closeFile(f);
+	//
+	result = computeSolution(n, M, stuff, []);
+	//
+	f = openWFile(outfp, false);
+	printlnFile(f, 'Total price: ' + result.cost);
+	printFile(f, 'Items configuration: ');
+	for(i = 0; i < n; i++)
+		printFile(f, ' ' + result.stuff[i]);
+	closeFile(f);
+	//
+	return 0;
+}
+
+function weight(n, stuff, conf)
+{
+	w = 0;
+	for(i = 0; i < n; i++)
+		if(conf[i])
+			w += stuff[i].weight;
+	return w;
+}
+
+function cost(n, stuff, conf)
+{
+	c = 0;
+	for(i = 0; i < n; i++)
+		if(conf[i])
+			c += stuff[i].cost;
+	return c;
+}
+
+function computeSolution(n, M, stuff, conf)
+{
+	cur_cost = 0;
+	max_cost = 0;
+	solution = conf;
+	//
+	if(weight(n, stuff, conf) <= M)
+		if((cur_cost = cost(n, stuff, conf)) > max_cost)
+			max_cost = cur_cost;
+	retval = ['cost': max_cost, 'stuff': solution];
+	//
+	for(i = 0; i < n; i++)
+	{
+		_conf = cloneArray(conf);
+		if(conf[i] == 0)
+		{
+			_conf[i] = 1;
+			_retval = computeSolution(n, M, stuff, _conf);
+			if(_retval.cost > retval.cost)
+				retval = cloneArray(_retval);
+		}
+	}
+	return retval;
+}

@@ -1,0 +1,10 @@
+function main()
+{
+	for(i = 0; i < 1000; i++)
+		println(i + "^2=" + sqr(i));
+}
+
+function sqr(x)
+{
+	return x*x;
+}

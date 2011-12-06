@@ -1,0 +1,89 @@
+struct Stuff
+{
+	int cost;
+	int weight;
+}
+
+struct Result
+{
+	int cost;
+	Array<Stuff> conf;
+}
+
+int main()
+{
+	println("Input file: ");
+	String infp = input();
+	println("Output file: ");
+	String outfp = input();
+	//
+	File f = openRFile(infp);
+	int n = integer(inputFile(f));
+	int M = integer(inputFile(f));
+	Array<Stuff> stuff = new Stuff[n];
+	Array<int> init_conf = new int[n];
+	for(int i = 0; i < n; i++)
+	{
+		init_conf[i] = 0;
+		stuff[i] = new Stuff;
+		stuff[i].weight = integer(inputFile(f));
+		stuff[i].cost   = integer(inputFile(f));
+	}
+	closeFile(f);
+	//
+	Result result = computeSolution(n, M, stuff, init_conf);
+	//
+	File f = openWFile(outfp, false);
+	printlnFile(f, concat('Total price: ', string(result.cost)));
+	printFile(f, 'Items configuration: ');
+	for(i = 0; i < n; i++)
+		printFile(f, concat(' ', string(result.conf[i]));
+	closeFile(f);
+	//
+	return 0;
+}
+
+int weight(int n, Array<Stuff> stuff, Array<int> conf)
+{
+	int w = 0;
+	for(int i = 0; i < n; i++)
+		if(conf[i])
+			w += stuff[i].weight;
+	return w;
+}
+
+int cost(int n, Array<Stuff> stuff, Array<int> conf)
+{
+	int c = 0;
+	for(int i = 0; i < n; i++)
+		if(conf[i])
+			c += stuff[i].cost;
+	return c;
+}
+
+Result computeSolution(int n, int M, Array<Stuff> stuff, Array<int> conf)
+{
+	int cur_cost = 0;
+	int max_cost = 0;
+	Array<int> solution = conf;
+	Result retval = new Result;
+	//
+	if(weight(n, stuff, conf) <= M)
+		if((cur_cost = cost(n, stuff, conf)) > max_cost)
+			max_cost = cur_cost;
+	retval.cost = max_cost;
+	retval.stuff = solution;
+	//
+	for(int i = 0; i < n; i++)
+	{
+		Array<int> _conf = cloneArray(conf);
+		if(conf[i] == 0)
+		{
+			_conf[i] = 1;
+			_retval = computeSolution(n, M, stuff, _conf);
+			if(_retval.cost > retval.cost)
+				retval = _retval;
+		}
+	}
+	return retval;
+}
