@@ -73,6 +73,8 @@ public class ArrayConstructor extends Expression
     @Override
     public Instruction genByteCode()
     {
+        throw new UnsupportedOperationException("Not supported yet.");
+        /*
         Instruction stream = new Instruction(Code.NOOP), stream2 = new Instruction(Code.NOOP);   // helpers
         Instruction first = stream, first2 = stream2;
         //
@@ -134,6 +136,7 @@ public class ArrayConstructor extends Expression
                 stream.last().append(new LoadStoreInstr(Code.LDR, new Variable("[]", true)));
         }
         return first;
+        */
     }
     
     private Object getKey(Expression key)

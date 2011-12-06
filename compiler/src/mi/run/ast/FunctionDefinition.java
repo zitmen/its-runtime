@@ -6,19 +6,22 @@ import mi.run.bytecode.LoadStoreInstr;
 
 public class FunctionDefinition extends Node
 {
+    public DataType type;
     public String name;
     public ExpressionList parameters;
     public BlockStatement body;
     
     private void removeNulls()
     {
+        type = ((type == null) ? new DataType(DataType.VOID) : type);
         name = ((name == null) ? new String() : name);
         parameters = ((parameters == null) ? (new ExpressionList()) : parameters);
         body = ((body == null) ? (new BlockStatement()) : body);
     }
     
-    public FunctionDefinition(String name, ExpressionList parameters, BlockStatement body)
+    public FunctionDefinition(DataType type, String name, ExpressionList parameters, BlockStatement body)
     {
+        this.type = type;
         this.name = name;
         this.parameters = parameters;
         this.body = body;
@@ -28,7 +31,7 @@ public class FunctionDefinition extends Node
     public String toString()
     {
         removeNulls();
-        return "(FunctionDefinition " + name + " " + parameters + " " + body.toString() + ")";
+        return "(FunctionDefinition " + type + " " + name + " " + parameters + " " + body.toString() + ")";
     }
     
     @Override

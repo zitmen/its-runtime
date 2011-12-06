@@ -1,4 +1,4 @@
-// $ANTLR 3.4 C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g 2011-12-06 04:16:08
+// $ANTLR 3.4 C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g 2011-12-06 21:30:05
 
 	package mi.run.ctalk;
 
@@ -11,7 +11,6 @@ import java.util.ArrayList;
 @SuppressWarnings({"all", "warnings", "unchecked"})
 public class CTalkLexer extends Lexer {
     public static final int EOF=-1;
-    public static final int T__36=36;
     public static final int T__37=37;
     public static final int T__38=38;
     public static final int T__39=39;
@@ -63,6 +62,14 @@ public class CTalkLexer extends Lexer {
     public static final int T__85=85;
     public static final int T__86=86;
     public static final int T__87=87;
+    public static final int T__88=88;
+    public static final int T__89=89;
+    public static final int T__90=90;
+    public static final int T__91=91;
+    public static final int T__92=92;
+    public static final int T__93=93;
+    public static final int T__94=94;
+    public static final int T__95=95;
     public static final int BOOLEAN=4;
     public static final int COMMENT=5;
     public static final int DECIMAL_LITERAL=6;
@@ -83,18 +90,19 @@ public class CTalkLexer extends Lexer {
     public static final int NONDIGIT=21;
     public static final int NONZERO_DIGIT=22;
     public static final int NOT_STR_CHAR=23;
-    public static final int OCTAL_DIGIT=24;
-    public static final int OCTAL_ESCAPE_SEQUENCE=25;
-    public static final int OCTAL_LITERAL=26;
-    public static final int REAL=27;
-    public static final int SIGN=28;
-    public static final int SIMPLE_ESCAPE_SEQUENCE=29;
-    public static final int STRING=30;
-    public static final int S_CHAR=31;
-    public static final int S_CHAR_SEQUENCE=32;
-    public static final int UNIVERSAL_CHARACTER_NAME=33;
-    public static final int UNSIGNED_SUFFIX=34;
-    public static final int WHITE_SPACE=35;
+    public static final int NULL=24;
+    public static final int OCTAL_DIGIT=25;
+    public static final int OCTAL_ESCAPE_SEQUENCE=26;
+    public static final int OCTAL_LITERAL=27;
+    public static final int REAL=28;
+    public static final int SIGN=29;
+    public static final int SIMPLE_ESCAPE_SEQUENCE=30;
+    public static final int STRING=31;
+    public static final int S_CHAR=32;
+    public static final int S_CHAR_SEQUENCE=33;
+    public static final int UNIVERSAL_CHARACTER_NAME=34;
+    public static final int UNSIGNED_SUFFIX=35;
+    public static final int WHITE_SPACE=36;
 
     // delegates
     // delegators
@@ -109,40 +117,17 @@ public class CTalkLexer extends Lexer {
     public CTalkLexer(CharStream input, RecognizerSharedState state) {
         super(input,state);
     }
-    public String getGrammarFileName() { return "C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g"; }
-
-    // $ANTLR start "T__36"
-    public final void mT__36() throws RecognitionException {
-        try {
-            int _type = T__36;
-            int _channel = DEFAULT_TOKEN_CHANNEL;
-            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:6:7: ( '!' )
-            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:6:9: '!'
-            {
-            match('!'); 
-
-            }
-
-            state.type = _type;
-            state.channel = _channel;
-        }
-        finally {
-        	// do for sure before leaving
-        }
-    }
-    // $ANTLR end "T__36"
+    public String getGrammarFileName() { return "C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g"; }
 
     // $ANTLR start "T__37"
     public final void mT__37() throws RecognitionException {
         try {
             int _type = T__37;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:7:7: ( '!=' )
-            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:7:9: '!='
+            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:6:7: ( '!' )
+            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:6:9: '!'
             {
-            match("!="); 
-
-
+            match('!'); 
 
             }
 
@@ -160,10 +145,12 @@ public class CTalkLexer extends Lexer {
         try {
             int _type = T__38;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:8:7: ( '%' )
-            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:8:9: '%'
+            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:7:7: ( '!=' )
+            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:7:9: '!='
             {
-            match('%'); 
+            match("!="); 
+
+
 
             }
 
@@ -181,12 +168,10 @@ public class CTalkLexer extends Lexer {
         try {
             int _type = T__39;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:9:7: ( '%=' )
-            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:9:9: '%='
+            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:8:7: ( '%' )
+            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:8:9: '%'
             {
-            match("%="); 
-
-
+            match('%'); 
 
             }
 
@@ -204,10 +189,10 @@ public class CTalkLexer extends Lexer {
         try {
             int _type = T__40;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:10:7: ( '&&' )
-            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:10:9: '&&'
+            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:9:7: ( '%=' )
+            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:9:9: '%='
             {
-            match("&&"); 
+            match("%="); 
 
 
 
@@ -227,10 +212,12 @@ public class CTalkLexer extends Lexer {
         try {
             int _type = T__41;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:11:7: ( '&' )
-            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:11:9: '&'
+            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:10:7: ( '&&' )
+            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:10:9: '&&'
             {
-            match('&'); 
+            match("&&"); 
+
+
 
             }
 
@@ -248,12 +235,10 @@ public class CTalkLexer extends Lexer {
         try {
             int _type = T__42;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:12:7: ( '&=' )
-            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:12:9: '&='
+            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:11:7: ( '&' )
+            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:11:9: '&'
             {
-            match("&="); 
-
-
+            match('&'); 
 
             }
 
@@ -271,10 +256,12 @@ public class CTalkLexer extends Lexer {
         try {
             int _type = T__43;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:13:7: ( '(' )
-            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:13:9: '('
+            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:12:7: ( '&=' )
+            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:12:9: '&='
             {
-            match('('); 
+            match("&="); 
+
+
 
             }
 
@@ -292,10 +279,10 @@ public class CTalkLexer extends Lexer {
         try {
             int _type = T__44;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:14:7: ( ')' )
-            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:14:9: ')'
+            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:13:7: ( '(' )
+            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:13:9: '('
             {
-            match(')'); 
+            match('('); 
 
             }
 
@@ -313,10 +300,10 @@ public class CTalkLexer extends Lexer {
         try {
             int _type = T__45;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:15:7: ( '*' )
-            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:15:9: '*'
+            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:14:7: ( ')' )
+            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:14:9: ')'
             {
-            match('*'); 
+            match(')'); 
 
             }
 
@@ -334,12 +321,10 @@ public class CTalkLexer extends Lexer {
         try {
             int _type = T__46;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:16:7: ( '*=' )
-            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:16:9: '*='
+            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:15:7: ( '*' )
+            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:15:9: '*'
             {
-            match("*="); 
-
-
+            match('*'); 
 
             }
 
@@ -357,10 +342,12 @@ public class CTalkLexer extends Lexer {
         try {
             int _type = T__47;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:17:7: ( '+' )
-            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:17:9: '+'
+            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:16:7: ( '*=' )
+            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:16:9: '*='
             {
-            match('+'); 
+            match("*="); 
+
+
 
             }
 
@@ -378,12 +365,10 @@ public class CTalkLexer extends Lexer {
         try {
             int _type = T__48;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:18:7: ( '++' )
-            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:18:9: '++'
+            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:17:7: ( '+' )
+            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:17:9: '+'
             {
-            match("++"); 
-
-
+            match('+'); 
 
             }
 
@@ -401,10 +386,10 @@ public class CTalkLexer extends Lexer {
         try {
             int _type = T__49;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:19:7: ( '+=' )
-            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:19:9: '+='
+            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:18:7: ( '++' )
+            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:18:9: '++'
             {
-            match("+="); 
+            match("++"); 
 
 
 
@@ -424,10 +409,12 @@ public class CTalkLexer extends Lexer {
         try {
             int _type = T__50;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:20:7: ( ',' )
-            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:20:9: ','
+            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:19:7: ( '+=' )
+            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:19:9: '+='
             {
-            match(','); 
+            match("+="); 
+
+
 
             }
 
@@ -445,10 +432,10 @@ public class CTalkLexer extends Lexer {
         try {
             int _type = T__51;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:21:7: ( '-' )
-            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:21:9: '-'
+            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:20:7: ( ',' )
+            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:20:9: ','
             {
-            match('-'); 
+            match(','); 
 
             }
 
@@ -466,12 +453,10 @@ public class CTalkLexer extends Lexer {
         try {
             int _type = T__52;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:22:7: ( '--' )
-            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:22:9: '--'
+            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:21:7: ( '-' )
+            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:21:9: '-'
             {
-            match("--"); 
-
-
+            match('-'); 
 
             }
 
@@ -489,10 +474,10 @@ public class CTalkLexer extends Lexer {
         try {
             int _type = T__53;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:23:7: ( '-=' )
-            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:23:9: '-='
+            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:22:7: ( '--' )
+            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:22:9: '--'
             {
-            match("-="); 
+            match("--"); 
 
 
 
@@ -512,10 +497,12 @@ public class CTalkLexer extends Lexer {
         try {
             int _type = T__54;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:24:7: ( '.' )
-            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:24:9: '.'
+            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:23:7: ( '-=' )
+            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:23:9: '-='
             {
-            match('.'); 
+            match("-="); 
+
+
 
             }
 
@@ -533,10 +520,10 @@ public class CTalkLexer extends Lexer {
         try {
             int _type = T__55;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:25:7: ( '/' )
-            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:25:9: '/'
+            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:24:7: ( '.' )
+            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:24:9: '.'
             {
-            match('/'); 
+            match('.'); 
 
             }
 
@@ -554,12 +541,10 @@ public class CTalkLexer extends Lexer {
         try {
             int _type = T__56;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:26:7: ( '/=' )
-            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:26:9: '/='
+            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:25:7: ( '/' )
+            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:25:9: '/'
             {
-            match("/="); 
-
-
+            match('/'); 
 
             }
 
@@ -577,10 +562,12 @@ public class CTalkLexer extends Lexer {
         try {
             int _type = T__57;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:27:7: ( ':' )
-            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:27:9: ':'
+            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:26:7: ( '/=' )
+            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:26:9: '/='
             {
-            match(':'); 
+            match("/="); 
+
+
 
             }
 
@@ -598,8 +585,8 @@ public class CTalkLexer extends Lexer {
         try {
             int _type = T__58;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:28:7: ( ';' )
-            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:28:9: ';'
+            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:27:7: ( ';' )
+            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:27:9: ';'
             {
             match(';'); 
 
@@ -619,8 +606,8 @@ public class CTalkLexer extends Lexer {
         try {
             int _type = T__59;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:29:7: ( '<' )
-            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:29:9: '<'
+            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:28:7: ( '<' )
+            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:28:9: '<'
             {
             match('<'); 
 
@@ -640,8 +627,8 @@ public class CTalkLexer extends Lexer {
         try {
             int _type = T__60;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:30:7: ( '<<' )
-            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:30:9: '<<'
+            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:29:7: ( '<<' )
+            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:29:9: '<<'
             {
             match("<<"); 
 
@@ -663,8 +650,8 @@ public class CTalkLexer extends Lexer {
         try {
             int _type = T__61;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:31:7: ( '<<=' )
-            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:31:9: '<<='
+            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:30:7: ( '<<=' )
+            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:30:9: '<<='
             {
             match("<<="); 
 
@@ -686,8 +673,8 @@ public class CTalkLexer extends Lexer {
         try {
             int _type = T__62;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:32:7: ( '<=' )
-            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:32:9: '<='
+            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:31:7: ( '<=' )
+            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:31:9: '<='
             {
             match("<="); 
 
@@ -709,8 +696,8 @@ public class CTalkLexer extends Lexer {
         try {
             int _type = T__63;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:33:7: ( '=' )
-            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:33:9: '='
+            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:32:7: ( '=' )
+            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:32:9: '='
             {
             match('='); 
 
@@ -730,8 +717,8 @@ public class CTalkLexer extends Lexer {
         try {
             int _type = T__64;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:34:7: ( '==' )
-            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:34:9: '=='
+            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:33:7: ( '==' )
+            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:33:9: '=='
             {
             match("=="); 
 
@@ -753,8 +740,8 @@ public class CTalkLexer extends Lexer {
         try {
             int _type = T__65;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:35:7: ( '>' )
-            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:35:9: '>'
+            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:34:7: ( '>' )
+            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:34:9: '>'
             {
             match('>'); 
 
@@ -774,8 +761,8 @@ public class CTalkLexer extends Lexer {
         try {
             int _type = T__66;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:36:7: ( '>=' )
-            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:36:9: '>='
+            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:35:7: ( '>=' )
+            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:35:9: '>='
             {
             match(">="); 
 
@@ -797,8 +784,8 @@ public class CTalkLexer extends Lexer {
         try {
             int _type = T__67;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:37:7: ( '>>' )
-            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:37:9: '>>'
+            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:36:7: ( '>>' )
+            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:36:9: '>>'
             {
             match(">>"); 
 
@@ -820,8 +807,8 @@ public class CTalkLexer extends Lexer {
         try {
             int _type = T__68;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:38:7: ( '>>=' )
-            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:38:9: '>>='
+            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:37:7: ( '>>=' )
+            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:37:9: '>>='
             {
             match(">>="); 
 
@@ -843,10 +830,12 @@ public class CTalkLexer extends Lexer {
         try {
             int _type = T__69;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:39:7: ( '[' )
-            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:39:9: '['
+            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:38:7: ( 'Array' )
+            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:38:9: 'Array'
             {
-            match('['); 
+            match("Array"); 
+
+
 
             }
 
@@ -864,10 +853,12 @@ public class CTalkLexer extends Lexer {
         try {
             int _type = T__70;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:40:7: ( ']' )
-            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:40:9: ']'
+            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:39:7: ( 'File' )
+            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:39:9: 'File'
             {
-            match(']'); 
+            match("File"); 
+
+
 
             }
 
@@ -885,10 +876,12 @@ public class CTalkLexer extends Lexer {
         try {
             int _type = T__71;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:41:7: ( '^' )
-            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:41:9: '^'
+            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:40:7: ( 'String' )
+            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:40:9: 'String'
             {
-            match('^'); 
+            match("String"); 
+
+
 
             }
 
@@ -906,12 +899,10 @@ public class CTalkLexer extends Lexer {
         try {
             int _type = T__72;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:42:7: ( '^=' )
-            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:42:9: '^='
+            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:41:7: ( '[' )
+            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:41:9: '['
             {
-            match("^="); 
-
-
+            match('['); 
 
             }
 
@@ -929,12 +920,10 @@ public class CTalkLexer extends Lexer {
         try {
             int _type = T__73;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:43:7: ( 'break' )
-            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:43:9: 'break'
+            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:42:7: ( ']' )
+            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:42:9: ']'
             {
-            match("break"); 
-
-
+            match(']'); 
 
             }
 
@@ -952,12 +941,10 @@ public class CTalkLexer extends Lexer {
         try {
             int _type = T__74;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:44:7: ( 'continue' )
-            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:44:9: 'continue'
+            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:43:7: ( '^' )
+            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:43:9: '^'
             {
-            match("continue"); 
-
-
+            match('^'); 
 
             }
 
@@ -975,10 +962,10 @@ public class CTalkLexer extends Lexer {
         try {
             int _type = T__75;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:45:7: ( 'do' )
-            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:45:9: 'do'
+            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:44:7: ( '^=' )
+            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:44:9: '^='
             {
-            match("do"); 
+            match("^="); 
 
 
 
@@ -998,10 +985,10 @@ public class CTalkLexer extends Lexer {
         try {
             int _type = T__76;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:46:7: ( 'else' )
-            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:46:9: 'else'
+            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:45:7: ( 'bool' )
+            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:45:9: 'bool'
             {
-            match("else"); 
+            match("bool"); 
 
 
 
@@ -1021,10 +1008,10 @@ public class CTalkLexer extends Lexer {
         try {
             int _type = T__77;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:47:7: ( 'for' )
-            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:47:9: 'for'
+            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:46:7: ( 'break' )
+            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:46:9: 'break'
             {
-            match("for"); 
+            match("break"); 
 
 
 
@@ -1044,10 +1031,10 @@ public class CTalkLexer extends Lexer {
         try {
             int _type = T__78;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:48:7: ( 'function' )
-            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:48:9: 'function'
+            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:47:7: ( 'continue' )
+            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:47:9: 'continue'
             {
-            match("function"); 
+            match("continue"); 
 
 
 
@@ -1067,10 +1054,10 @@ public class CTalkLexer extends Lexer {
         try {
             int _type = T__79;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:49:7: ( 'if' )
-            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:49:9: 'if'
+            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:48:7: ( 'do' )
+            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:48:9: 'do'
             {
-            match("if"); 
+            match("do"); 
 
 
 
@@ -1090,10 +1077,10 @@ public class CTalkLexer extends Lexer {
         try {
             int _type = T__80;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:50:7: ( 'return' )
-            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:50:9: 'return'
+            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:49:7: ( 'double' )
+            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:49:9: 'double'
             {
-            match("return"); 
+            match("double"); 
 
 
 
@@ -1113,10 +1100,10 @@ public class CTalkLexer extends Lexer {
         try {
             int _type = T__81;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:51:7: ( 'while' )
-            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:51:9: 'while'
+            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:50:7: ( 'else' )
+            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:50:9: 'else'
             {
-            match("while"); 
+            match("else"); 
 
 
 
@@ -1136,10 +1123,12 @@ public class CTalkLexer extends Lexer {
         try {
             int _type = T__82;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:52:7: ( '{' )
-            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:52:9: '{'
+            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:51:7: ( 'for' )
+            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:51:9: 'for'
             {
-            match('{'); 
+            match("for"); 
+
+
 
             }
 
@@ -1157,10 +1146,12 @@ public class CTalkLexer extends Lexer {
         try {
             int _type = T__83;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:53:7: ( '|' )
-            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:53:9: '|'
+            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:52:7: ( 'if' )
+            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:52:9: 'if'
             {
-            match('|'); 
+            match("if"); 
+
+
 
             }
 
@@ -1178,10 +1169,10 @@ public class CTalkLexer extends Lexer {
         try {
             int _type = T__84;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:54:7: ( '|=' )
-            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:54:9: '|='
+            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:53:7: ( 'int' )
+            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:53:9: 'int'
             {
-            match("|="); 
+            match("int"); 
 
 
 
@@ -1201,10 +1192,10 @@ public class CTalkLexer extends Lexer {
         try {
             int _type = T__85;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:55:7: ( '||' )
-            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:55:9: '||'
+            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:54:7: ( 'new' )
+            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:54:9: 'new'
             {
-            match("||"); 
+            match("new"); 
 
 
 
@@ -1224,10 +1215,12 @@ public class CTalkLexer extends Lexer {
         try {
             int _type = T__86;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:56:7: ( '}' )
-            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:56:9: '}'
+            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:55:7: ( 'return' )
+            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:55:9: 'return'
             {
-            match('}'); 
+            match("return"); 
+
+
 
             }
 
@@ -1245,10 +1238,12 @@ public class CTalkLexer extends Lexer {
         try {
             int _type = T__87;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:57:7: ( '~' )
-            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:57:9: '~'
+            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:56:7: ( 'struct' )
+            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:56:9: 'struct'
             {
-            match('~'); 
+            match("struct"); 
+
+
 
             }
 
@@ -1261,12 +1256,188 @@ public class CTalkLexer extends Lexer {
     }
     // $ANTLR end "T__87"
 
+    // $ANTLR start "T__88"
+    public final void mT__88() throws RecognitionException {
+        try {
+            int _type = T__88;
+            int _channel = DEFAULT_TOKEN_CHANNEL;
+            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:57:7: ( 'void' )
+            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:57:9: 'void'
+            {
+            match("void"); 
+
+
+
+            }
+
+            state.type = _type;
+            state.channel = _channel;
+        }
+        finally {
+        	// do for sure before leaving
+        }
+    }
+    // $ANTLR end "T__88"
+
+    // $ANTLR start "T__89"
+    public final void mT__89() throws RecognitionException {
+        try {
+            int _type = T__89;
+            int _channel = DEFAULT_TOKEN_CHANNEL;
+            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:58:7: ( 'while' )
+            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:58:9: 'while'
+            {
+            match("while"); 
+
+
+
+            }
+
+            state.type = _type;
+            state.channel = _channel;
+        }
+        finally {
+        	// do for sure before leaving
+        }
+    }
+    // $ANTLR end "T__89"
+
+    // $ANTLR start "T__90"
+    public final void mT__90() throws RecognitionException {
+        try {
+            int _type = T__90;
+            int _channel = DEFAULT_TOKEN_CHANNEL;
+            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:59:7: ( '{' )
+            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:59:9: '{'
+            {
+            match('{'); 
+
+            }
+
+            state.type = _type;
+            state.channel = _channel;
+        }
+        finally {
+        	// do for sure before leaving
+        }
+    }
+    // $ANTLR end "T__90"
+
+    // $ANTLR start "T__91"
+    public final void mT__91() throws RecognitionException {
+        try {
+            int _type = T__91;
+            int _channel = DEFAULT_TOKEN_CHANNEL;
+            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:60:7: ( '|' )
+            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:60:9: '|'
+            {
+            match('|'); 
+
+            }
+
+            state.type = _type;
+            state.channel = _channel;
+        }
+        finally {
+        	// do for sure before leaving
+        }
+    }
+    // $ANTLR end "T__91"
+
+    // $ANTLR start "T__92"
+    public final void mT__92() throws RecognitionException {
+        try {
+            int _type = T__92;
+            int _channel = DEFAULT_TOKEN_CHANNEL;
+            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:61:7: ( '|=' )
+            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:61:9: '|='
+            {
+            match("|="); 
+
+
+
+            }
+
+            state.type = _type;
+            state.channel = _channel;
+        }
+        finally {
+        	// do for sure before leaving
+        }
+    }
+    // $ANTLR end "T__92"
+
+    // $ANTLR start "T__93"
+    public final void mT__93() throws RecognitionException {
+        try {
+            int _type = T__93;
+            int _channel = DEFAULT_TOKEN_CHANNEL;
+            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:62:7: ( '||' )
+            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:62:9: '||'
+            {
+            match("||"); 
+
+
+
+            }
+
+            state.type = _type;
+            state.channel = _channel;
+        }
+        finally {
+        	// do for sure before leaving
+        }
+    }
+    // $ANTLR end "T__93"
+
+    // $ANTLR start "T__94"
+    public final void mT__94() throws RecognitionException {
+        try {
+            int _type = T__94;
+            int _channel = DEFAULT_TOKEN_CHANNEL;
+            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:63:7: ( '}' )
+            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:63:9: '}'
+            {
+            match('}'); 
+
+            }
+
+            state.type = _type;
+            state.channel = _channel;
+        }
+        finally {
+        	// do for sure before leaving
+        }
+    }
+    // $ANTLR end "T__94"
+
+    // $ANTLR start "T__95"
+    public final void mT__95() throws RecognitionException {
+        try {
+            int _type = T__95;
+            int _channel = DEFAULT_TOKEN_CHANNEL;
+            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:64:7: ( '~' )
+            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:64:9: '~'
+            {
+            match('~'); 
+
+            }
+
+            state.type = _type;
+            state.channel = _channel;
+        }
+        finally {
+        	// do for sure before leaving
+        }
+    }
+    // $ANTLR end "T__95"
+
     // $ANTLR start "BOOLEAN"
     public final void mBOOLEAN() throws RecognitionException {
         try {
             int _type = BOOLEAN;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:513:8: ( 'true' | 'false' )
+            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:568:8: ( 'true' | 'false' )
             int alt1=2;
             int LA1_0 = input.LA(1);
 
@@ -1285,7 +1456,7 @@ public class CTalkLexer extends Lexer {
             }
             switch (alt1) {
                 case 1 :
-                    // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:513:10: 'true'
+                    // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:568:10: 'true'
                     {
                     match("true"); 
 
@@ -1294,7 +1465,7 @@ public class CTalkLexer extends Lexer {
                     }
                     break;
                 case 2 :
-                    // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:513:19: 'false'
+                    // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:568:19: 'false'
                     {
                     match("false"); 
 
@@ -1313,18 +1484,41 @@ public class CTalkLexer extends Lexer {
     }
     // $ANTLR end "BOOLEAN"
 
+    // $ANTLR start "NULL"
+    public final void mNULL() throws RecognitionException {
+        try {
+            int _type = NULL;
+            int _channel = DEFAULT_TOKEN_CHANNEL;
+            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:570:5: ( 'null' )
+            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:570:7: 'null'
+            {
+            match("null"); 
+
+
+
+            }
+
+            state.type = _type;
+            state.channel = _channel;
+        }
+        finally {
+        	// do for sure before leaving
+        }
+    }
+    // $ANTLR end "NULL"
+
     // $ANTLR start "IDENTIFIER"
     public final void mIDENTIFIER() throws RecognitionException {
         try {
             int _type = IDENTIFIER;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:515:11: ( NONDIGIT ( NONDIGIT | DIGIT )* )
-            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:515:13: NONDIGIT ( NONDIGIT | DIGIT )*
+            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:572:11: ( NONDIGIT ( NONDIGIT | DIGIT )* )
+            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:572:13: NONDIGIT ( NONDIGIT | DIGIT )*
             {
             mNONDIGIT(); 
 
 
-            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:515:22: ( NONDIGIT | DIGIT )*
+            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:572:22: ( NONDIGIT | DIGIT )*
             loop2:
             do {
                 int alt2=3;
@@ -1340,7 +1534,7 @@ public class CTalkLexer extends Lexer {
 
                 switch (alt2) {
             	case 1 :
-            	    // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:515:24: NONDIGIT
+            	    // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:572:24: NONDIGIT
             	    {
             	    mNONDIGIT(); 
 
@@ -1348,7 +1542,7 @@ public class CTalkLexer extends Lexer {
             	    }
             	    break;
             	case 2 :
-            	    // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:515:35: DIGIT
+            	    // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:572:35: DIGIT
             	    {
             	    mDIGIT(); 
 
@@ -1376,10 +1570,10 @@ public class CTalkLexer extends Lexer {
     // $ANTLR start "NONDIGIT"
     public final void mNONDIGIT() throws RecognitionException {
         try {
-            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:516:18: ( ( UNIVERSAL_CHARACTER_NAME | '_' | 'a' .. 'z' | 'A' .. 'Z' ) )
-            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:516:20: ( UNIVERSAL_CHARACTER_NAME | '_' | 'a' .. 'z' | 'A' .. 'Z' )
+            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:573:18: ( ( UNIVERSAL_CHARACTER_NAME | '_' | 'a' .. 'z' | 'A' .. 'Z' ) )
+            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:573:20: ( UNIVERSAL_CHARACTER_NAME | '_' | 'a' .. 'z' | 'A' .. 'Z' )
             {
-            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:516:20: ( UNIVERSAL_CHARACTER_NAME | '_' | 'a' .. 'z' | 'A' .. 'Z' )
+            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:573:20: ( UNIVERSAL_CHARACTER_NAME | '_' | 'a' .. 'z' | 'A' .. 'Z' )
             int alt3=4;
             switch ( input.LA(1) ) {
             case '\\':
@@ -1462,7 +1656,7 @@ public class CTalkLexer extends Lexer {
 
             switch (alt3) {
                 case 1 :
-                    // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:516:22: UNIVERSAL_CHARACTER_NAME
+                    // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:573:22: UNIVERSAL_CHARACTER_NAME
                     {
                     mUNIVERSAL_CHARACTER_NAME(); 
 
@@ -1470,21 +1664,21 @@ public class CTalkLexer extends Lexer {
                     }
                     break;
                 case 2 :
-                    // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:516:49: '_'
+                    // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:573:49: '_'
                     {
                     match('_'); 
 
                     }
                     break;
                 case 3 :
-                    // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:516:55: 'a' .. 'z'
+                    // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:573:55: 'a' .. 'z'
                     {
                     matchRange('a','z'); 
 
                     }
                     break;
                 case 4 :
-                    // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:516:66: 'A' .. 'Z'
+                    // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:573:66: 'A' .. 'Z'
                     {
                     matchRange('A','Z'); 
 
@@ -1507,8 +1701,8 @@ public class CTalkLexer extends Lexer {
     // $ANTLR start "DIGIT"
     public final void mDIGIT() throws RecognitionException {
         try {
-            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:517:15: ( '0' .. '9' )
-            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:
+            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:574:15: ( '0' .. '9' )
+            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:
             {
             if ( (input.LA(1) >= '0' && input.LA(1) <= '9') ) {
                 input.consume();
@@ -1533,10 +1727,10 @@ public class CTalkLexer extends Lexer {
     // $ANTLR start "UNIVERSAL_CHARACTER_NAME"
     public final void mUNIVERSAL_CHARACTER_NAME() throws RecognitionException {
         try {
-            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:518:34: ( ( ( '\\\\u' HEX_QUAD ) | ( '\\\\U' HEX_QUAD HEX_QUAD ) ) )
-            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:518:36: ( ( '\\\\u' HEX_QUAD ) | ( '\\\\U' HEX_QUAD HEX_QUAD ) )
+            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:575:34: ( ( ( '\\\\u' HEX_QUAD ) | ( '\\\\U' HEX_QUAD HEX_QUAD ) ) )
+            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:575:36: ( ( '\\\\u' HEX_QUAD ) | ( '\\\\U' HEX_QUAD HEX_QUAD ) )
             {
-            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:518:36: ( ( '\\\\u' HEX_QUAD ) | ( '\\\\U' HEX_QUAD HEX_QUAD ) )
+            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:575:36: ( ( '\\\\u' HEX_QUAD ) | ( '\\\\U' HEX_QUAD HEX_QUAD ) )
             int alt4=2;
             int LA4_0 = input.LA(1);
 
@@ -1566,10 +1760,10 @@ public class CTalkLexer extends Lexer {
             }
             switch (alt4) {
                 case 1 :
-                    // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:518:38: ( '\\\\u' HEX_QUAD )
+                    // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:575:38: ( '\\\\u' HEX_QUAD )
                     {
-                    // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:518:38: ( '\\\\u' HEX_QUAD )
-                    // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:518:40: '\\\\u' HEX_QUAD
+                    // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:575:38: ( '\\\\u' HEX_QUAD )
+                    // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:575:40: '\\\\u' HEX_QUAD
                     {
                     match("\\u"); 
 
@@ -1584,10 +1778,10 @@ public class CTalkLexer extends Lexer {
                     }
                     break;
                 case 2 :
-                    // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:518:59: ( '\\\\U' HEX_QUAD HEX_QUAD )
+                    // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:575:59: ( '\\\\U' HEX_QUAD HEX_QUAD )
                     {
-                    // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:518:59: ( '\\\\U' HEX_QUAD HEX_QUAD )
-                    // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:518:61: '\\\\U' HEX_QUAD HEX_QUAD
+                    // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:575:59: ( '\\\\U' HEX_QUAD HEX_QUAD )
+                    // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:575:61: '\\\\U' HEX_QUAD HEX_QUAD
                     {
                     match("\\U"); 
 
@@ -1621,8 +1815,8 @@ public class CTalkLexer extends Lexer {
     // $ANTLR start "HEX_QUAD"
     public final void mHEX_QUAD() throws RecognitionException {
         try {
-            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:519:18: ( HEX_DIGIT HEX_DIGIT HEX_DIGIT HEX_DIGIT )
-            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:519:20: HEX_DIGIT HEX_DIGIT HEX_DIGIT HEX_DIGIT
+            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:576:18: ( HEX_DIGIT HEX_DIGIT HEX_DIGIT HEX_DIGIT )
+            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:576:20: HEX_DIGIT HEX_DIGIT HEX_DIGIT HEX_DIGIT
             {
             mHEX_DIGIT(); 
 
@@ -1649,8 +1843,8 @@ public class CTalkLexer extends Lexer {
     // $ANTLR start "HEX_DIGIT"
     public final void mHEX_DIGIT() throws RecognitionException {
         try {
-            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:520:19: ( ( '0' .. '9' | 'a' .. 'f' | 'A' .. 'F' ) )
-            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:
+            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:577:19: ( ( '0' .. '9' | 'a' .. 'f' | 'A' .. 'F' ) )
+            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:
             {
             if ( (input.LA(1) >= '0' && input.LA(1) <= '9')||(input.LA(1) >= 'A' && input.LA(1) <= 'F')||(input.LA(1) >= 'a' && input.LA(1) <= 'f') ) {
                 input.consume();
@@ -1675,8 +1869,8 @@ public class CTalkLexer extends Lexer {
     // $ANTLR start "OCTAL_DIGIT"
     public final void mOCTAL_DIGIT() throws RecognitionException {
         try {
-            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:521:21: ( '0' .. '7' )
-            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:
+            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:578:21: ( '0' .. '7' )
+            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:
             {
             if ( (input.LA(1) >= '0' && input.LA(1) <= '7') ) {
                 input.consume();
@@ -1703,10 +1897,10 @@ public class CTalkLexer extends Lexer {
         try {
             int _type = STRING;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:523:7: ( ( ( ( 'L' )? '\\\"' ( S_CHAR_SEQUENCE )? '\\\"' ) | ( ( 'L' )? '\\'' ( S_CHAR_SEQUENCE )? '\\'' ) ) )
-            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:523:9: ( ( ( 'L' )? '\\\"' ( S_CHAR_SEQUENCE )? '\\\"' ) | ( ( 'L' )? '\\'' ( S_CHAR_SEQUENCE )? '\\'' ) )
+            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:580:7: ( ( ( ( 'L' )? '\\\"' ( S_CHAR_SEQUENCE )? '\\\"' ) | ( ( 'L' )? '\\'' ( S_CHAR_SEQUENCE )? '\\'' ) ) )
+            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:580:9: ( ( ( 'L' )? '\\\"' ( S_CHAR_SEQUENCE )? '\\\"' ) | ( ( 'L' )? '\\'' ( S_CHAR_SEQUENCE )? '\\'' ) )
             {
-            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:523:9: ( ( ( 'L' )? '\\\"' ( S_CHAR_SEQUENCE )? '\\\"' ) | ( ( 'L' )? '\\'' ( S_CHAR_SEQUENCE )? '\\'' ) )
+            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:580:9: ( ( ( 'L' )? '\\\"' ( S_CHAR_SEQUENCE )? '\\\"' ) | ( ( 'L' )? '\\'' ( S_CHAR_SEQUENCE )? '\\'' ) )
             int alt9=2;
             switch ( input.LA(1) ) {
             case 'L':
@@ -1748,12 +1942,12 @@ public class CTalkLexer extends Lexer {
 
             switch (alt9) {
                 case 1 :
-                    // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:523:11: ( ( 'L' )? '\\\"' ( S_CHAR_SEQUENCE )? '\\\"' )
+                    // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:580:11: ( ( 'L' )? '\\\"' ( S_CHAR_SEQUENCE )? '\\\"' )
                     {
-                    // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:523:11: ( ( 'L' )? '\\\"' ( S_CHAR_SEQUENCE )? '\\\"' )
-                    // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:523:13: ( 'L' )? '\\\"' ( S_CHAR_SEQUENCE )? '\\\"'
+                    // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:580:11: ( ( 'L' )? '\\\"' ( S_CHAR_SEQUENCE )? '\\\"' )
+                    // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:580:13: ( 'L' )? '\\\"' ( S_CHAR_SEQUENCE )? '\\\"'
                     {
-                    // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:523:13: ( 'L' )?
+                    // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:580:13: ( 'L' )?
                     int alt5=2;
                     int LA5_0 = input.LA(1);
 
@@ -1762,7 +1956,7 @@ public class CTalkLexer extends Lexer {
                     }
                     switch (alt5) {
                         case 1 :
-                            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:523:15: 'L'
+                            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:580:15: 'L'
                             {
                             match('L'); 
 
@@ -1774,7 +1968,7 @@ public class CTalkLexer extends Lexer {
 
                     match('\"'); 
 
-                    // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:523:27: ( S_CHAR_SEQUENCE )?
+                    // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:580:27: ( S_CHAR_SEQUENCE )?
                     int alt6=2;
                     int LA6_0 = input.LA(1);
 
@@ -1783,7 +1977,7 @@ public class CTalkLexer extends Lexer {
                     }
                     switch (alt6) {
                         case 1 :
-                            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:523:29: S_CHAR_SEQUENCE
+                            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:580:29: S_CHAR_SEQUENCE
                             {
                             mS_CHAR_SEQUENCE(); 
 
@@ -1802,12 +1996,12 @@ public class CTalkLexer extends Lexer {
                     }
                     break;
                 case 2 :
-                    // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:523:57: ( ( 'L' )? '\\'' ( S_CHAR_SEQUENCE )? '\\'' )
+                    // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:580:57: ( ( 'L' )? '\\'' ( S_CHAR_SEQUENCE )? '\\'' )
                     {
-                    // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:523:57: ( ( 'L' )? '\\'' ( S_CHAR_SEQUENCE )? '\\'' )
-                    // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:523:59: ( 'L' )? '\\'' ( S_CHAR_SEQUENCE )? '\\''
+                    // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:580:57: ( ( 'L' )? '\\'' ( S_CHAR_SEQUENCE )? '\\'' )
+                    // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:580:59: ( 'L' )? '\\'' ( S_CHAR_SEQUENCE )? '\\''
                     {
-                    // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:523:59: ( 'L' )?
+                    // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:580:59: ( 'L' )?
                     int alt7=2;
                     int LA7_0 = input.LA(1);
 
@@ -1816,7 +2010,7 @@ public class CTalkLexer extends Lexer {
                     }
                     switch (alt7) {
                         case 1 :
-                            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:523:61: 'L'
+                            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:580:61: 'L'
                             {
                             match('L'); 
 
@@ -1828,7 +2022,7 @@ public class CTalkLexer extends Lexer {
 
                     match('\''); 
 
-                    // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:523:73: ( S_CHAR_SEQUENCE )?
+                    // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:580:73: ( S_CHAR_SEQUENCE )?
                     int alt8=2;
                     int LA8_0 = input.LA(1);
 
@@ -1837,7 +2031,7 @@ public class CTalkLexer extends Lexer {
                     }
                     switch (alt8) {
                         case 1 :
-                            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:523:75: S_CHAR_SEQUENCE
+                            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:580:75: S_CHAR_SEQUENCE
                             {
                             mS_CHAR_SEQUENCE(); 
 
@@ -1873,10 +2067,10 @@ public class CTalkLexer extends Lexer {
     // $ANTLR start "SIMPLE_ESCAPE_SEQUENCE"
     public final void mSIMPLE_ESCAPE_SEQUENCE() throws RecognitionException {
         try {
-            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:524:32: ( ( '\\\\\\'' | '\\\\\\\"' | '\\\\\\?' | '\\\\\\\\' | '\\\\a' | '\\\\b' | '\\\\f' | '\\\\n' | '\\\\r' | '\\\\t' | '\\\\v' ) )
-            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:524:34: ( '\\\\\\'' | '\\\\\\\"' | '\\\\\\?' | '\\\\\\\\' | '\\\\a' | '\\\\b' | '\\\\f' | '\\\\n' | '\\\\r' | '\\\\t' | '\\\\v' )
+            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:581:32: ( ( '\\\\\\'' | '\\\\\\\"' | '\\\\\\?' | '\\\\\\\\' | '\\\\a' | '\\\\b' | '\\\\f' | '\\\\n' | '\\\\r' | '\\\\t' | '\\\\v' ) )
+            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:581:34: ( '\\\\\\'' | '\\\\\\\"' | '\\\\\\?' | '\\\\\\\\' | '\\\\a' | '\\\\b' | '\\\\f' | '\\\\n' | '\\\\r' | '\\\\t' | '\\\\v' )
             {
-            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:524:34: ( '\\\\\\'' | '\\\\\\\"' | '\\\\\\?' | '\\\\\\\\' | '\\\\a' | '\\\\b' | '\\\\f' | '\\\\n' | '\\\\r' | '\\\\t' | '\\\\v' )
+            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:581:34: ( '\\\\\\'' | '\\\\\\\"' | '\\\\\\?' | '\\\\\\\\' | '\\\\a' | '\\\\b' | '\\\\f' | '\\\\n' | '\\\\r' | '\\\\t' | '\\\\v' )
             int alt10=11;
             int LA10_0 = input.LA(1);
 
@@ -1955,7 +2149,7 @@ public class CTalkLexer extends Lexer {
             }
             switch (alt10) {
                 case 1 :
-                    // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:524:36: '\\\\\\''
+                    // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:581:36: '\\\\\\''
                     {
                     match("\\'"); 
 
@@ -1964,7 +2158,7 @@ public class CTalkLexer extends Lexer {
                     }
                     break;
                 case 2 :
-                    // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:524:45: '\\\\\\\"'
+                    // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:581:45: '\\\\\\\"'
                     {
                     match("\\\""); 
 
@@ -1973,7 +2167,7 @@ public class CTalkLexer extends Lexer {
                     }
                     break;
                 case 3 :
-                    // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:524:54: '\\\\\\?'
+                    // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:581:54: '\\\\\\?'
                     {
                     match("\\?"); 
 
@@ -1982,7 +2176,7 @@ public class CTalkLexer extends Lexer {
                     }
                     break;
                 case 4 :
-                    // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:524:63: '\\\\\\\\'
+                    // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:581:63: '\\\\\\\\'
                     {
                     match("\\\\"); 
 
@@ -1991,7 +2185,7 @@ public class CTalkLexer extends Lexer {
                     }
                     break;
                 case 5 :
-                    // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:524:72: '\\\\a'
+                    // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:581:72: '\\\\a'
                     {
                     match("\\a"); 
 
@@ -2000,7 +2194,7 @@ public class CTalkLexer extends Lexer {
                     }
                     break;
                 case 6 :
-                    // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:524:80: '\\\\b'
+                    // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:581:80: '\\\\b'
                     {
                     match("\\b"); 
 
@@ -2009,7 +2203,7 @@ public class CTalkLexer extends Lexer {
                     }
                     break;
                 case 7 :
-                    // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:524:88: '\\\\f'
+                    // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:581:88: '\\\\f'
                     {
                     match("\\f"); 
 
@@ -2018,7 +2212,7 @@ public class CTalkLexer extends Lexer {
                     }
                     break;
                 case 8 :
-                    // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:524:96: '\\\\n'
+                    // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:581:96: '\\\\n'
                     {
                     match("\\n"); 
 
@@ -2027,7 +2221,7 @@ public class CTalkLexer extends Lexer {
                     }
                     break;
                 case 9 :
-                    // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:524:104: '\\\\r'
+                    // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:581:104: '\\\\r'
                     {
                     match("\\r"); 
 
@@ -2036,7 +2230,7 @@ public class CTalkLexer extends Lexer {
                     }
                     break;
                 case 10 :
-                    // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:524:112: '\\\\t'
+                    // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:581:112: '\\\\t'
                     {
                     match("\\t"); 
 
@@ -2045,7 +2239,7 @@ public class CTalkLexer extends Lexer {
                     }
                     break;
                 case 11 :
-                    // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:524:120: '\\\\v'
+                    // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:581:120: '\\\\v'
                     {
                     match("\\v"); 
 
@@ -2070,15 +2264,15 @@ public class CTalkLexer extends Lexer {
     // $ANTLR start "OCTAL_ESCAPE_SEQUENCE"
     public final void mOCTAL_ESCAPE_SEQUENCE() throws RecognitionException {
         try {
-            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:525:31: ( '\\\\' OCTAL_DIGIT ( OCTAL_DIGIT ( OCTAL_DIGIT )? )? )
-            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:525:33: '\\\\' OCTAL_DIGIT ( OCTAL_DIGIT ( OCTAL_DIGIT )? )?
+            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:582:31: ( '\\\\' OCTAL_DIGIT ( OCTAL_DIGIT ( OCTAL_DIGIT )? )? )
+            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:582:33: '\\\\' OCTAL_DIGIT ( OCTAL_DIGIT ( OCTAL_DIGIT )? )?
             {
             match('\\'); 
 
             mOCTAL_DIGIT(); 
 
 
-            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:525:50: ( OCTAL_DIGIT ( OCTAL_DIGIT )? )?
+            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:582:50: ( OCTAL_DIGIT ( OCTAL_DIGIT )? )?
             int alt12=2;
             int LA12_0 = input.LA(1);
 
@@ -2087,12 +2281,12 @@ public class CTalkLexer extends Lexer {
             }
             switch (alt12) {
                 case 1 :
-                    // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:525:52: OCTAL_DIGIT ( OCTAL_DIGIT )?
+                    // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:582:52: OCTAL_DIGIT ( OCTAL_DIGIT )?
                     {
                     mOCTAL_DIGIT(); 
 
 
-                    // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:525:64: ( OCTAL_DIGIT )?
+                    // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:582:64: ( OCTAL_DIGIT )?
                     int alt11=2;
                     int LA11_0 = input.LA(1);
 
@@ -2101,7 +2295,7 @@ public class CTalkLexer extends Lexer {
                     }
                     switch (alt11) {
                         case 1 :
-                            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:
+                            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:
                             {
                             if ( (input.LA(1) >= '0' && input.LA(1) <= '7') ) {
                                 input.consume();
@@ -2138,14 +2332,14 @@ public class CTalkLexer extends Lexer {
     // $ANTLR start "HEXADECIMAL_ESCAPE_SEQUENCE"
     public final void mHEXADECIMAL_ESCAPE_SEQUENCE() throws RecognitionException {
         try {
-            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:526:37: ( '\\\\x' ( HEX_DIGIT )+ )
-            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:526:39: '\\\\x' ( HEX_DIGIT )+
+            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:583:37: ( '\\\\x' ( HEX_DIGIT )+ )
+            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:583:39: '\\\\x' ( HEX_DIGIT )+
             {
             match("\\x"); 
 
 
 
-            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:526:45: ( HEX_DIGIT )+
+            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:583:45: ( HEX_DIGIT )+
             int cnt13=0;
             loop13:
             do {
@@ -2159,7 +2353,7 @@ public class CTalkLexer extends Lexer {
 
                 switch (alt13) {
             	case 1 :
-            	    // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:
+            	    // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:
             	    {
             	    if ( (input.LA(1) >= '0' && input.LA(1) <= '9')||(input.LA(1) >= 'A' && input.LA(1) <= 'F')||(input.LA(1) >= 'a' && input.LA(1) <= 'f') ) {
             	        input.consume();
@@ -2197,10 +2391,10 @@ public class CTalkLexer extends Lexer {
     // $ANTLR start "ESCAPE_SEQUENCE"
     public final void mESCAPE_SEQUENCE() throws RecognitionException {
         try {
-            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:527:25: ( ( SIMPLE_ESCAPE_SEQUENCE | OCTAL_ESCAPE_SEQUENCE | HEXADECIMAL_ESCAPE_SEQUENCE ) )
-            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:527:27: ( SIMPLE_ESCAPE_SEQUENCE | OCTAL_ESCAPE_SEQUENCE | HEXADECIMAL_ESCAPE_SEQUENCE )
+            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:584:25: ( ( SIMPLE_ESCAPE_SEQUENCE | OCTAL_ESCAPE_SEQUENCE | HEXADECIMAL_ESCAPE_SEQUENCE ) )
+            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:584:27: ( SIMPLE_ESCAPE_SEQUENCE | OCTAL_ESCAPE_SEQUENCE | HEXADECIMAL_ESCAPE_SEQUENCE )
             {
-            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:527:27: ( SIMPLE_ESCAPE_SEQUENCE | OCTAL_ESCAPE_SEQUENCE | HEXADECIMAL_ESCAPE_SEQUENCE )
+            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:584:27: ( SIMPLE_ESCAPE_SEQUENCE | OCTAL_ESCAPE_SEQUENCE | HEXADECIMAL_ESCAPE_SEQUENCE )
             int alt14=3;
             int LA14_0 = input.LA(1);
 
@@ -2256,7 +2450,7 @@ public class CTalkLexer extends Lexer {
             }
             switch (alt14) {
                 case 1 :
-                    // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:527:29: SIMPLE_ESCAPE_SEQUENCE
+                    // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:584:29: SIMPLE_ESCAPE_SEQUENCE
                     {
                     mSIMPLE_ESCAPE_SEQUENCE(); 
 
@@ -2264,7 +2458,7 @@ public class CTalkLexer extends Lexer {
                     }
                     break;
                 case 2 :
-                    // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:527:54: OCTAL_ESCAPE_SEQUENCE
+                    // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:584:54: OCTAL_ESCAPE_SEQUENCE
                     {
                     mOCTAL_ESCAPE_SEQUENCE(); 
 
@@ -2272,7 +2466,7 @@ public class CTalkLexer extends Lexer {
                     }
                     break;
                 case 3 :
-                    // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:527:78: HEXADECIMAL_ESCAPE_SEQUENCE
+                    // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:584:78: HEXADECIMAL_ESCAPE_SEQUENCE
                     {
                     mHEXADECIMAL_ESCAPE_SEQUENCE(); 
 
@@ -2296,10 +2490,10 @@ public class CTalkLexer extends Lexer {
     // $ANTLR start "S_CHAR"
     public final void mS_CHAR() throws RecognitionException {
         try {
-            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:528:16: ( ( ( NOT_STR_CHAR )+ | ESCAPE_SEQUENCE | UNIVERSAL_CHARACTER_NAME ) )
-            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:528:18: ( ( NOT_STR_CHAR )+ | ESCAPE_SEQUENCE | UNIVERSAL_CHARACTER_NAME )
+            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:585:16: ( ( ( NOT_STR_CHAR )+ | ESCAPE_SEQUENCE | UNIVERSAL_CHARACTER_NAME ) )
+            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:585:18: ( ( NOT_STR_CHAR )+ | ESCAPE_SEQUENCE | UNIVERSAL_CHARACTER_NAME )
             {
-            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:528:18: ( ( NOT_STR_CHAR )+ | ESCAPE_SEQUENCE | UNIVERSAL_CHARACTER_NAME )
+            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:585:18: ( ( NOT_STR_CHAR )+ | ESCAPE_SEQUENCE | UNIVERSAL_CHARACTER_NAME )
             int alt16=3;
             int LA16_0 = input.LA(1);
 
@@ -2332,9 +2526,9 @@ public class CTalkLexer extends Lexer {
             }
             switch (alt16) {
                 case 1 :
-                    // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:528:20: ( NOT_STR_CHAR )+
+                    // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:585:20: ( NOT_STR_CHAR )+
                     {
-                    // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:528:20: ( NOT_STR_CHAR )+
+                    // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:585:20: ( NOT_STR_CHAR )+
                     int cnt15=0;
                     loop15:
                     do {
@@ -2348,7 +2542,7 @@ public class CTalkLexer extends Lexer {
 
                         switch (alt15) {
                     	case 1 :
-                    	    // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:
+                    	    // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:
                     	    {
                     	    if ( (input.LA(1) >= '\u0000' && input.LA(1) <= '\t')||(input.LA(1) >= '\u000B' && input.LA(1) <= '\f')||(input.LA(1) >= '\u000E' && input.LA(1) <= '!')||(input.LA(1) >= '#' && input.LA(1) <= '&')||(input.LA(1) >= '(' && input.LA(1) <= '[')||(input.LA(1) >= ']' && input.LA(1) <= '\uFFFF') ) {
                     	        input.consume();
@@ -2376,7 +2570,7 @@ public class CTalkLexer extends Lexer {
                     }
                     break;
                 case 2 :
-                    // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:528:40: ESCAPE_SEQUENCE
+                    // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:585:40: ESCAPE_SEQUENCE
                     {
                     mESCAPE_SEQUENCE(); 
 
@@ -2384,7 +2578,7 @@ public class CTalkLexer extends Lexer {
                     }
                     break;
                 case 3 :
-                    // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:528:58: UNIVERSAL_CHARACTER_NAME
+                    // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:585:58: UNIVERSAL_CHARACTER_NAME
                     {
                     mUNIVERSAL_CHARACTER_NAME(); 
 
@@ -2408,10 +2602,10 @@ public class CTalkLexer extends Lexer {
     // $ANTLR start "S_CHAR_SEQUENCE"
     public final void mS_CHAR_SEQUENCE() throws RecognitionException {
         try {
-            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:529:25: ( ( S_CHAR )+ )
-            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:529:27: ( S_CHAR )+
+            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:586:25: ( ( S_CHAR )+ )
+            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:586:27: ( S_CHAR )+
             {
-            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:529:27: ( S_CHAR )+
+            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:586:27: ( S_CHAR )+
             int cnt17=0;
             loop17:
             do {
@@ -2425,7 +2619,7 @@ public class CTalkLexer extends Lexer {
 
                 switch (alt17) {
             	case 1 :
-            	    // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:529:29: S_CHAR
+            	    // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:586:29: S_CHAR
             	    {
             	    mS_CHAR(); 
 
@@ -2456,8 +2650,8 @@ public class CTalkLexer extends Lexer {
     // $ANTLR start "NOT_STR_CHAR"
     public final void mNOT_STR_CHAR() throws RecognitionException {
         try {
-            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:530:22: (~ ( '\\\"' | '\\'' | '\\\\' | '\\n' | '\\r' ) )
-            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:
+            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:587:22: (~ ( '\\\"' | '\\'' | '\\\\' | '\\n' | '\\r' ) )
+            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:
             {
             if ( (input.LA(1) >= '\u0000' && input.LA(1) <= '\t')||(input.LA(1) >= '\u000B' && input.LA(1) <= '\f')||(input.LA(1) >= '\u000E' && input.LA(1) <= '!')||(input.LA(1) >= '#' && input.LA(1) <= '&')||(input.LA(1) >= '(' && input.LA(1) <= '[')||(input.LA(1) >= ']' && input.LA(1) <= '\uFFFF') ) {
                 input.consume();
@@ -2484,23 +2678,23 @@ public class CTalkLexer extends Lexer {
         try {
             int _type = REAL;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:533:5: ( ( ( FRACTIONAL_CONSTANT ( EXPONENT_PART )? ( FLOATING_SUFFIX )? ) | ( DIGIT_SEQUENCE EXPONENT_PART ( FLOATING_SUFFIX )? ) ) )
-            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:533:7: ( ( FRACTIONAL_CONSTANT ( EXPONENT_PART )? ( FLOATING_SUFFIX )? ) | ( DIGIT_SEQUENCE EXPONENT_PART ( FLOATING_SUFFIX )? ) )
+            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:590:5: ( ( ( FRACTIONAL_CONSTANT ( EXPONENT_PART )? ( FLOATING_SUFFIX )? ) | ( DIGIT_SEQUENCE EXPONENT_PART ( FLOATING_SUFFIX )? ) ) )
+            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:590:7: ( ( FRACTIONAL_CONSTANT ( EXPONENT_PART )? ( FLOATING_SUFFIX )? ) | ( DIGIT_SEQUENCE EXPONENT_PART ( FLOATING_SUFFIX )? ) )
             {
-            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:533:7: ( ( FRACTIONAL_CONSTANT ( EXPONENT_PART )? ( FLOATING_SUFFIX )? ) | ( DIGIT_SEQUENCE EXPONENT_PART ( FLOATING_SUFFIX )? ) )
+            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:590:7: ( ( FRACTIONAL_CONSTANT ( EXPONENT_PART )? ( FLOATING_SUFFIX )? ) | ( DIGIT_SEQUENCE EXPONENT_PART ( FLOATING_SUFFIX )? ) )
             int alt21=2;
             alt21 = dfa21.predict(input);
             switch (alt21) {
                 case 1 :
-                    // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:533:9: ( FRACTIONAL_CONSTANT ( EXPONENT_PART )? ( FLOATING_SUFFIX )? )
+                    // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:590:9: ( FRACTIONAL_CONSTANT ( EXPONENT_PART )? ( FLOATING_SUFFIX )? )
                     {
-                    // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:533:9: ( FRACTIONAL_CONSTANT ( EXPONENT_PART )? ( FLOATING_SUFFIX )? )
-                    // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:533:11: FRACTIONAL_CONSTANT ( EXPONENT_PART )? ( FLOATING_SUFFIX )?
+                    // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:590:9: ( FRACTIONAL_CONSTANT ( EXPONENT_PART )? ( FLOATING_SUFFIX )? )
+                    // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:590:11: FRACTIONAL_CONSTANT ( EXPONENT_PART )? ( FLOATING_SUFFIX )?
                     {
                     mFRACTIONAL_CONSTANT(); 
 
 
-                    // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:533:31: ( EXPONENT_PART )?
+                    // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:590:31: ( EXPONENT_PART )?
                     int alt18=2;
                     int LA18_0 = input.LA(1);
 
@@ -2509,7 +2703,7 @@ public class CTalkLexer extends Lexer {
                     }
                     switch (alt18) {
                         case 1 :
-                            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:533:33: EXPONENT_PART
+                            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:590:33: EXPONENT_PART
                             {
                             mEXPONENT_PART(); 
 
@@ -2520,7 +2714,7 @@ public class CTalkLexer extends Lexer {
                     }
 
 
-                    // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:533:50: ( FLOATING_SUFFIX )?
+                    // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:590:50: ( FLOATING_SUFFIX )?
                     int alt19=2;
                     int LA19_0 = input.LA(1);
 
@@ -2529,7 +2723,7 @@ public class CTalkLexer extends Lexer {
                     }
                     switch (alt19) {
                         case 1 :
-                            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:
+                            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:
                             {
                             if ( input.LA(1)=='F'||input.LA(1)=='L'||input.LA(1)=='f'||input.LA(1)=='l' ) {
                                 input.consume();
@@ -2553,10 +2747,10 @@ public class CTalkLexer extends Lexer {
                     }
                     break;
                 case 2 :
-                    // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:533:75: ( DIGIT_SEQUENCE EXPONENT_PART ( FLOATING_SUFFIX )? )
+                    // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:590:75: ( DIGIT_SEQUENCE EXPONENT_PART ( FLOATING_SUFFIX )? )
                     {
-                    // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:533:75: ( DIGIT_SEQUENCE EXPONENT_PART ( FLOATING_SUFFIX )? )
-                    // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:533:77: DIGIT_SEQUENCE EXPONENT_PART ( FLOATING_SUFFIX )?
+                    // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:590:75: ( DIGIT_SEQUENCE EXPONENT_PART ( FLOATING_SUFFIX )? )
+                    // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:590:77: DIGIT_SEQUENCE EXPONENT_PART ( FLOATING_SUFFIX )?
                     {
                     mDIGIT_SEQUENCE(); 
 
@@ -2564,7 +2758,7 @@ public class CTalkLexer extends Lexer {
                     mEXPONENT_PART(); 
 
 
-                    // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:533:106: ( FLOATING_SUFFIX )?
+                    // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:590:106: ( FLOATING_SUFFIX )?
                     int alt20=2;
                     int LA20_0 = input.LA(1);
 
@@ -2573,7 +2767,7 @@ public class CTalkLexer extends Lexer {
                     }
                     switch (alt20) {
                         case 1 :
-                            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:
+                            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:
                             {
                             if ( input.LA(1)=='F'||input.LA(1)=='L'||input.LA(1)=='f'||input.LA(1)=='l' ) {
                                 input.consume();
@@ -2614,8 +2808,8 @@ public class CTalkLexer extends Lexer {
     // $ANTLR start "EXPONENT_PART"
     public final void mEXPONENT_PART() throws RecognitionException {
         try {
-            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:534:23: ( ( 'e' | 'E' ) ( SIGN )? DIGIT_SEQUENCE )
-            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:534:25: ( 'e' | 'E' ) ( SIGN )? DIGIT_SEQUENCE
+            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:591:23: ( ( 'e' | 'E' ) ( SIGN )? DIGIT_SEQUENCE )
+            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:591:25: ( 'e' | 'E' ) ( SIGN )? DIGIT_SEQUENCE
             {
             if ( input.LA(1)=='E'||input.LA(1)=='e' ) {
                 input.consume();
@@ -2627,7 +2821,7 @@ public class CTalkLexer extends Lexer {
             }
 
 
-            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:534:39: ( SIGN )?
+            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:591:39: ( SIGN )?
             int alt22=2;
             int LA22_0 = input.LA(1);
 
@@ -2636,7 +2830,7 @@ public class CTalkLexer extends Lexer {
             }
             switch (alt22) {
                 case 1 :
-                    // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:
+                    // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:
                     {
                     if ( input.LA(1)=='+'||input.LA(1)=='-' ) {
                         input.consume();
@@ -2670,20 +2864,20 @@ public class CTalkLexer extends Lexer {
     // $ANTLR start "FRACTIONAL_CONSTANT"
     public final void mFRACTIONAL_CONSTANT() throws RecognitionException {
         try {
-            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:535:29: ( ( ( ( DIGIT_SEQUENCE )? '.' DIGIT_SEQUENCE ) | ( DIGIT_SEQUENCE '.' ) ) )
-            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:535:31: ( ( ( DIGIT_SEQUENCE )? '.' DIGIT_SEQUENCE ) | ( DIGIT_SEQUENCE '.' ) )
+            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:592:29: ( ( ( ( DIGIT_SEQUENCE )? '.' DIGIT_SEQUENCE ) | ( DIGIT_SEQUENCE '.' ) ) )
+            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:592:31: ( ( ( DIGIT_SEQUENCE )? '.' DIGIT_SEQUENCE ) | ( DIGIT_SEQUENCE '.' ) )
             {
-            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:535:31: ( ( ( DIGIT_SEQUENCE )? '.' DIGIT_SEQUENCE ) | ( DIGIT_SEQUENCE '.' ) )
+            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:592:31: ( ( ( DIGIT_SEQUENCE )? '.' DIGIT_SEQUENCE ) | ( DIGIT_SEQUENCE '.' ) )
             int alt24=2;
             alt24 = dfa24.predict(input);
             switch (alt24) {
                 case 1 :
-                    // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:535:33: ( ( DIGIT_SEQUENCE )? '.' DIGIT_SEQUENCE )
+                    // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:592:33: ( ( DIGIT_SEQUENCE )? '.' DIGIT_SEQUENCE )
                     {
-                    // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:535:33: ( ( DIGIT_SEQUENCE )? '.' DIGIT_SEQUENCE )
-                    // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:535:35: ( DIGIT_SEQUENCE )? '.' DIGIT_SEQUENCE
+                    // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:592:33: ( ( DIGIT_SEQUENCE )? '.' DIGIT_SEQUENCE )
+                    // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:592:35: ( DIGIT_SEQUENCE )? '.' DIGIT_SEQUENCE
                     {
-                    // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:535:35: ( DIGIT_SEQUENCE )?
+                    // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:592:35: ( DIGIT_SEQUENCE )?
                     int alt23=2;
                     int LA23_0 = input.LA(1);
 
@@ -2692,7 +2886,7 @@ public class CTalkLexer extends Lexer {
                     }
                     switch (alt23) {
                         case 1 :
-                            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:535:37: DIGIT_SEQUENCE
+                            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:592:37: DIGIT_SEQUENCE
                             {
                             mDIGIT_SEQUENCE(); 
 
@@ -2714,10 +2908,10 @@ public class CTalkLexer extends Lexer {
                     }
                     break;
                 case 2 :
-                    // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:535:78: ( DIGIT_SEQUENCE '.' )
+                    // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:592:78: ( DIGIT_SEQUENCE '.' )
                     {
-                    // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:535:78: ( DIGIT_SEQUENCE '.' )
-                    // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:535:80: DIGIT_SEQUENCE '.'
+                    // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:592:78: ( DIGIT_SEQUENCE '.' )
+                    // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:592:80: DIGIT_SEQUENCE '.'
                     {
                     mDIGIT_SEQUENCE(); 
 
@@ -2746,10 +2940,10 @@ public class CTalkLexer extends Lexer {
     // $ANTLR start "DIGIT_SEQUENCE"
     public final void mDIGIT_SEQUENCE() throws RecognitionException {
         try {
-            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:536:24: ( ( DIGIT )+ )
-            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:536:26: ( DIGIT )+
+            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:593:24: ( ( DIGIT )+ )
+            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:593:26: ( DIGIT )+
             {
-            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:536:26: ( DIGIT )+
+            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:593:26: ( DIGIT )+
             int cnt25=0;
             loop25:
             do {
@@ -2763,7 +2957,7 @@ public class CTalkLexer extends Lexer {
 
                 switch (alt25) {
             	case 1 :
-            	    // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:
+            	    // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:
             	    {
             	    if ( (input.LA(1) >= '0' && input.LA(1) <= '9') ) {
             	        input.consume();
@@ -2801,8 +2995,8 @@ public class CTalkLexer extends Lexer {
     // $ANTLR start "SIGN"
     public final void mSIGN() throws RecognitionException {
         try {
-            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:537:14: ( ( '+' | '-' ) )
-            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:
+            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:594:14: ( ( '+' | '-' ) )
+            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:
             {
             if ( input.LA(1)=='+'||input.LA(1)=='-' ) {
                 input.consume();
@@ -2827,8 +3021,8 @@ public class CTalkLexer extends Lexer {
     // $ANTLR start "FLOATING_SUFFIX"
     public final void mFLOATING_SUFFIX() throws RecognitionException {
         try {
-            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:538:25: ( ( 'f' | 'l' | 'F' | 'L' ) )
-            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:
+            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:595:25: ( ( 'f' | 'l' | 'F' | 'L' ) )
+            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:
             {
             if ( input.LA(1)=='F'||input.LA(1)=='L'||input.LA(1)=='f'||input.LA(1)=='l' ) {
                 input.consume();
@@ -2855,10 +3049,10 @@ public class CTalkLexer extends Lexer {
         try {
             int _type = INTEGER;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:540:8: ( ( DECIMAL_LITERAL | OCTAL_LITERAL | HEXADECIMAL_LITERAL ) ( INTEGER_SUFFIX )? )
-            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:540:10: ( DECIMAL_LITERAL | OCTAL_LITERAL | HEXADECIMAL_LITERAL ) ( INTEGER_SUFFIX )?
+            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:597:8: ( ( DECIMAL_LITERAL | OCTAL_LITERAL | HEXADECIMAL_LITERAL ) ( INTEGER_SUFFIX )? )
+            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:597:10: ( DECIMAL_LITERAL | OCTAL_LITERAL | HEXADECIMAL_LITERAL ) ( INTEGER_SUFFIX )?
             {
-            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:540:10: ( DECIMAL_LITERAL | OCTAL_LITERAL | HEXADECIMAL_LITERAL )
+            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:597:10: ( DECIMAL_LITERAL | OCTAL_LITERAL | HEXADECIMAL_LITERAL )
             int alt26=3;
             int LA26_0 = input.LA(1);
 
@@ -2884,7 +3078,7 @@ public class CTalkLexer extends Lexer {
             }
             switch (alt26) {
                 case 1 :
-                    // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:540:12: DECIMAL_LITERAL
+                    // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:597:12: DECIMAL_LITERAL
                     {
                     mDECIMAL_LITERAL(); 
 
@@ -2892,7 +3086,7 @@ public class CTalkLexer extends Lexer {
                     }
                     break;
                 case 2 :
-                    // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:540:30: OCTAL_LITERAL
+                    // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:597:30: OCTAL_LITERAL
                     {
                     mOCTAL_LITERAL(); 
 
@@ -2900,7 +3094,7 @@ public class CTalkLexer extends Lexer {
                     }
                     break;
                 case 3 :
-                    // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:540:46: HEXADECIMAL_LITERAL
+                    // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:597:46: HEXADECIMAL_LITERAL
                     {
                     mHEXADECIMAL_LITERAL(); 
 
@@ -2911,7 +3105,7 @@ public class CTalkLexer extends Lexer {
             }
 
 
-            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:540:68: ( INTEGER_SUFFIX )?
+            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:597:68: ( INTEGER_SUFFIX )?
             int alt27=2;
             int LA27_0 = input.LA(1);
 
@@ -2920,7 +3114,7 @@ public class CTalkLexer extends Lexer {
             }
             switch (alt27) {
                 case 1 :
-                    // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:540:70: INTEGER_SUFFIX
+                    // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:597:70: INTEGER_SUFFIX
                     {
                     mINTEGER_SUFFIX(); 
 
@@ -2945,10 +3139,10 @@ public class CTalkLexer extends Lexer {
     // $ANTLR start "INTEGER_SUFFIX"
     public final void mINTEGER_SUFFIX() throws RecognitionException {
         try {
-            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:541:24: ( ( UNSIGNED_SUFFIX ( LONG_SUFFIX )? | LONG_SUFFIX ( UNSIGNED_SUFFIX )? ) )
-            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:541:26: ( UNSIGNED_SUFFIX ( LONG_SUFFIX )? | LONG_SUFFIX ( UNSIGNED_SUFFIX )? )
+            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:598:24: ( ( UNSIGNED_SUFFIX ( LONG_SUFFIX )? | LONG_SUFFIX ( UNSIGNED_SUFFIX )? ) )
+            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:598:26: ( UNSIGNED_SUFFIX ( LONG_SUFFIX )? | LONG_SUFFIX ( UNSIGNED_SUFFIX )? )
             {
-            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:541:26: ( UNSIGNED_SUFFIX ( LONG_SUFFIX )? | LONG_SUFFIX ( UNSIGNED_SUFFIX )? )
+            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:598:26: ( UNSIGNED_SUFFIX ( LONG_SUFFIX )? | LONG_SUFFIX ( UNSIGNED_SUFFIX )? )
             int alt30=2;
             int LA30_0 = input.LA(1);
 
@@ -2967,12 +3161,12 @@ public class CTalkLexer extends Lexer {
             }
             switch (alt30) {
                 case 1 :
-                    // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:541:28: UNSIGNED_SUFFIX ( LONG_SUFFIX )?
+                    // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:598:28: UNSIGNED_SUFFIX ( LONG_SUFFIX )?
                     {
                     mUNSIGNED_SUFFIX(); 
 
 
-                    // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:541:44: ( LONG_SUFFIX )?
+                    // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:598:44: ( LONG_SUFFIX )?
                     int alt28=2;
                     int LA28_0 = input.LA(1);
 
@@ -2981,7 +3175,7 @@ public class CTalkLexer extends Lexer {
                     }
                     switch (alt28) {
                         case 1 :
-                            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:
+                            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:
                             {
                             if ( input.LA(1)=='L'||input.LA(1)=='l' ) {
                                 input.consume();
@@ -3002,12 +3196,12 @@ public class CTalkLexer extends Lexer {
                     }
                     break;
                 case 2 :
-                    // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:541:63: LONG_SUFFIX ( UNSIGNED_SUFFIX )?
+                    // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:598:63: LONG_SUFFIX ( UNSIGNED_SUFFIX )?
                     {
                     mLONG_SUFFIX(); 
 
 
-                    // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:541:75: ( UNSIGNED_SUFFIX )?
+                    // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:598:75: ( UNSIGNED_SUFFIX )?
                     int alt29=2;
                     int LA29_0 = input.LA(1);
 
@@ -3016,7 +3210,7 @@ public class CTalkLexer extends Lexer {
                     }
                     switch (alt29) {
                         case 1 :
-                            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:
+                            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:
                             {
                             if ( input.LA(1)=='U'||input.LA(1)=='u' ) {
                                 input.consume();
@@ -3053,13 +3247,13 @@ public class CTalkLexer extends Lexer {
     // $ANTLR start "DECIMAL_LITERAL"
     public final void mDECIMAL_LITERAL() throws RecognitionException {
         try {
-            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:542:25: ( NONZERO_DIGIT ( DIGIT )* )
-            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:542:27: NONZERO_DIGIT ( DIGIT )*
+            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:599:25: ( NONZERO_DIGIT ( DIGIT )* )
+            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:599:27: NONZERO_DIGIT ( DIGIT )*
             {
             mNONZERO_DIGIT(); 
 
 
-            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:542:41: ( DIGIT )*
+            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:599:41: ( DIGIT )*
             loop31:
             do {
                 int alt31=2;
@@ -3072,7 +3266,7 @@ public class CTalkLexer extends Lexer {
 
                 switch (alt31) {
             	case 1 :
-            	    // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:
+            	    // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:
             	    {
             	    if ( (input.LA(1) >= '0' && input.LA(1) <= '9') ) {
             	        input.consume();
@@ -3106,12 +3300,12 @@ public class CTalkLexer extends Lexer {
     // $ANTLR start "OCTAL_LITERAL"
     public final void mOCTAL_LITERAL() throws RecognitionException {
         try {
-            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:543:23: ( '0' ( OCTAL_DIGIT )* )
-            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:543:25: '0' ( OCTAL_DIGIT )*
+            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:600:23: ( '0' ( OCTAL_DIGIT )* )
+            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:600:25: '0' ( OCTAL_DIGIT )*
             {
             match('0'); 
 
-            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:543:29: ( OCTAL_DIGIT )*
+            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:600:29: ( OCTAL_DIGIT )*
             loop32:
             do {
                 int alt32=2;
@@ -3124,7 +3318,7 @@ public class CTalkLexer extends Lexer {
 
                 switch (alt32) {
             	case 1 :
-            	    // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:
+            	    // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:
             	    {
             	    if ( (input.LA(1) >= '0' && input.LA(1) <= '7') ) {
             	        input.consume();
@@ -3158,10 +3352,10 @@ public class CTalkLexer extends Lexer {
     // $ANTLR start "HEXADECIMAL_LITERAL"
     public final void mHEXADECIMAL_LITERAL() throws RecognitionException {
         try {
-            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:544:29: ( ( '0x' | '0X' ) ( HEX_DIGIT )+ )
-            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:544:31: ( '0x' | '0X' ) ( HEX_DIGIT )+
+            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:601:29: ( ( '0x' | '0X' ) ( HEX_DIGIT )+ )
+            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:601:31: ( '0x' | '0X' ) ( HEX_DIGIT )+
             {
-            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:544:31: ( '0x' | '0X' )
+            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:601:31: ( '0x' | '0X' )
             int alt33=2;
             int LA33_0 = input.LA(1);
 
@@ -3191,7 +3385,7 @@ public class CTalkLexer extends Lexer {
             }
             switch (alt33) {
                 case 1 :
-                    // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:544:33: '0x'
+                    // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:601:33: '0x'
                     {
                     match("0x"); 
 
@@ -3200,7 +3394,7 @@ public class CTalkLexer extends Lexer {
                     }
                     break;
                 case 2 :
-                    // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:544:40: '0X'
+                    // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:601:40: '0X'
                     {
                     match("0X"); 
 
@@ -3212,7 +3406,7 @@ public class CTalkLexer extends Lexer {
             }
 
 
-            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:544:47: ( HEX_DIGIT )+
+            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:601:47: ( HEX_DIGIT )+
             int cnt34=0;
             loop34:
             do {
@@ -3226,7 +3420,7 @@ public class CTalkLexer extends Lexer {
 
                 switch (alt34) {
             	case 1 :
-            	    // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:
+            	    // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:
             	    {
             	    if ( (input.LA(1) >= '0' && input.LA(1) <= '9')||(input.LA(1) >= 'A' && input.LA(1) <= 'F')||(input.LA(1) >= 'a' && input.LA(1) <= 'f') ) {
             	        input.consume();
@@ -3264,8 +3458,8 @@ public class CTalkLexer extends Lexer {
     // $ANTLR start "NONZERO_DIGIT"
     public final void mNONZERO_DIGIT() throws RecognitionException {
         try {
-            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:545:23: ( ( '1' .. '9' ) )
-            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:
+            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:602:23: ( ( '1' .. '9' ) )
+            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:
             {
             if ( (input.LA(1) >= '1' && input.LA(1) <= '9') ) {
                 input.consume();
@@ -3290,8 +3484,8 @@ public class CTalkLexer extends Lexer {
     // $ANTLR start "UNSIGNED_SUFFIX"
     public final void mUNSIGNED_SUFFIX() throws RecognitionException {
         try {
-            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:546:25: ( ( 'u' | 'U' ) )
-            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:
+            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:603:25: ( ( 'u' | 'U' ) )
+            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:
             {
             if ( input.LA(1)=='U'||input.LA(1)=='u' ) {
                 input.consume();
@@ -3316,8 +3510,8 @@ public class CTalkLexer extends Lexer {
     // $ANTLR start "LONG_SUFFIX"
     public final void mLONG_SUFFIX() throws RecognitionException {
         try {
-            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:547:21: ( ( 'l' | 'L' ) )
-            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:
+            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:604:21: ( ( 'l' | 'L' ) )
+            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:
             {
             if ( input.LA(1)=='L'||input.LA(1)=='l' ) {
                 input.consume();
@@ -3344,10 +3538,10 @@ public class CTalkLexer extends Lexer {
         try {
             int _type = WHITE_SPACE;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:549:12: ( ( ' ' | '\\t' | '\\n' | '\\r' )+ )
-            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:549:14: ( ' ' | '\\t' | '\\n' | '\\r' )+
+            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:606:12: ( ( ' ' | '\\t' | '\\n' | '\\r' )+ )
+            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:606:14: ( ' ' | '\\t' | '\\n' | '\\r' )+
             {
-            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:549:14: ( ' ' | '\\t' | '\\n' | '\\r' )+
+            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:606:14: ( ' ' | '\\t' | '\\n' | '\\r' )+
             int cnt35=0;
             loop35:
             do {
@@ -3361,7 +3555,7 @@ public class CTalkLexer extends Lexer {
 
                 switch (alt35) {
             	case 1 :
-            	    // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:
+            	    // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:
             	    {
             	    if ( (input.LA(1) >= '\t' && input.LA(1) <= '\n')||input.LA(1)=='\r'||input.LA(1)==' ' ) {
             	        input.consume();
@@ -3404,10 +3598,10 @@ public class CTalkLexer extends Lexer {
         try {
             int _type = COMMENT;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:551:8: ( ( ( '/*' ( options {greedy=false; } : . )* '*/' ) | ( '//' (~ ( '\\n' | '\\r' ) )* ) ) )
-            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:551:10: ( ( '/*' ( options {greedy=false; } : . )* '*/' ) | ( '//' (~ ( '\\n' | '\\r' ) )* ) )
+            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:608:8: ( ( ( '/*' ( options {greedy=false; } : . )* '*/' ) | ( '//' (~ ( '\\n' | '\\r' ) )* ) ) )
+            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:608:10: ( ( '/*' ( options {greedy=false; } : . )* '*/' ) | ( '//' (~ ( '\\n' | '\\r' ) )* ) )
             {
-            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:551:10: ( ( '/*' ( options {greedy=false; } : . )* '*/' ) | ( '//' (~ ( '\\n' | '\\r' ) )* ) )
+            // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:608:10: ( ( '/*' ( options {greedy=false; } : . )* '*/' ) | ( '//' (~ ( '\\n' | '\\r' ) )* ) )
             int alt38=2;
             int LA38_0 = input.LA(1);
 
@@ -3437,16 +3631,16 @@ public class CTalkLexer extends Lexer {
             }
             switch (alt38) {
                 case 1 :
-                    // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:551:12: ( '/*' ( options {greedy=false; } : . )* '*/' )
+                    // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:608:12: ( '/*' ( options {greedy=false; } : . )* '*/' )
                     {
-                    // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:551:12: ( '/*' ( options {greedy=false; } : . )* '*/' )
-                    // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:551:14: '/*' ( options {greedy=false; } : . )* '*/'
+                    // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:608:12: ( '/*' ( options {greedy=false; } : . )* '*/' )
+                    // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:608:14: '/*' ( options {greedy=false; } : . )* '*/'
                     {
                     match("/*"); 
 
 
 
-                    // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:551:19: ( options {greedy=false; } : . )*
+                    // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:608:19: ( options {greedy=false; } : . )*
                     loop36:
                     do {
                         int alt36=2;
@@ -3471,7 +3665,7 @@ public class CTalkLexer extends Lexer {
 
                         switch (alt36) {
                     	case 1 :
-                    	    // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:551:46: .
+                    	    // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:608:46: .
                     	    {
                     	    matchAny(); 
 
@@ -3494,16 +3688,16 @@ public class CTalkLexer extends Lexer {
                     }
                     break;
                 case 2 :
-                    // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:551:60: ( '//' (~ ( '\\n' | '\\r' ) )* )
+                    // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:608:60: ( '//' (~ ( '\\n' | '\\r' ) )* )
                     {
-                    // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:551:60: ( '//' (~ ( '\\n' | '\\r' ) )* )
-                    // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:551:62: '//' (~ ( '\\n' | '\\r' ) )*
+                    // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:608:60: ( '//' (~ ( '\\n' | '\\r' ) )* )
+                    // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:608:62: '//' (~ ( '\\n' | '\\r' ) )*
                     {
                     match("//"); 
 
 
 
-                    // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:551:67: (~ ( '\\n' | '\\r' ) )*
+                    // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:608:67: (~ ( '\\n' | '\\r' ) )*
                     loop37:
                     do {
                         int alt37=2;
@@ -3516,7 +3710,7 @@ public class CTalkLexer extends Lexer {
 
                         switch (alt37) {
                     	case 1 :
-                    	    // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:
+                    	    // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:
                     	    {
                     	    if ( (input.LA(1) >= '\u0000' && input.LA(1) <= '\t')||(input.LA(1) >= '\u000B' && input.LA(1) <= '\f')||(input.LA(1) >= '\u000E' && input.LA(1) <= '\uFFFF') ) {
                     	        input.consume();
@@ -3560,476 +3754,540 @@ public class CTalkLexer extends Lexer {
     // $ANTLR end "COMMENT"
 
     public void mTokens() throws RecognitionException {
-        // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:1:8: ( T__36 | T__37 | T__38 | T__39 | T__40 | T__41 | T__42 | T__43 | T__44 | T__45 | T__46 | T__47 | T__48 | T__49 | T__50 | T__51 | T__52 | T__53 | T__54 | T__55 | T__56 | T__57 | T__58 | T__59 | T__60 | T__61 | T__62 | T__63 | T__64 | T__65 | T__66 | T__67 | T__68 | T__69 | T__70 | T__71 | T__72 | T__73 | T__74 | T__75 | T__76 | T__77 | T__78 | T__79 | T__80 | T__81 | T__82 | T__83 | T__84 | T__85 | T__86 | T__87 | BOOLEAN | IDENTIFIER | STRING | REAL | INTEGER | WHITE_SPACE | COMMENT )
-        int alt39=59;
+        // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:1:8: ( T__37 | T__38 | T__39 | T__40 | T__41 | T__42 | T__43 | T__44 | T__45 | T__46 | T__47 | T__48 | T__49 | T__50 | T__51 | T__52 | T__53 | T__54 | T__55 | T__56 | T__57 | T__58 | T__59 | T__60 | T__61 | T__62 | T__63 | T__64 | T__65 | T__66 | T__67 | T__68 | T__69 | T__70 | T__71 | T__72 | T__73 | T__74 | T__75 | T__76 | T__77 | T__78 | T__79 | T__80 | T__81 | T__82 | T__83 | T__84 | T__85 | T__86 | T__87 | T__88 | T__89 | T__90 | T__91 | T__92 | T__93 | T__94 | T__95 | BOOLEAN | NULL | IDENTIFIER | STRING | REAL | INTEGER | WHITE_SPACE | COMMENT )
+        int alt39=67;
         alt39 = dfa39.predict(input);
         switch (alt39) {
             case 1 :
-                // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:1:10: T__36
-                {
-                mT__36(); 
-
-
-                }
-                break;
-            case 2 :
-                // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:1:16: T__37
+                // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:1:10: T__37
                 {
                 mT__37(); 
 
 
                 }
                 break;
-            case 3 :
-                // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:1:22: T__38
+            case 2 :
+                // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:1:16: T__38
                 {
                 mT__38(); 
 
 
                 }
                 break;
-            case 4 :
-                // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:1:28: T__39
+            case 3 :
+                // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:1:22: T__39
                 {
                 mT__39(); 
 
 
                 }
                 break;
-            case 5 :
-                // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:1:34: T__40
+            case 4 :
+                // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:1:28: T__40
                 {
                 mT__40(); 
 
 
                 }
                 break;
-            case 6 :
-                // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:1:40: T__41
+            case 5 :
+                // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:1:34: T__41
                 {
                 mT__41(); 
 
 
                 }
                 break;
-            case 7 :
-                // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:1:46: T__42
+            case 6 :
+                // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:1:40: T__42
                 {
                 mT__42(); 
 
 
                 }
                 break;
-            case 8 :
-                // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:1:52: T__43
+            case 7 :
+                // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:1:46: T__43
                 {
                 mT__43(); 
 
 
                 }
                 break;
-            case 9 :
-                // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:1:58: T__44
+            case 8 :
+                // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:1:52: T__44
                 {
                 mT__44(); 
 
 
                 }
                 break;
-            case 10 :
-                // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:1:64: T__45
+            case 9 :
+                // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:1:58: T__45
                 {
                 mT__45(); 
 
 
                 }
                 break;
-            case 11 :
-                // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:1:70: T__46
+            case 10 :
+                // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:1:64: T__46
                 {
                 mT__46(); 
 
 
                 }
                 break;
-            case 12 :
-                // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:1:76: T__47
+            case 11 :
+                // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:1:70: T__47
                 {
                 mT__47(); 
 
 
                 }
                 break;
-            case 13 :
-                // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:1:82: T__48
+            case 12 :
+                // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:1:76: T__48
                 {
                 mT__48(); 
 
 
                 }
                 break;
-            case 14 :
-                // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:1:88: T__49
+            case 13 :
+                // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:1:82: T__49
                 {
                 mT__49(); 
 
 
                 }
                 break;
-            case 15 :
-                // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:1:94: T__50
+            case 14 :
+                // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:1:88: T__50
                 {
                 mT__50(); 
 
 
                 }
                 break;
-            case 16 :
-                // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:1:100: T__51
+            case 15 :
+                // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:1:94: T__51
                 {
                 mT__51(); 
 
 
                 }
                 break;
-            case 17 :
-                // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:1:106: T__52
+            case 16 :
+                // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:1:100: T__52
                 {
                 mT__52(); 
 
 
                 }
                 break;
-            case 18 :
-                // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:1:112: T__53
+            case 17 :
+                // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:1:106: T__53
                 {
                 mT__53(); 
 
 
                 }
                 break;
-            case 19 :
-                // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:1:118: T__54
+            case 18 :
+                // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:1:112: T__54
                 {
                 mT__54(); 
 
 
                 }
                 break;
-            case 20 :
-                // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:1:124: T__55
+            case 19 :
+                // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:1:118: T__55
                 {
                 mT__55(); 
 
 
                 }
                 break;
-            case 21 :
-                // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:1:130: T__56
+            case 20 :
+                // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:1:124: T__56
                 {
                 mT__56(); 
 
 
                 }
                 break;
-            case 22 :
-                // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:1:136: T__57
+            case 21 :
+                // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:1:130: T__57
                 {
                 mT__57(); 
 
 
                 }
                 break;
-            case 23 :
-                // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:1:142: T__58
+            case 22 :
+                // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:1:136: T__58
                 {
                 mT__58(); 
 
 
                 }
                 break;
-            case 24 :
-                // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:1:148: T__59
+            case 23 :
+                // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:1:142: T__59
                 {
                 mT__59(); 
 
 
                 }
                 break;
-            case 25 :
-                // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:1:154: T__60
+            case 24 :
+                // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:1:148: T__60
                 {
                 mT__60(); 
 
 
                 }
                 break;
-            case 26 :
-                // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:1:160: T__61
+            case 25 :
+                // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:1:154: T__61
                 {
                 mT__61(); 
 
 
                 }
                 break;
-            case 27 :
-                // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:1:166: T__62
+            case 26 :
+                // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:1:160: T__62
                 {
                 mT__62(); 
 
 
                 }
                 break;
-            case 28 :
-                // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:1:172: T__63
+            case 27 :
+                // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:1:166: T__63
                 {
                 mT__63(); 
 
 
                 }
                 break;
-            case 29 :
-                // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:1:178: T__64
+            case 28 :
+                // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:1:172: T__64
                 {
                 mT__64(); 
 
 
                 }
                 break;
-            case 30 :
-                // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:1:184: T__65
+            case 29 :
+                // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:1:178: T__65
                 {
                 mT__65(); 
 
 
                 }
                 break;
-            case 31 :
-                // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:1:190: T__66
+            case 30 :
+                // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:1:184: T__66
                 {
                 mT__66(); 
 
 
                 }
                 break;
-            case 32 :
-                // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:1:196: T__67
+            case 31 :
+                // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:1:190: T__67
                 {
                 mT__67(); 
 
 
                 }
                 break;
-            case 33 :
-                // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:1:202: T__68
+            case 32 :
+                // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:1:196: T__68
                 {
                 mT__68(); 
 
 
                 }
                 break;
-            case 34 :
-                // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:1:208: T__69
+            case 33 :
+                // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:1:202: T__69
                 {
                 mT__69(); 
 
 
                 }
                 break;
-            case 35 :
-                // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:1:214: T__70
+            case 34 :
+                // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:1:208: T__70
                 {
                 mT__70(); 
 
 
                 }
                 break;
-            case 36 :
-                // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:1:220: T__71
+            case 35 :
+                // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:1:214: T__71
                 {
                 mT__71(); 
 
 
                 }
                 break;
-            case 37 :
-                // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:1:226: T__72
+            case 36 :
+                // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:1:220: T__72
                 {
                 mT__72(); 
 
 
                 }
                 break;
-            case 38 :
-                // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:1:232: T__73
+            case 37 :
+                // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:1:226: T__73
                 {
                 mT__73(); 
 
 
                 }
                 break;
-            case 39 :
-                // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:1:238: T__74
+            case 38 :
+                // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:1:232: T__74
                 {
                 mT__74(); 
 
 
                 }
                 break;
-            case 40 :
-                // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:1:244: T__75
+            case 39 :
+                // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:1:238: T__75
                 {
                 mT__75(); 
 
 
                 }
                 break;
-            case 41 :
-                // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:1:250: T__76
+            case 40 :
+                // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:1:244: T__76
                 {
                 mT__76(); 
 
 
                 }
                 break;
-            case 42 :
-                // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:1:256: T__77
+            case 41 :
+                // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:1:250: T__77
                 {
                 mT__77(); 
 
 
                 }
                 break;
-            case 43 :
-                // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:1:262: T__78
+            case 42 :
+                // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:1:256: T__78
                 {
                 mT__78(); 
 
 
                 }
                 break;
-            case 44 :
-                // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:1:268: T__79
+            case 43 :
+                // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:1:262: T__79
                 {
                 mT__79(); 
 
 
                 }
                 break;
-            case 45 :
-                // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:1:274: T__80
+            case 44 :
+                // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:1:268: T__80
                 {
                 mT__80(); 
 
 
                 }
                 break;
-            case 46 :
-                // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:1:280: T__81
+            case 45 :
+                // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:1:274: T__81
                 {
                 mT__81(); 
 
 
                 }
                 break;
-            case 47 :
-                // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:1:286: T__82
+            case 46 :
+                // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:1:280: T__82
                 {
                 mT__82(); 
 
 
                 }
                 break;
-            case 48 :
-                // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:1:292: T__83
+            case 47 :
+                // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:1:286: T__83
                 {
                 mT__83(); 
 
 
                 }
                 break;
-            case 49 :
-                // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:1:298: T__84
+            case 48 :
+                // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:1:292: T__84
                 {
                 mT__84(); 
 
 
                 }
                 break;
-            case 50 :
-                // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:1:304: T__85
+            case 49 :
+                // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:1:298: T__85
                 {
                 mT__85(); 
 
 
                 }
                 break;
-            case 51 :
-                // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:1:310: T__86
+            case 50 :
+                // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:1:304: T__86
                 {
                 mT__86(); 
 
 
                 }
                 break;
-            case 52 :
-                // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:1:316: T__87
+            case 51 :
+                // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:1:310: T__87
                 {
                 mT__87(); 
 
 
                 }
                 break;
+            case 52 :
+                // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:1:316: T__88
+                {
+                mT__88(); 
+
+
+                }
+                break;
             case 53 :
-                // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:1:322: BOOLEAN
+                // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:1:322: T__89
+                {
+                mT__89(); 
+
+
+                }
+                break;
+            case 54 :
+                // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:1:328: T__90
+                {
+                mT__90(); 
+
+
+                }
+                break;
+            case 55 :
+                // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:1:334: T__91
+                {
+                mT__91(); 
+
+
+                }
+                break;
+            case 56 :
+                // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:1:340: T__92
+                {
+                mT__92(); 
+
+
+                }
+                break;
+            case 57 :
+                // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:1:346: T__93
+                {
+                mT__93(); 
+
+
+                }
+                break;
+            case 58 :
+                // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:1:352: T__94
+                {
+                mT__94(); 
+
+
+                }
+                break;
+            case 59 :
+                // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:1:358: T__95
+                {
+                mT__95(); 
+
+
+                }
+                break;
+            case 60 :
+                // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:1:364: BOOLEAN
                 {
                 mBOOLEAN(); 
 
 
                 }
                 break;
-            case 54 :
-                // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:1:330: IDENTIFIER
+            case 61 :
+                // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:1:372: NULL
+                {
+                mNULL(); 
+
+
+                }
+                break;
+            case 62 :
+                // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:1:377: IDENTIFIER
                 {
                 mIDENTIFIER(); 
 
 
                 }
                 break;
-            case 55 :
-                // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:1:341: STRING
+            case 63 :
+                // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:1:388: STRING
                 {
                 mSTRING(); 
 
 
                 }
                 break;
-            case 56 :
-                // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:1:348: REAL
+            case 64 :
+                // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:1:395: REAL
                 {
                 mREAL(); 
 
 
                 }
                 break;
-            case 57 :
-                // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:1:353: INTEGER
+            case 65 :
+                // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:1:400: INTEGER
                 {
                 mINTEGER(); 
 
 
                 }
                 break;
-            case 58 :
-                // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:1:361: WHITE_SPACE
+            case 66 :
+                // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:1:408: WHITE_SPACE
                 {
                 mWHITE_SPACE(); 
 
 
                 }
                 break;
-            case 59 :
-                // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\ctalk-interpreter\\src\\mi\\run\\ctalk\\CTalk.g:1:373: COMMENT
+            case 67 :
+                // C:\\Documents and Settings\\Martin\\My Documents\\NetBeansProjects\\its-runtime\\compiler\\src\\mi\\run\\ctalk\\CTalk.g:1:420: COMMENT
                 {
                 mCOMMENT(); 
 
@@ -4094,7 +4352,7 @@ public class CTalkLexer extends Lexer {
             this.transition = DFA21_transition;
         }
         public String getDescription() {
-            return "533:7: ( ( FRACTIONAL_CONSTANT ( EXPONENT_PART )? ( FLOATING_SUFFIX )? ) | ( DIGIT_SEQUENCE EXPONENT_PART ( FLOATING_SUFFIX )? ) )";
+            return "590:7: ( ( FRACTIONAL_CONSTANT ( EXPONENT_PART )? ( FLOATING_SUFFIX )? ) | ( DIGIT_SEQUENCE EXPONENT_PART ( FLOATING_SUFFIX )? ) )";
         }
     }
     static final String DFA24_eotS =
@@ -4147,184 +4405,237 @@ public class CTalkLexer extends Lexer {
             this.transition = DFA24_transition;
         }
         public String getDescription() {
-            return "535:31: ( ( ( DIGIT_SEQUENCE )? '.' DIGIT_SEQUENCE ) | ( DIGIT_SEQUENCE '.' ) )";
+            return "592:31: ( ( ( DIGIT_SEQUENCE )? '.' DIGIT_SEQUENCE ) | ( DIGIT_SEQUENCE '.' ) )";
         }
     }
     static final String DFA39_eotS =
-        "\1\uffff\1\50\1\52\1\55\2\uffff\1\57\1\62\1\uffff\1\65\1\66\1\72"+
-        "\2\uffff\1\75\1\77\1\102\2\uffff\1\104\10\41\1\uffff\1\121\2\uffff"+
-        "\1\41\1\uffff\1\41\1\uffff\2\123\25\uffff\1\127\5\uffff\1\131\3"+
-        "\uffff\2\41\1\134\4\41\1\141\2\41\3\uffff\1\41\1\uffff\2\123\4\uffff"+
-        "\2\41\1\uffff\1\41\1\150\2\41\1\uffff\5\41\1\160\1\uffff\4\41\1"+
-        "\165\1\166\1\41\1\uffff\1\41\1\165\1\41\1\172\2\uffff\2\41\1\175"+
-        "\1\uffff\2\41\1\uffff\1\u0080\1\u0081\2\uffff";
+        "\1\uffff\1\55\1\57\1\62\2\uffff\1\64\1\67\1\uffff\1\72\1\73\1\77"+
+        "\1\uffff\1\102\1\104\1\107\3\46\2\uffff\1\114\13\46\1\uffff\1\136"+
+        "\2\uffff\1\46\1\uffff\1\46\1\uffff\2\140\25\uffff\1\144\5\uffff"+
+        "\1\146\1\uffff\3\46\2\uffff\3\46\1\156\3\46\1\162\7\46\3\uffff\1"+
+        "\46\1\uffff\2\140\4\uffff\7\46\1\uffff\1\46\1\u0083\1\46\1\uffff"+
+        "\1\u0085\1\u0086\7\46\1\u008e\1\46\1\u0090\3\46\1\u0094\1\uffff"+
+        "\1\46\2\uffff\1\u0096\2\46\1\u0099\1\46\1\u009b\1\u009c\1\uffff"+
+        "\1\46\1\uffff\1\u009e\2\46\1\uffff\1\u009b\1\uffff\2\46\1\uffff"+
+        "\1\u00a3\2\uffff\1\u00a4\1\uffff\1\46\1\u00a6\1\u00a7\1\u00a8\2"+
+        "\uffff\1\46\3\uffff\1\u00aa\1\uffff";
     static final String DFA39_eofS =
-        "\u0082\uffff";
+        "\u00ab\uffff";
     static final String DFA39_minS =
-        "\1\11\2\75\1\46\2\uffff\1\75\1\53\1\uffff\1\55\1\60\1\52\2\uffff"+
-        "\1\74\2\75\2\uffff\1\75\1\162\2\157\1\154\1\141\1\146\1\145\1\150"+
-        "\1\uffff\1\75\2\uffff\1\162\1\uffff\1\42\1\uffff\2\56\25\uffff\1"+
-        "\75\5\uffff\1\75\3\uffff\1\145\1\156\1\60\1\163\1\162\1\156\1\154"+
-        "\1\60\1\164\1\151\3\uffff\1\165\1\uffff\2\56\4\uffff\1\141\1\164"+
-        "\1\uffff\1\145\1\60\1\143\1\163\1\uffff\1\165\1\154\1\145\1\153"+
-        "\1\151\1\60\1\uffff\1\164\1\145\1\162\1\145\2\60\1\156\1\uffff\1"+
-        "\151\1\60\1\156\1\60\2\uffff\1\165\1\157\1\60\1\uffff\1\145\1\156"+
-        "\1\uffff\2\60\2\uffff";
+        "\1\11\2\75\1\46\2\uffff\1\75\1\53\1\uffff\1\55\1\60\1\52\1\uffff"+
+        "\1\74\2\75\1\162\1\151\1\164\2\uffff\1\75\3\157\1\154\1\141\1\146"+
+        "\2\145\1\164\1\157\1\150\1\uffff\1\75\2\uffff\1\162\1\uffff\1\42"+
+        "\1\uffff\2\56\25\uffff\1\75\5\uffff\1\75\1\uffff\1\162\1\154\1\162"+
+        "\2\uffff\1\157\1\145\1\156\1\60\1\163\1\162\1\154\1\60\1\164\1\167"+
+        "\1\154\1\164\1\162\2\151\3\uffff\1\165\1\uffff\2\56\4\uffff\1\141"+
+        "\1\145\1\151\1\154\1\141\1\164\1\142\1\uffff\1\145\1\60\1\163\1"+
+        "\uffff\2\60\1\154\2\165\1\144\1\154\1\145\1\171\1\60\1\156\1\60"+
+        "\1\153\1\151\1\154\1\60\1\uffff\1\145\2\uffff\1\60\1\162\1\143\1"+
+        "\60\1\145\2\60\1\uffff\1\147\1\uffff\1\60\1\156\1\145\1\uffff\1"+
+        "\60\1\uffff\1\156\1\164\1\uffff\1\60\2\uffff\1\60\1\uffff\1\165"+
+        "\3\60\2\uffff\1\145\3\uffff\1\60\1\uffff";
     static final String DFA39_maxS =
-        "\1\176\3\75\2\uffff\2\75\1\uffff\1\75\1\71\1\75\2\uffff\2\75\1\76"+
-        "\2\uffff\1\75\1\162\2\157\1\154\1\165\1\146\1\145\1\150\1\uffff"+
-        "\1\174\2\uffff\1\162\1\uffff\1\47\1\uffff\2\145\25\uffff\1\75\5"+
-        "\uffff\1\75\3\uffff\1\145\1\156\1\172\1\163\1\162\1\156\1\154\1"+
-        "\172\1\164\1\151\3\uffff\1\165\1\uffff\2\145\4\uffff\1\141\1\164"+
-        "\1\uffff\1\145\1\172\1\143\1\163\1\uffff\1\165\1\154\1\145\1\153"+
-        "\1\151\1\172\1\uffff\1\164\1\145\1\162\1\145\2\172\1\156\1\uffff"+
-        "\1\151\1\172\1\156\1\172\2\uffff\1\165\1\157\1\172\1\uffff\1\145"+
-        "\1\156\1\uffff\2\172\2\uffff";
+        "\1\176\3\75\2\uffff\2\75\1\uffff\1\75\1\71\1\75\1\uffff\2\75\1\76"+
+        "\1\162\1\151\1\164\2\uffff\1\75\1\162\2\157\1\154\1\157\1\156\1"+
+        "\165\1\145\1\164\1\157\1\150\1\uffff\1\174\2\uffff\1\162\1\uffff"+
+        "\1\47\1\uffff\2\145\25\uffff\1\75\5\uffff\1\75\1\uffff\1\162\1\154"+
+        "\1\162\2\uffff\1\157\1\145\1\156\1\172\1\163\1\162\1\154\1\172\1"+
+        "\164\1\167\1\154\1\164\1\162\2\151\3\uffff\1\165\1\uffff\2\145\4"+
+        "\uffff\1\141\1\145\1\151\1\154\1\141\1\164\1\142\1\uffff\1\145\1"+
+        "\172\1\163\1\uffff\2\172\1\154\2\165\1\144\1\154\1\145\1\171\1\172"+
+        "\1\156\1\172\1\153\1\151\1\154\1\172\1\uffff\1\145\2\uffff\1\172"+
+        "\1\162\1\143\1\172\1\145\2\172\1\uffff\1\147\1\uffff\1\172\1\156"+
+        "\1\145\1\uffff\1\172\1\uffff\1\156\1\164\1\uffff\1\172\2\uffff\1"+
+        "\172\1\uffff\1\165\3\172\2\uffff\1\145\3\uffff\1\172\1\uffff";
     static final String DFA39_acceptS =
-        "\4\uffff\1\10\1\11\2\uffff\1\17\3\uffff\1\26\1\27\3\uffff\1\42\1"+
-        "\43\11\uffff\1\57\1\uffff\1\63\1\64\1\uffff\1\66\1\uffff\1\67\2"+
-        "\uffff\1\72\1\2\1\1\1\4\1\3\1\5\1\7\1\6\1\13\1\12\1\15\1\16\1\14"+
-        "\1\21\1\22\1\20\1\23\1\70\1\25\1\73\1\24\1\uffff\1\33\1\30\1\35"+
-        "\1\34\1\37\1\uffff\1\36\1\45\1\44\12\uffff\1\61\1\62\1\60\1\uffff"+
-        "\1\71\2\uffff\1\32\1\31\1\41\1\40\2\uffff\1\50\4\uffff\1\54\6\uffff"+
-        "\1\52\7\uffff\1\51\4\uffff\1\65\1\46\3\uffff\1\56\2\uffff\1\55\2"+
-        "\uffff\1\47\1\53";
+        "\4\uffff\1\10\1\11\2\uffff\1\17\3\uffff\1\26\6\uffff\1\44\1\45\14"+
+        "\uffff\1\66\1\uffff\1\72\1\73\1\uffff\1\76\1\uffff\1\77\2\uffff"+
+        "\1\102\1\2\1\1\1\4\1\3\1\5\1\7\1\6\1\13\1\12\1\15\1\16\1\14\1\21"+
+        "\1\22\1\20\1\23\1\100\1\25\1\103\1\24\1\uffff\1\32\1\27\1\34\1\33"+
+        "\1\36\1\uffff\1\35\3\uffff\1\47\1\46\17\uffff\1\70\1\71\1\67\1\uffff"+
+        "\1\101\2\uffff\1\31\1\30\1\40\1\37\7\uffff\1\53\3\uffff\1\57\20"+
+        "\uffff\1\56\1\uffff\1\60\1\61\7\uffff\1\42\1\uffff\1\50\3\uffff"+
+        "\1\55\1\uffff\1\75\2\uffff\1\64\1\uffff\1\74\1\41\1\uffff\1\51\4"+
+        "\uffff\1\65\1\43\1\uffff\1\54\1\62\1\63\1\uffff\1\52";
     static final String DFA39_specialS =
-        "\u0082\uffff}>";
+        "\u00ab\uffff}>";
     static final String[] DFA39_transitionS = {
-            "\2\46\2\uffff\1\46\22\uffff\1\46\1\1\1\43\2\uffff\1\2\1\3\1"+
-            "\43\1\4\1\5\1\6\1\7\1\10\1\11\1\12\1\13\1\45\11\44\1\14\1\15"+
-            "\1\16\1\17\1\20\2\uffff\13\41\1\42\16\41\1\21\1\41\1\22\1\23"+
-            "\1\41\1\uffff\1\41\1\24\1\25\1\26\1\27\1\30\2\41\1\31\10\41"+
-            "\1\32\1\41\1\40\2\41\1\33\3\41\1\34\1\35\1\36\1\37",
-            "\1\47",
-            "\1\51",
-            "\1\53\26\uffff\1\54",
-            "",
-            "",
+            "\2\53\2\uffff\1\53\22\uffff\1\53\1\1\1\50\2\uffff\1\2\1\3\1"+
+            "\50\1\4\1\5\1\6\1\7\1\10\1\11\1\12\1\13\1\52\11\51\1\uffff\1"+
+            "\14\1\15\1\16\1\17\2\uffff\1\20\4\46\1\21\5\46\1\47\6\46\1\22"+
+            "\7\46\1\23\1\46\1\24\1\25\1\46\1\uffff\1\46\1\26\1\27\1\30\1"+
+            "\31\1\32\2\46\1\33\4\46\1\34\3\46\1\35\1\36\1\45\1\46\1\37\1"+
+            "\40\3\46\1\41\1\42\1\43\1\44",
+            "\1\54",
             "\1\56",
-            "\1\60\21\uffff\1\61",
-            "",
-            "\1\63\17\uffff\1\64",
-            "\12\67",
-            "\1\71\4\uffff\1\71\15\uffff\1\70",
+            "\1\60\26\uffff\1\61",
             "",
             "",
-            "\1\73\1\74",
-            "\1\76",
+            "\1\63",
+            "\1\65\21\uffff\1\66",
+            "",
+            "\1\70\17\uffff\1\71",
+            "\12\74",
+            "\1\76\4\uffff\1\76\15\uffff\1\75",
+            "",
             "\1\100\1\101",
-            "",
-            "",
             "\1\103",
-            "\1\105",
-            "\1\106",
-            "\1\107",
+            "\1\105\1\106",
             "\1\110",
-            "\1\113\15\uffff\1\111\5\uffff\1\112",
-            "\1\114",
-            "\1\115",
-            "\1\116",
-            "",
-            "\1\117\76\uffff\1\120",
+            "\1\111",
+            "\1\112",
             "",
             "",
-            "\1\122",
-            "",
-            "\1\43\4\uffff\1\43",
-            "",
-            "\1\67\1\uffff\12\124\13\uffff\1\67\37\uffff\1\67",
-            "\1\67\1\uffff\10\125\2\67\13\uffff\1\67\37\uffff\1\67",
-            "",
-            "",
-            "",
-            "",
-            "",
-            "",
-            "",
-            "",
-            "",
-            "",
-            "",
-            "",
-            "",
-            "",
-            "",
-            "",
-            "",
-            "",
-            "",
-            "",
-            "",
-            "\1\126",
-            "",
-            "",
-            "",
-            "",
-            "",
+            "\1\113",
+            "\1\115\2\uffff\1\116",
+            "\1\117",
+            "\1\120",
+            "\1\121",
+            "\1\123\15\uffff\1\122",
+            "\1\124\7\uffff\1\125",
+            "\1\126\17\uffff\1\127",
             "\1\130",
-            "",
-            "",
-            "",
+            "\1\131",
             "\1\132",
             "\1\133",
-            "\12\41\7\uffff\32\41\1\uffff\1\41\2\uffff\1\41\1\uffff\32\41",
-            "\1\135",
-            "\1\136",
+            "",
+            "\1\134\76\uffff\1\135",
+            "",
+            "",
             "\1\137",
-            "\1\140",
-            "\12\41\7\uffff\32\41\1\uffff\1\41\2\uffff\1\41\1\uffff\32\41",
-            "\1\142",
+            "",
+            "\1\50\4\uffff\1\50",
+            "",
+            "\1\74\1\uffff\12\141\13\uffff\1\74\37\uffff\1\74",
+            "\1\74\1\uffff\10\142\2\74\13\uffff\1\74\37\uffff\1\74",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
             "\1\143",
             "",
-            "",
-            "",
-            "\1\144",
-            "",
-            "\1\67\1\uffff\12\124\13\uffff\1\67\37\uffff\1\67",
-            "\1\67\1\uffff\10\125\2\67\13\uffff\1\67\37\uffff\1\67",
             "",
             "",
             "",
             "",
             "\1\145",
-            "\1\146",
             "",
             "\1\147",
-            "\12\41\7\uffff\32\41\1\uffff\1\41\2\uffff\1\41\1\uffff\32\41",
+            "\1\150",
             "\1\151",
-            "\1\152",
             "",
+            "",
+            "\1\152",
             "\1\153",
             "\1\154",
-            "\1\155",
-            "\1\156",
+            "\12\46\7\uffff\32\46\1\uffff\1\46\2\uffff\1\46\1\uffff\24\46"+
+            "\1\155\5\46",
             "\1\157",
-            "\12\41\7\uffff\32\41\1\uffff\1\41\2\uffff\1\41\1\uffff\32\41",
-            "",
+            "\1\160",
             "\1\161",
-            "\1\162",
+            "\12\46\7\uffff\32\46\1\uffff\1\46\2\uffff\1\46\1\uffff\32\46",
             "\1\163",
             "\1\164",
-            "\12\41\7\uffff\32\41\1\uffff\1\41\2\uffff\1\41\1\uffff\32\41",
-            "\12\41\7\uffff\32\41\1\uffff\1\41\2\uffff\1\41\1\uffff\32\41",
+            "\1\165",
+            "\1\166",
             "\1\167",
-            "",
             "\1\170",
-            "\12\41\7\uffff\32\41\1\uffff\1\41\2\uffff\1\41\1\uffff\32\41",
             "\1\171",
-            "\12\41\7\uffff\32\41\1\uffff\1\41\2\uffff\1\41\1\uffff\32\41",
+            "",
+            "",
+            "",
+            "\1\172",
+            "",
+            "\1\74\1\uffff\12\141\13\uffff\1\74\37\uffff\1\74",
+            "\1\74\1\uffff\10\142\2\74\13\uffff\1\74\37\uffff\1\74",
+            "",
+            "",
             "",
             "",
             "\1\173",
             "\1\174",
-            "\12\41\7\uffff\32\41\1\uffff\1\41\2\uffff\1\41\1\uffff\32\41",
-            "",
+            "\1\175",
             "\1\176",
             "\1\177",
+            "\1\u0080",
+            "\1\u0081",
             "",
-            "\12\41\7\uffff\32\41\1\uffff\1\41\2\uffff\1\41\1\uffff\32\41",
-            "\12\41\7\uffff\32\41\1\uffff\1\41\2\uffff\1\41\1\uffff\32\41",
+            "\1\u0082",
+            "\12\46\7\uffff\32\46\1\uffff\1\46\2\uffff\1\46\1\uffff\32\46",
+            "\1\u0084",
             "",
+            "\12\46\7\uffff\32\46\1\uffff\1\46\2\uffff\1\46\1\uffff\32\46",
+            "\12\46\7\uffff\32\46\1\uffff\1\46\2\uffff\1\46\1\uffff\32\46",
+            "\1\u0087",
+            "\1\u0088",
+            "\1\u0089",
+            "\1\u008a",
+            "\1\u008b",
+            "\1\u008c",
+            "\1\u008d",
+            "\12\46\7\uffff\32\46\1\uffff\1\46\2\uffff\1\46\1\uffff\32\46",
+            "\1\u008f",
+            "\12\46\7\uffff\32\46\1\uffff\1\46\2\uffff\1\46\1\uffff\32\46",
+            "\1\u0091",
+            "\1\u0092",
+            "\1\u0093",
+            "\12\46\7\uffff\32\46\1\uffff\1\46\2\uffff\1\46\1\uffff\32\46",
+            "",
+            "\1\u0095",
+            "",
+            "",
+            "\12\46\7\uffff\32\46\1\uffff\1\46\2\uffff\1\46\1\uffff\32\46",
+            "\1\u0097",
+            "\1\u0098",
+            "\12\46\7\uffff\32\46\1\uffff\1\46\2\uffff\1\46\1\uffff\32\46",
+            "\1\u009a",
+            "\12\46\7\uffff\32\46\1\uffff\1\46\2\uffff\1\46\1\uffff\32\46",
+            "\12\46\7\uffff\32\46\1\uffff\1\46\2\uffff\1\46\1\uffff\32\46",
+            "",
+            "\1\u009d",
+            "",
+            "\12\46\7\uffff\32\46\1\uffff\1\46\2\uffff\1\46\1\uffff\32\46",
+            "\1\u009f",
+            "\1\u00a0",
+            "",
+            "\12\46\7\uffff\32\46\1\uffff\1\46\2\uffff\1\46\1\uffff\32\46",
+            "",
+            "\1\u00a1",
+            "\1\u00a2",
+            "",
+            "\12\46\7\uffff\32\46\1\uffff\1\46\2\uffff\1\46\1\uffff\32\46",
+            "",
+            "",
+            "\12\46\7\uffff\32\46\1\uffff\1\46\2\uffff\1\46\1\uffff\32\46",
+            "",
+            "\1\u00a5",
+            "\12\46\7\uffff\32\46\1\uffff\1\46\2\uffff\1\46\1\uffff\32\46",
+            "\12\46\7\uffff\32\46\1\uffff\1\46\2\uffff\1\46\1\uffff\32\46",
+            "\12\46\7\uffff\32\46\1\uffff\1\46\2\uffff\1\46\1\uffff\32\46",
+            "",
+            "",
+            "\1\u00a9",
+            "",
+            "",
+            "",
+            "\12\46\7\uffff\32\46\1\uffff\1\46\2\uffff\1\46\1\uffff\32\46",
             ""
     };
 
@@ -4358,7 +4669,7 @@ public class CTalkLexer extends Lexer {
             this.transition = DFA39_transition;
         }
         public String getDescription() {
-            return "1:1: Tokens : ( T__36 | T__37 | T__38 | T__39 | T__40 | T__41 | T__42 | T__43 | T__44 | T__45 | T__46 | T__47 | T__48 | T__49 | T__50 | T__51 | T__52 | T__53 | T__54 | T__55 | T__56 | T__57 | T__58 | T__59 | T__60 | T__61 | T__62 | T__63 | T__64 | T__65 | T__66 | T__67 | T__68 | T__69 | T__70 | T__71 | T__72 | T__73 | T__74 | T__75 | T__76 | T__77 | T__78 | T__79 | T__80 | T__81 | T__82 | T__83 | T__84 | T__85 | T__86 | T__87 | BOOLEAN | IDENTIFIER | STRING | REAL | INTEGER | WHITE_SPACE | COMMENT );";
+            return "1:1: Tokens : ( T__37 | T__38 | T__39 | T__40 | T__41 | T__42 | T__43 | T__44 | T__45 | T__46 | T__47 | T__48 | T__49 | T__50 | T__51 | T__52 | T__53 | T__54 | T__55 | T__56 | T__57 | T__58 | T__59 | T__60 | T__61 | T__62 | T__63 | T__64 | T__65 | T__66 | T__67 | T__68 | T__69 | T__70 | T__71 | T__72 | T__73 | T__74 | T__75 | T__76 | T__77 | T__78 | T__79 | T__80 | T__81 | T__82 | T__83 | T__84 | T__85 | T__86 | T__87 | T__88 | T__89 | T__90 | T__91 | T__92 | T__93 | T__94 | T__95 | BOOLEAN | NULL | IDENTIFIER | STRING | REAL | INTEGER | WHITE_SPACE | COMMENT );";
         }
     }
  

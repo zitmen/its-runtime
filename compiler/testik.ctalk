@@ -20,12 +20,12 @@ int main()
 	File f = openRFile(infp);
 	int n = integer(inputFile(f));
 	int M = integer(inputFile(f));
-	Array<Stuff> stuff = new Stuff[n];
-	Array<int> init_conf = new int[n];
+	Array<Stuff> stuff = new[n];
+	Array<int> init_conf = new[n];
 	for(int i = 0; i < n; i++)
 	{
 		init_conf[i] = 0;
-		stuff[i] = new Stuff;
+		stuff[i] = new;
 		stuff[i].weight = integer(inputFile(f));
 		stuff[i].cost   = integer(inputFile(f));
 	}
@@ -37,7 +37,7 @@ int main()
 	printlnFile(f, concat('Total price: ', string(result.cost)));
 	printFile(f, 'Items configuration: ');
 	for(i = 0; i < n; i++)
-		printFile(f, concat(' ', string(result.conf[i]));
+		printFile(f, concat(' ', string(result.conf[i])));
 	closeFile(f);
 	//
 	return 0;
@@ -66,7 +66,7 @@ Result computeSolution(int n, int M, Array<Stuff> stuff, Array<int> conf)
 	int cur_cost = 0;
 	int max_cost = 0;
 	Array<int> solution = conf;
-	Result retval = new Result;
+	Result retval = new;
 	//
 	if(weight(n, stuff, conf) <= M)
 		if((cur_cost = cost(n, stuff, conf)) > max_cost)

@@ -20,25 +20,28 @@ options {
  *------------------------------------------------------------------*/
 program returns [Program prg]
 	@init { $prg = new Program(); }
-	:	(funcDef { $prg.functions.add($funcDef.fn); $funcDef.fn.parent = $prg; })* EOF
+	:	(
+			funcDef { $prg.functions.add($funcDef.fn); $funcDef.fn.parent = $prg; }
+			| structDef { $prg.structures.add($structDef.struct); $structDef.struct.parent = $prg; }
+		)* EOF
 	;
 	
 funcDef returns [FunctionDefinition fn]
-	:	'function' IDENTIFIER '(' paramsList? ')' blockStmt
-		{ $fn = new FunctionDefinition($IDENTIFIER.text, $paramsList.params, $blockStmt.stmt); if($paramsList.params != null) $paramsList.params.parent = $fn; $blockStmt.stmt.parent = $fn; }
+	:	dataType IDENTIFIER '(' paramsList? ')' blockStmt
+		{ $fn = new FunctionDefinition($dataType.type, $IDENTIFIER.text, $paramsList.params, $blockStmt.stmt); if($paramsList.params != null) $paramsList.params.parent = $fn; $dataType.type.parent = $fn; $blockStmt.stmt.parent = $fn; }
 	;
 	
 paramsList returns [ExpressionList params]
-	:	id=IDENTIFIER
+	:	type=dataType id=IDENTIFIER
 		{
 			$params = new ExpressionList();
-			Variable var = new Variable($id.text);
+			Variable var = new Variable($id.text, $type.type);
 			$params.expressions.add(var);
 			var.parent = $params;
 		}
-		( ',' id=IDENTIFIER
+		( ',' type=dataType id=IDENTIFIER
 			{
-				Variable var = new Variable($id.text);
+				Variable var = new Variable($id.text, $type.type);
 				$params.expressions.add(var);
 				var.parent = $params;
 			}
@@ -46,16 +49,64 @@ paramsList returns [ExpressionList params]
 	;
 	
 stmt returns [Statement stmt]
-	: ';'
-	| expr ';'     { $stmt = new ExpressionStatement($expr.expr); $expr.expr.parent = $stmt; }
-	| blockStmt    { $stmt = $blockStmt.stmt; }
-	| whileStmt    { $stmt = $whileStmt.stmt; }
-	| doWhileStmt  { $stmt = $doWhileStmt.stmt; }
-	| forStmt      { $stmt = $forStmt.stmt; }
-	| ifStmt       { $stmt = $ifStmt.stmt; }
-	| breakStmt    { $stmt = $breakStmt.stmt; }
-	| continueStmt { $stmt = $continueStmt.stmt; }
-	| returnStmt   { $stmt = $returnStmt.stmt; }
+	:	';'
+	|	declaration ';' { $stmt = new ExpressionStatement($declaration.decl); $declaration.decl.parent = $stmt; }
+	|	expr ';'        { $stmt = new ExpressionStatement($expr.expr); $expr.expr.parent = $stmt; }
+	|	blockStmt       { $stmt = $blockStmt.stmt; }
+	|	whileStmt       { $stmt = $whileStmt.stmt; }
+	|	doWhileStmt     { $stmt = $doWhileStmt.stmt; }
+	|	forStmt         { $stmt = $forStmt.stmt; }
+	|	ifStmt          { $stmt = $ifStmt.stmt; }
+	|	breakStmt       { $stmt = $breakStmt.stmt; }
+	|	continueStmt    { $stmt = $continueStmt.stmt; }
+	|	returnStmt      { $stmt = $returnStmt.stmt; }
+	;
+
+dataType returns [DataType type]
+	:	'Array' '<' arg=dataType '>' { $type = new DataType(DataType.ARRAY, $arg.type); }
+	|	'int'                        { $type = new DataType(DataType.INTEGER); }
+	|	'double'                     { $type = new DataType(DataType.DOUBLE); }
+	|	'File'                       { $type = new DataType(DataType.FILE); }
+	|	'String'                     { $type = new DataType(DataType.STRING); }
+	|	IDENTIFIER					 { $type = new DataType(DataType.STRUCTURE, $IDENTIFIER.text); }
+	|	'void'						 { $type = new DataType(DataType.VOID); }
+	|	'bool'						 { $type = new DataType(DataType.BOOL); }
+	;
+
+declaration returns [ExpressionList decl]
+	:	type=dataType id=IDENTIFIER ('=' e=expr)?
+			{
+				$decl = new ExpressionList();
+				Variable var = new Variable($id.text, $type.type);
+				if($e.expr != null)
+				{
+					var.value = $e.expr;
+					var.value.parent = var;
+				}
+				var.parent = $decl;
+				$decl.expressions.add(var);
+
+			}
+		(',' id=IDENTIFIER ('=' e=expr)?
+	  		{
+	  			Variable var = new Variable($id.text, $type.type);
+				if($e.expr != null)
+				{
+					var.value = $e.expr;
+					var.value.parent = var;
+				}
+				var.parent = $decl;
+				$decl.expressions.add(var);
+		  	}
+		)*
+	;
+
+structDef returns [StructureDefinition struct]
+	:	'struct' id=IDENTIFIER '{'
+			{ $struct = new StructureDefinition($id.text); }
+		(type=dataType var=IDENTIFIER ';'
+			{ $struct.declarations.expressions.add(new Variable($var.text, $type.type)); }
+		)+ '}'
 	;
 	
 whileStmt returns [WhileStatement stmt]
@@ -69,8 +120,15 @@ doWhileStmt returns [DoWhileStatement stmt]
 	;
 	
 forStmt returns [ForStatement stmt]
-	:	'for' '(' init=expr? ';' cond=expr? ';' iter=expr? ')' body=stmt
-		{ $stmt = new ForStatement($init.expr, $cond.expr, $iter.expr, $body.stmt); $init.expr.parent = $stmt; $cond.expr.parent = $stmt; $iter.expr.parent = $stmt; $body.stmt.parent = $stmt; }
+	:	'for' '(' (initE=expr|initD=declaration)? ';' cond=expr? ';' iter=expr? ')' body=stmt
+			{
+				$stmt = new ForStatement(($initE.expr != null ? $initE.expr : ($initD.decl != null ? $initD.decl : null)), $cond.expr, $iter.expr, $body.stmt);
+				if($initE.expr != null) $initE.expr.parent = $stmt;
+				else if($initD.decl != null) $initD.decl.parent = $stmt;
+				if($cond.expr != null) $cond.expr.parent = $stmt;
+				if($iter.expr != null) $iter.expr.parent = $stmt;
+				$body.stmt.parent = $stmt;
+			}
 	;
 
 ifStmt returns [IfStatement stmt]
@@ -403,11 +461,18 @@ atom returns [Expression expr]
 		{ $expr = $literal.expr; }
 	|	'(' e=expr ')'
 		{ $expr = $e.expr; }
-	|	variable ( ('[' index=expr ']' { $variable.expr.isArray = true; $variable.expr.members.add($index.expr); }) |
-	               ('.' member=IDENTIFIER { $variable.expr.isArray = true; $variable.expr.members.add(new StringAtom($member.text)); }) )*
+	|	variable ( ('[' index=expr ']' { $variable.expr.members.add($index.expr); $index.expr.parent = $variable.expr; }) |
+	               ('.' member=IDENTIFIER { $variable.expr.members.add(new StringAtom($member.text)); }) )*
 		{ $expr = $variable.expr; }
 	|	funcCall
 		{ $expr = $funcCall.expr; }
+	|	newExpr
+		{ $expr = $newExpr.expr; }
+	;
+
+newExpr returns [Expression expr]
+	:	'new' ('[' count=expr ']')?
+		{ $expr = new NewExpression($count.expr); }
 	;
 		
 literal returns [Expression expr]
@@ -415,21 +480,11 @@ literal returns [Expression expr]
 	|	INTEGER { $expr = new IntegerAtom(Integer.parseInt($INTEGER.text)); }
 	|	REAL    { $expr = new RealAtom(Double.parseDouble($REAL.text)); }
 	|	BOOLEAN { $expr = new BooleanAtom(Boolean.parseBoolean($BOOLEAN.text)); }
-	|	arrayConstructor { $expr = $arrayConstructor.expr; }
+	|	NULL	{ $expr = new NullAtom(); }
 	;
 	
 variable returns [Variable expr]
 	:	IDENTIFIER { $expr = new Variable($IDENTIFIER.text); }
-	;
-	
-arrayConstructor returns [ArrayConstructor expr]
-	@init { $expr = new ArrayConstructor(); }
-	:	'[' ( e=arrayElem { $expr.items.put($e.entry.key, $e.entry.value); } ( ',' e=arrayElem { $expr.items.put($e.entry.key, $e.entry.value); } )* )? ']'
-	;
-	
-arrayElem returns [ArrayConstructor.Item entry]
-	:	key=expr ':' val=expr
-		{ $entry = new ArrayConstructor.Item($key.expr, $val.expr); }
 	;
 	
 funcCall returns [FunctionCall expr]
@@ -511,6 +566,8 @@ postfixOp returns [Integer operator]
  * LEXER RULES
  *------------------------------------------------------------------*/
 BOOLEAN: 'true' | 'false';
+
+NULL:	'null';
 
 IDENTIFIER: NONDIGIT ( NONDIGIT | DIGIT )* ;
 fragment NONDIGIT: ( UNIVERSAL_CHARACTER_NAME | '_' | 'a'..'z' | 'A'..'Z' ) ;

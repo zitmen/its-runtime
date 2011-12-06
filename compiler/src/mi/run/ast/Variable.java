@@ -9,21 +9,20 @@ import mi.run.bytecode.LoadStoreInstr;
 public class Variable extends Atom
 {
     public String name;
-    public boolean isArray;
     public Expression value;
+    public DataType type;
     public ArrayList<Expression> members;
     
     public Variable(String name)
     {
-        isArray = false;
         value = null;
         this.name = name;
         members = new ArrayList<Expression>();
     }
     
-    public Variable(String name, boolean array)
+    public Variable(String name, DataType type)
     {
-        isArray = array;
+        this.type = type;
         value = null;
         this.name = name;
         members = new ArrayList<Expression>();
@@ -31,7 +30,7 @@ public class Variable extends Atom
     
     public Variable()
     {
-        isArray = true;
+        type = null;
         value = null;
         name = null;
         members = new ArrayList<Expression>();
@@ -40,7 +39,7 @@ public class Variable extends Atom
     @Override
     public String toString()
     {
-        return "(Variable " + name + " " + members + " " + isArray + " " + value + ")";
+        return "(Variable " + name + " " + members + " " + type + " " + value + ")";
     }
     
     @Override
@@ -70,6 +69,8 @@ public class Variable extends Atom
     @Override
     public Instruction genByteCode()
     {
+        throw new UnsupportedOperationException("Not supported yet.");
+        /*
         if(isArray)
         {
             boolean dump_indices = false;
@@ -96,5 +97,6 @@ public class Variable extends Atom
         }
         else
             return new LoadStoreInstr(Code.LD, this);
+        */
     }
 }

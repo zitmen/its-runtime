@@ -45,6 +45,8 @@ public class BinaryExpression extends Expression
     @Override
     public Instruction genByteCode()
     {
+        throw new UnsupportedOperationException("Not supported yet.");
+        /*
         Variable var;
         Instruction stream, first, arr_stream;
         //
@@ -400,6 +402,7 @@ public class BinaryExpression extends Expression
             }
         }
         return first;
+        */
     }
 
     @Override

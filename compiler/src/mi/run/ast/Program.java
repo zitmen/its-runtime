@@ -10,17 +10,19 @@ import mi.run.semantic.Functions;
 
 public class Program extends Node
 {
+    public java.util.ArrayList<StructureDefinition> structures;
     public java.util.ArrayList<FunctionDefinition> functions;
     
     public Program()
     {
-        functions = new java.util.ArrayList<FunctionDefinition>();
+        functions  = new java.util.ArrayList<FunctionDefinition>();
+        structures = new java.util.ArrayList<StructureDefinition>();
     }
 
     @Override
     public String toString()
     {
-        return "(Program " + functions + ")";
+        return "(Program " + structures + functions + ")";
     }
     
     @Override
@@ -35,6 +37,9 @@ public class Program extends Node
     @Override
     public Instruction genByteCode()
     {
+        // TODO: struktury --nejak musim uvest jejich popis!!
+        throw new UnsupportedOperationException("Not supported yet.");
+        /*
         // "main" function is the first, then other functions following
         //
         HashMap<String, Instruction> fnCode = new HashMap<String, Instruction>();
@@ -61,6 +66,7 @@ public class Program extends Node
             }
         }
         return first;
+        */
     }
     
     private Instruction removeNoOps(Instruction instr)

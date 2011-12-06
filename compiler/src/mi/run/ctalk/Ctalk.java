@@ -38,12 +38,6 @@ public class Ctalk
             PrintStream printer = new PrintStream(out);
             machine.printByteCode(printer);
             printer.close();
-            //
-            //machine.printByteCode(System.out);
-            System.out.println("\nINTERPRETING");
-            machine.interpret();
-            System.out.println("HALT.");
-            System.out.println("RETURN VALUE = " + (machine.memory.stack.empty() ? "null" : machine.memory.stack.pop().toString()));
         //}
         //catch(Exception ex)
         //{
