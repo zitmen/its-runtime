@@ -8,7 +8,7 @@ import mi.run.runtime.built_in_routines.ArrayRoutines;
 import mi.run.runtime.built_in_routines.IORoutines;
 import mi.run.runtime.built_in_routines.MathRoutines;
 import mi.run.runtime.built_in_routines.StringRoutines;
-import mi.run.runtime.built_in_routines.TypeCheckRoutines;
+import mi.run.runtime.built_in_routines.TypeCastRoutines;
 import mi.run.semantic.Functions;
 
 public class CallInstr extends Instruction
@@ -60,22 +60,26 @@ public class CallInstr extends Instruction
                     push(machine, new Value(StringRoutines.startsWith(pop(machine).toStr(), pop(machine).toStr())));
                 else if(functionName.equals("endsWith"))
                     push(machine, new Value(StringRoutines.endsWith(pop(machine).toStr(), pop(machine).toStr())));
-                else if(functionName.equals("string"))
-                    push(machine, new Value(StringRoutines.string(pop(machine))));
-                else if(functionName.equals("integer"))
-                    push(machine, new Value(StringRoutines.integer(pop(machine))));
-                else if(functionName.equals("real"))
-                    push(machine, new Value(StringRoutines.real(pop(machine))));
-                else if(functionName.equals("length"))
-                    push(machine, new Value(StringRoutines.length(pop(machine).toStr())));
+                else if(functionName.equals("strlen"))
+                    push(machine, new Value(StringRoutines.strlen(pop(machine).toStr())));
+                else if(functionName.equals("int2str"))
+                    push(machine, new Value(TypeCastRoutines.int2str(pop(machine).toInt())));
+                else if(functionName.equals("double2str"))
+                    push(machine, new Value(TypeCastRoutines.double2str(pop(machine).toReal())));
+                else if(functionName.equals("str2int"))
+                    push(machine, new Value(TypeCastRoutines.str2int(pop(machine).toStr())));
+                else if(functionName.equals("double2int"))
+                    push(machine, new Value(TypeCastRoutines.double2int(pop(machine).toReal())));
+                else if(functionName.equals("int2double"))
+                    push(machine, new Value(TypeCastRoutines.int2double(pop(machine).toInt())));
+                else if(functionName.equals("str2double"))
+                    push(machine, new Value(TypeCastRoutines.str2double(pop(machine).toStr())));
                 else if(functionName.equals("cloneArray"))
                     push(machine, new Value(ArrayRoutines.cloneArray(pop(machine).toArray())));
                 else if(functionName.equals("clearArray"))  // no retval
                     ArrayRoutines.clearArray(pop(machine).toArray());
-                else if(functionName.equals("containsKey"))
-                    push(machine, new Value(ArrayRoutines.containsKey(pop(machine).toArray(), pop(machine))));
-                else if(functionName.equals("getKeys"))
-                    push(machine, new Value(ArrayRoutines.getKeys(pop(machine).toArray())));
+                else if(functionName.equals("length"))
+                    push(machine, new Value(ArrayRoutines.length(pop(machine).toArray())));
                 else if(functionName.equals("openRFile"))
                     push(machine, new Value(IORoutines.openRFile(pop(machine).toStr())));
                 else if(functionName.equals("openWFile"))
@@ -106,22 +110,14 @@ public class CallInstr extends Instruction
                     push(machine, new Value(IORoutines.eoi()));
                 else if(functionName.equals("eof"))
                     push(machine, new Value(IORoutines.eof(pop(machine).toRFile())));
-                else if(functionName.equals("isString"))
-                    push(machine, new Value(TypeCheckRoutines.isString(pop(machine))));
-                else if(functionName.equals("isArray"))
-                    push(machine, new Value(TypeCheckRoutines.isArray(pop(machine))));
-                else if(functionName.equals("isInteger"))
-                    push(machine, new Value(TypeCheckRoutines.isInteger(pop(machine))));
-                else if(functionName.equals("isReal"))
-                    push(machine, new Value(TypeCheckRoutines.isReal(pop(machine))));
-                else if(functionName.equals("isFile"))
-                    push(machine, new Value(TypeCheckRoutines.isFile(pop(machine))));
                 else if(functionName.equals("pow"))
                     push(machine, new Value(MathRoutines.pow(pop(machine).toReal(), pop(machine).toReal())));
                 else if(functionName.equals("sqrt"))
                     push(machine, new Value(MathRoutines.sqrt(pop(machine).toReal())));
                 else if(functionName.equals("log"))
                     push(machine, new Value(MathRoutines.log(pop(machine).toReal())));
+                else if(functionName.equals("rand"))
+                    push(machine, new Value(MathRoutines.rand(pop(machine).toInt())));
                 else
                     throw new Exception("Runtime error: function '" + functionName + "' doesn't exist!");
                 //

@@ -6,6 +6,11 @@ public class NewExpression extends Atom
 {
     public Expression count;
     
+    public NewExpression()
+    {
+        this.count = null;
+    }
+    
     public NewExpression(Expression count)
     {
         this.count = count;
@@ -14,13 +19,16 @@ public class NewExpression extends Atom
     @Override
     public String toString()
     {
-        throw new UnsupportedOperationException("Not supported yet.");
+        return "(NewExpression " + count + ")";
     }
 
     @Override
     public Node optimize() throws Exception
     {
-        count.optimize();
+        if(count != null)
+        {
+            count.optimize();
+        }
         return this;
     }
 
@@ -33,7 +41,18 @@ public class NewExpression extends Atom
     @Override
     public void semanticCheck() throws Exception
     {
-        throw new UnsupportedOperationException("Not supported yet.");
+        if(count != null)
+        {
+            count.semanticCheck();
+            if(count.evalDatatype() != DataType.INTEGER)
+                throw new Exception("SEMANTIC ERROR: argument of NEW expression must be INTEGER");
+        }
+    }
+
+    @Override
+    public int evalDatatype()
+    {
+        return DataType.NEW_EXPR;
     }
     
 }

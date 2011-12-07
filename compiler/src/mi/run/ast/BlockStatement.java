@@ -2,6 +2,7 @@ package mi.run.ast;
 
 import mi.run.bytecode.Code;
 import mi.run.bytecode.Instruction;
+import mi.run.semantic.SymbolTable;
 
 public class BlockStatement extends Statement
 {
@@ -21,8 +22,10 @@ public class BlockStatement extends Statement
    @Override
     public void semanticCheck() throws Exception
     {
+        SymbolTable.stepIn();
         for(int i = 0; i < statements.size(); i++)
             statements.get(i).semanticCheck();
+        SymbolTable.stepOut();
     }
 
     @Override

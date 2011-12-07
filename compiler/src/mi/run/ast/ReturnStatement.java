@@ -11,6 +11,18 @@ public class ReturnStatement extends Statement
     {
         returnValue = retval;
     }
+    
+    private FunctionDefinition getFunction()
+    {
+        Node node = parent;
+        while(node != null)
+        {
+            if(node instanceof FunctionDefinition)
+                return (FunctionDefinition)node;
+            node = node.parent;
+        }
+        return null;
+    }
 
     @Override
     public String toString()
@@ -24,8 +36,18 @@ public class ReturnStatement extends Statement
     @Override
     public void semanticCheck() throws Exception
     {
+        FunctionDefinition fn = getFunction();
+        if(fn == null)
+            throw new Exception("SEMANTIC ERROR: return statement must not be used outside of function scope!");
+        //
         if(returnValue != null)
+        {
             returnValue.semanticCheck();
+            if(returnValue.evalDatatype() != fn.type.type)
+                throw new Exception("SEMANTIC ERROR: function '" + fn.name + "' must return declared type!");
+        }
+        else if(fn.type.type != DataType.VOID)
+            throw new Exception("SEMANTIC ERROR: function '" + fn.name + "' must return declared type!");
     }
 
     @Override

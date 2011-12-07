@@ -2,6 +2,7 @@ package mi.run.runtime;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.util.ArrayList;
 import java.util.HashMap;
 
 public final class Value
@@ -22,7 +23,7 @@ public final class Value
     String sVal;    // String
     BufferedReader frVal;   // File reader
     BufferedWriter fwVal;   // File Writer
-    HashMap<Object, Value> aVal;   // Array
+    ArrayList<Value> aVal;   // Array
 
     public Value(int val)
     {
@@ -59,7 +60,7 @@ public final class Value
         set(val);
     }
     
-    public Value(HashMap<Object, Value> val)
+    public Value(ArrayList<Value> val)
     {
         set(val);
     }
@@ -105,7 +106,7 @@ public final class Value
         fwVal = f;
     }
     
-    public void set(HashMap<Object, Value> a)
+    public void set(ArrayList<Value> a)
     {
         type = ARRAY;
         aVal = a;
@@ -199,7 +200,7 @@ public final class Value
         return null;   // RFILE
     }
     
-    public HashMap<Object, Value> toArray() throws Exception
+    public ArrayList<Value> toArray() throws Exception
     {
         switch(type)
         {
@@ -209,9 +210,9 @@ public final class Value
             case STRING:
             case RFILE:
             case WFILE:
-                if(aVal == null) aVal = new HashMap<Object, Value>();
+                if(aVal == null) aVal = new ArrayList<Value>();
                 aVal.clear();
-                aVal.put(new Integer(0), this);
+                aVal.add(this);
             case ARRAY:
                 return aVal;
         }

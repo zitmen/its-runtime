@@ -46,7 +46,7 @@ public class ExpressionStatement extends Statement
         expression = (Expression)expression.optimize();
         if((expression instanceof StringAtom ) || (expression instanceof RealAtom) ||
            (expression instanceof IntegerAtom) || (expression instanceof BooleanAtom) ||
-           (expression instanceof UnaryExpression) || (expression instanceof ArrayConstructor) ||
+           (expression instanceof UnaryExpression) ||
            (expression instanceof Variable) ||
            ((expression instanceof BinaryExpression) && !isAssign(((BinaryExpression)expression).operator)))
         {   // f.e.: x; 3+5; i+y; 5; [0:'foo','bar':1]; ~x; --> those kind of 'statements' are useless

@@ -1,5 +1,6 @@
 package mi.run.bytecode;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import mi.run.runtime.Interpreter;
 import mi.run.runtime.Value;
@@ -32,7 +33,7 @@ public class LoadConstInstr extends Instruction
         value = new Value(val);
     }
     
-    public LoadConstInstr(HashMap<Object, Value> val)
+    public LoadConstInstr(ArrayList<Value> val)
     {
         super(Code.LDCA);
         value = new Value(val);

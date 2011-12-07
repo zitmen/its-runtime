@@ -4,6 +4,7 @@ import mi.run.bytecode.Code;
 import mi.run.bytecode.Instruction;
 import mi.run.bytecode.JumpInstr;
 import mi.run.semantic.FlowControl;
+import mi.run.semantic.SymbolTable;
 import mi.run.semantic.TypeCast;
 
 public class ForStatement extends Statement
@@ -30,10 +31,14 @@ public class ForStatement extends Statement
     @Override
     public void semanticCheck() throws Exception
     {
+        SymbolTable.stepIn();
         init.semanticCheck();
         condition.semanticCheck();
+        if(condition.evalDatatype() != DataType.BOOL)
+            throw new Exception("SEMANTIC ERROR: condition must be of bool type!");
         iterator.semanticCheck();
         body.semanticCheck();
+        SymbolTable.stepOut();
     }
 
     @Override

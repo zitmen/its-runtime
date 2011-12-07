@@ -2,107 +2,176 @@ package mi.run.semantic;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import mi.run.ast.DataType;
+import mi.run.ast.ExpressionList;
 import mi.run.ast.FunctionCall;
 import mi.run.ast.FunctionDefinition;
+import mi.run.ast.Variable;
 
 public class Functions
 {
     public static HashMap<String, ArrayList<FunctionCall> > fnCallers = new HashMap<String, ArrayList<FunctionCall> >();    // who calls the function?
+    //
     public static HashMap<String, FunctionDefinition> functions = new HashMap<String, FunctionDefinition>();    // all fn definitions
-    public static HashMap<String, Boolean> builtInFunctions = new HashMap<String, Boolean>();   // does the function return a value?
-    public static HashMap<String, Integer> builtInFunctionsArgs = new HashMap<String, Integer>();   // how many arguments does the function have?
     public static HashMap<String, Integer> fnIC = new HashMap<String, Integer>();   // what IC jump to, when calling a function?
+    //
+    public static HashMap<String, FunctionDefinition> builtInFunctions = new HashMap<String, FunctionDefinition>();   // all built-in fn definitions
     
     public static void init()
     {
-        builtInFunctionsArgs.put("indexOf", 2);
-        builtInFunctionsArgs.put("lastIndexOf", 2);
-        builtInFunctionsArgs.put("substring", 3);
-        builtInFunctionsArgs.put("toLower", 1);
-        builtInFunctionsArgs.put("toUpper", 1);
-        builtInFunctionsArgs.put("trim", 1);
-        builtInFunctionsArgs.put("startsWith", 2);
-        builtInFunctionsArgs.put("endsWith", 2);
         //
-        builtInFunctionsArgs.put("string", 1);
-        builtInFunctionsArgs.put("integer", 1);
-        builtInFunctionsArgs.put("real", 1);
+        // StringRoutines
+        ExpressionList params = new ExpressionList();
+        params.expressions.add(new Variable("haystack", new DataType(DataType.STRING)));
+        params.expressions.add(new Variable("needle", new DataType(DataType.STRING)));
+        builtInFunctions.put("indexOf", new FunctionDefinition(new DataType(DataType.INTEGER), "indexOf", params, null));
         //
-        builtInFunctionsArgs.put("length", 1);
+        params = new ExpressionList();
+        params.expressions.add(new Variable("haystack", new DataType(DataType.STRING)));
+        params.expressions.add(new Variable("needle", new DataType(DataType.STRING)));
+        builtInFunctions.put("lastIndexOf", new FunctionDefinition(new DataType(DataType.INTEGER), "lastIndexOf", params, null));
         //
-        builtInFunctionsArgs.put("cloneArray", 1);
-        builtInFunctionsArgs.put("clearArray", 1);
-        builtInFunctionsArgs.put("containsKey", 2);
-        builtInFunctionsArgs.put("getKeys", 1);
+        params = new ExpressionList();
+        params.expressions.add(new Variable("str", new DataType(DataType.STRING)));
+        params.expressions.add(new Variable("start", new DataType(DataType.INTEGER)));
+        params.expressions.add(new Variable("end", new DataType(DataType.INTEGER)));
+        builtInFunctions.put("substring", new FunctionDefinition(new DataType(DataType.STRING), "substring", params, null));
         //
-        builtInFunctionsArgs.put("openRFile", 1);
-        builtInFunctionsArgs.put("openWFile", 2);
-        builtInFunctionsArgs.put("closeFile", 1);
-        builtInFunctionsArgs.put("flushFile", 1);
-        builtInFunctionsArgs.put("printFile", 2);
-        builtInFunctionsArgs.put("printlnFile", 2);
-        builtInFunctionsArgs.put("print", 1);
-        builtInFunctionsArgs.put("println", 1);
-        builtInFunctionsArgs.put("inputFile", 1);
-        builtInFunctionsArgs.put("input", 0);
-        builtInFunctionsArgs.put("eof", 1);
-        builtInFunctionsArgs.put("eoi", 0);
+        params = new ExpressionList();
+        params.expressions.add(new Variable("str", new DataType(DataType.STRING)));
+        builtInFunctions.put("toLower", new FunctionDefinition(new DataType(DataType.STRING), "toLower", params, null));
         //
-        builtInFunctionsArgs.put("isString", 1);
-        builtInFunctionsArgs.put("isArray", 1);
-        builtInFunctionsArgs.put("isInteger", 1);
-        builtInFunctionsArgs.put("isReal", 1);
-        builtInFunctionsArgs.put("isFile", 1);
+        params = new ExpressionList();
+        params.expressions.add(new Variable("str", new DataType(DataType.STRING)));
+        builtInFunctions.put("toUpper", new FunctionDefinition(new DataType(DataType.STRING), "toUpper", params, null));
         //
-        builtInFunctionsArgs.put("pow", 2);
-        builtInFunctionsArgs.put("sqrt", 1);
-        builtInFunctionsArgs.put("log", 1);
+        params = new ExpressionList();
+        params.expressions.add(new Variable("str", new DataType(DataType.STRING)));
+        builtInFunctions.put("trim", new FunctionDefinition(new DataType(DataType.STRING), "trim", params, null));
         //
+        params = new ExpressionList();
+        params.expressions.add(new Variable("str", new DataType(DataType.STRING)));
+        params.expressions.add(new Variable("prefix", new DataType(DataType.STRING)));
+        builtInFunctions.put("startsWith", new FunctionDefinition(new DataType(DataType.BOOL), "startsWith", params, null));
         //
+        params = new ExpressionList();
+        params.expressions.add(new Variable("str", new DataType(DataType.STRING)));
+        params.expressions.add(new Variable("suffix", new DataType(DataType.STRING)));
+        builtInFunctions.put("endsWith", new FunctionDefinition(new DataType(DataType.BOOL), "endsWith", params, null));
         //
+        params = new ExpressionList();
+        params.expressions.add(new Variable("str1", new DataType(DataType.STRING)));
+        params.expressions.add(new Variable("str2", new DataType(DataType.STRING)));
+        builtInFunctions.put("concat", new FunctionDefinition(new DataType(DataType.STRING), "concat", params, null));
         //
+        params = new ExpressionList();
+        params.expressions.add(new Variable("str", new DataType(DataType.STRING)));
+        builtInFunctions.put("strlen", new FunctionDefinition(new DataType(DataType.INTEGER), "strlen", params, null));
         //
-        builtInFunctions.put("indexOf", Boolean.TRUE);
-        builtInFunctions.put("lastIndexOf", Boolean.TRUE);
-        builtInFunctions.put("substring", Boolean.TRUE);
-        builtInFunctions.put("toLower", Boolean.TRUE);
-        builtInFunctions.put("toUpper", Boolean.TRUE);
-        builtInFunctions.put("trim", Boolean.TRUE);
-        builtInFunctions.put("startsWith", Boolean.TRUE);
-        builtInFunctions.put("endsWith", Boolean.TRUE);
+        // TypeCastRoutines
+        params = new ExpressionList();
+        params.expressions.add(new Variable("i", new DataType(DataType.INTEGER)));
+        builtInFunctions.put("int2str", new FunctionDefinition(new DataType(DataType.STRING), "int2str", params, null));
         //
-        builtInFunctions.put("string", Boolean.TRUE);
-        builtInFunctions.put("integer", Boolean.TRUE);
-        builtInFunctions.put("real", Boolean.TRUE);
+        params = new ExpressionList();
+        params.expressions.add(new Variable("s", new DataType(DataType.STRING)));
+        builtInFunctions.put("str2int", new FunctionDefinition(new DataType(DataType.INTEGER), "str2int", params, null));
         //
-        builtInFunctions.put("length", Boolean.TRUE);
+        params = new ExpressionList();
+        params.expressions.add(new Variable("d", new DataType(DataType.DOUBLE)));
+        builtInFunctions.put("double2str", new FunctionDefinition(new DataType(DataType.STRING), "double2str", params, null));
         //
-        builtInFunctions.put("cloneArray", Boolean.TRUE);
-        builtInFunctions.put("clearArray", Boolean.FALSE);
-        builtInFunctions.put("containsKey", Boolean.TRUE);
-        builtInFunctions.put("getKeys", Boolean.TRUE);
+        params = new ExpressionList();
+        params.expressions.add(new Variable("s", new DataType(DataType.STRING)));
+        builtInFunctions.put("str2double", new FunctionDefinition(new DataType(DataType.DOUBLE), "str2double", params, null));
         //
-        builtInFunctions.put("openRFile", Boolean.TRUE);
-        builtInFunctions.put("openWFile", Boolean.TRUE);
-        builtInFunctions.put("closeFile", Boolean.FALSE);
-        builtInFunctions.put("flushFile", Boolean.FALSE);
-        builtInFunctions.put("printFile", Boolean.FALSE);
-        builtInFunctions.put("printlnFile", Boolean.FALSE);
-        builtInFunctions.put("print", Boolean.FALSE);
-        builtInFunctions.put("println", Boolean.FALSE);
-        builtInFunctions.put("inputFile", Boolean.TRUE);
-        builtInFunctions.put("input", Boolean.TRUE);
-        builtInFunctions.put("eof", Boolean.TRUE);
-        builtInFunctions.put("eoi", Boolean.TRUE);
+        params = new ExpressionList();
+        params.expressions.add(new Variable("i", new DataType(DataType.INTEGER)));
+        builtInFunctions.put("int2double", new FunctionDefinition(new DataType(DataType.DOUBLE), "int2double", params, null));
         //
-        builtInFunctions.put("isString", Boolean.TRUE);
-        builtInFunctions.put("isArray", Boolean.TRUE);
-        builtInFunctions.put("isInteger", Boolean.TRUE);
-        builtInFunctions.put("isReal", Boolean.TRUE);
-        builtInFunctions.put("isFile", Boolean.TRUE);
+        params = new ExpressionList();
+        params.expressions.add(new Variable("d", new DataType(DataType.DOUBLE)));
+        builtInFunctions.put("double2int", new FunctionDefinition(new DataType(DataType.INTEGER), "double2int", params, null));
         //
-        builtInFunctions.put("pow", Boolean.TRUE);
-        builtInFunctions.put("sqrt", Boolean.TRUE);
-        builtInFunctions.put("log", Boolean.TRUE);
+        // ArrayRoutines
+        params = new ExpressionList();
+        params.expressions.add(new Variable("arr", new DataType(DataType.ARRAY)));
+        builtInFunctions.put("cloneArray", new FunctionDefinition(new DataType(DataType.ARRAY), "cloneArray", params, null));
+        //
+        params = new ExpressionList();
+        params.expressions.add(new Variable("arr", new DataType(DataType.ARRAY)));
+        builtInFunctions.put("clearArray", new FunctionDefinition(new DataType(DataType.VOID), "clearArray", params, null));
+        //
+        params = new ExpressionList();
+        params.expressions.add(new Variable("arr", new DataType(DataType.ARRAY)));
+        builtInFunctions.put("length", new FunctionDefinition(new DataType(DataType.INTEGER), "length", params, null));
+        //
+        // IORoutines
+        params = new ExpressionList();
+        params.expressions.add(new Variable("fname", new DataType(DataType.STRING)));
+        builtInFunctions.put("openRFile", new FunctionDefinition(new DataType(DataType.FILE), "openRFile", params, null));
+        //
+        params = new ExpressionList();
+        params.expressions.add(new Variable("fname", new DataType(DataType.STRING)));
+        params.expressions.add(new Variable("append", new DataType(DataType.BOOL)));
+        builtInFunctions.put("openWFile", new FunctionDefinition(new DataType(DataType.FILE), "openWFile", params, null));
+        //
+        params = new ExpressionList();
+        params.expressions.add(new Variable("f", new DataType(DataType.FILE)));
+        builtInFunctions.put("closeFile", new FunctionDefinition(new DataType(DataType.VOID), "closeFile", params, null));
+        //
+        params = new ExpressionList();
+        params.expressions.add(new Variable("f", new DataType(DataType.FILE)));
+        builtInFunctions.put("flushFile", new FunctionDefinition(new DataType(DataType.VOID), "flushFile", params, null));
+        //
+        params = new ExpressionList();
+        params.expressions.add(new Variable("f", new DataType(DataType.FILE)));
+        params.expressions.add(new Variable("str", new DataType(DataType.STRING)));
+        builtInFunctions.put("printFile", new FunctionDefinition(new DataType(DataType.VOID), "printFile", params, null));
+        //
+        params = new ExpressionList();
+        params.expressions.add(new Variable("f", new DataType(DataType.FILE)));
+        params.expressions.add(new Variable("str", new DataType(DataType.STRING)));
+        builtInFunctions.put("printlnFile", new FunctionDefinition(new DataType(DataType.VOID), "printlnFile", params, null));
+        //
+        params = new ExpressionList();
+        params.expressions.add(new Variable("str", new DataType(DataType.STRING)));
+        builtInFunctions.put("print", new FunctionDefinition(new DataType(DataType.VOID), "print", params, null));
+        //
+        params = new ExpressionList();
+        params.expressions.add(new Variable("str", new DataType(DataType.STRING)));
+        builtInFunctions.put("println", new FunctionDefinition(new DataType(DataType.VOID), "println", params, null));
+        //
+        params = new ExpressionList();
+        params.expressions.add(new Variable("f", new DataType(DataType.FILE)));
+        builtInFunctions.put("inputFile", new FunctionDefinition(new DataType(DataType.STRING), "inputFile", params, null));
+        //
+        params = new ExpressionList();
+        builtInFunctions.put("input", new FunctionDefinition(new DataType(DataType.STRING), "input", params, null));
+        //
+        params = new ExpressionList();
+        params.expressions.add(new Variable("f", new DataType(DataType.FILE)));
+        builtInFunctions.put("eof", new FunctionDefinition(new DataType(DataType.BOOL), "eof", params, null));
+        //
+        params = new ExpressionList();
+        builtInFunctions.put("eoi", new FunctionDefinition(new DataType(DataType.BOOL), "eoi", params, null));
+        //
+        // MathRoutines
+        params = new ExpressionList();
+        params.expressions.add(new Variable("x", new DataType(DataType.DOUBLE)));
+        params.expressions.add(new Variable("n", new DataType(DataType.DOUBLE)));
+        builtInFunctions.put("pow", new FunctionDefinition(new DataType(DataType.DOUBLE), "pow", params, null));
+        //
+        params = new ExpressionList();
+        params.expressions.add(new Variable("x", new DataType(DataType.DOUBLE)));
+        builtInFunctions.put("sqrt", new FunctionDefinition(new DataType(DataType.DOUBLE), "sqrt", params, null));
+        //
+        params = new ExpressionList();
+        params.expressions.add(new Variable("x", new DataType(DataType.DOUBLE)));
+        builtInFunctions.put("log", new FunctionDefinition(new DataType(DataType.DOUBLE), "log", params, null));
+        //
+        params = new ExpressionList();
+        params.expressions.add(new Variable("modul", new DataType(DataType.DOUBLE)));
+        builtInFunctions.put("rand", new FunctionDefinition(new DataType(DataType.INTEGER), "rand", params, null));
     }
 }

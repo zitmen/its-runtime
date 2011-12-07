@@ -1,22 +1,26 @@
 package mi.run.ast;
 
+import java.util.HashMap;
 import mi.run.bytecode.Instruction;
+import mi.run.semantic.SymbolTable;
 
 public class StructureDefinition extends Node
 {
     public String name;
     public ExpressionList declarations;
+    public HashMap<String, DataType> variables;
     
     public StructureDefinition(String name)
     {
         this.name = name;
         declarations = new ExpressionList();
+        variables = new HashMap<String, DataType>();
     }
     
     @Override
     public String toString()
     {
-        throw new UnsupportedOperationException("Not supported yet.");
+        return "(StructureDefinition " + name + " " + declarations + ")";
     }
 
     @Override
@@ -28,13 +32,15 @@ public class StructureDefinition extends Node
     @Override
     public Instruction genByteCode()
     {
-        return null;
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 
     @Override
     public void semanticCheck() throws Exception
     {
-        throw new UnsupportedOperationException("Not supported yet.");
+        SymbolTable.stepIn();
+        declarations.semanticCheck();
+        variables = SymbolTable.getThisScopeDeclarations();
+        SymbolTable.stepOut();
     }
-    
 }

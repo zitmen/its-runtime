@@ -408,14 +408,42 @@ public class BinaryExpression extends Expression
     @Override
     public void semanticCheck() throws Exception
     {
-        if(rightOperand instanceof FunctionCall)
-        {
-            String fnName = ((FunctionCall)rightOperand).functionName;
-            if(Functions.builtInFunctions.get(fnName) == Boolean.FALSE)
-                throw new Exception("Semantic error: function '" + fnName + "' doesn't return value! Therefore you can't assign it to a variable!");
-        }
-        //
         leftOperand.semanticCheck();
         rightOperand.semanticCheck();
+        //
+        exprDataType = leftOperand.evalDatatype();
+        if((operator == Operator.ASN) && ((exprDataType == DataType.ARRAY) || (exprDataType == DataType.STRING) || (exprDataType == DataType.STRUCTURE)))
+        {
+            int type = rightOperand.evalDatatype();
+            if((type != DataType.NEW_EXPR) && (type != DataType.NULL))
+                exprDataType = DataType.INVALID;
+            else if((type == DataType.NEW_EXPR) && ((exprDataType == DataType.ARRAY) || (exprDataType == DataType.STRING)))
+            {
+                if(((NewExpression)rightOperand).count == null)
+                    throw new Exception("SEMANTIC ERROR: Array and String must be initialized by operator new[] (not only new)!");
+            }
+        }
+        else
+            exprDataType = DataType.INVALID;
+        //
+        if(exprDataType == DataType.INVALID)
+        {
+            if((exprDataType = leftOperand.evalDatatype()) != rightOperand.evalDatatype())
+                throw new Exception("SEMANTIC ERROR: both operands of BinaryExpression must be of the same type!\n" + toString());
+            if(Operator.isRelational(operator))
+                exprDataType = DataType.BOOL;
+        }
+    }
+
+    @Override
+    public int evalDatatype()
+    {
+        if(exprDataType == DataType.INVALID)
+        {
+            exprDataType = leftOperand.evalDatatype();
+            if(Operator.isRelational(operator))
+                exprDataType = DataType.BOOL;
+        }
+        return exprDataType;
     }
 }

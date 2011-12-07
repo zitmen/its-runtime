@@ -38,11 +38,45 @@ public class UnaryExpression extends Atom
     @Override
     public void semanticCheck() throws Exception
     {
-        if((operator != Operator.NOT) && (operator != Operator.NEG) && (operator != Operator.MINUS) &&
-           (operator != Operator.DEC) && (operator != Operator.INC) && (operator != Operator.PLUS))
-            throw new Exception("Operator '" + operator + "' is not supported!");
-        //
         operand.semanticCheck();
+        //
+        exprDataType = operand.evalDatatype();
+        switch(operator)
+        {
+            case Operator.NOT:
+                if(exprDataType != DataType.BOOL)
+                    throw new Exception("SEMANTIC ERROR: operator '!' must be used only with operand of bool type!");
+                break;
+                
+            case Operator.NEG:
+                if(exprDataType != DataType.INTEGER)
+                    throw new Exception("SEMANTIC ERROR: operator '~' must be used only with operand of int type!");
+                break;
+                    
+            case Operator.MINUS:
+                if(exprDataType != DataType.INTEGER && exprDataType != DataType.DOUBLE)
+                    throw new Exception("SEMANTIC ERROR: operator '-' must be used only with operand of int type or double type!");
+                break;
+                        
+            case Operator.PLUS:
+                if(exprDataType != DataType.INTEGER && exprDataType != DataType.DOUBLE)
+                    throw new Exception("SEMANTIC ERROR: operator '+' must be used only with operand of int type or double type!");
+                break;
+                            
+            case Operator.INC:
+                if(exprDataType != DataType.INTEGER)
+                    throw new Exception("SEMANTIC ERROR: operator '++' must be used only with operand of int type!");
+                break;
+                                
+            case Operator.DEC:
+                if(exprDataType != DataType.INTEGER)
+                    throw new Exception("SEMANTIC ERROR: operator '--' must be used only with operand of int type!");
+                break;
+                
+            default:
+                throw new Exception("Operator '" + operator + "' is not supported!");
+                //break;
+        }
     }
 
     @Override
@@ -131,5 +165,14 @@ public class UnaryExpression extends Atom
             return first;
         }
         return null;    // can't happen due to the previous semantic check
+    }
+
+    @Override
+    public int evalDatatype()
+    {
+        if(exprDataType == DataType.INVALID)
+            return (exprDataType = operand.evalDatatype());
+        else
+            return exprDataType;
     }
 }

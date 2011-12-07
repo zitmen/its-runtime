@@ -3,6 +3,7 @@ package mi.run.ast;
 import mi.run.bytecode.Code;
 import mi.run.bytecode.Instruction;
 import mi.run.bytecode.LoadStoreInstr;
+import mi.run.semantic.SymbolTable;
 
 public class FunctionDefinition extends Node
 {
@@ -71,7 +72,9 @@ public class FunctionDefinition extends Node
     public void semanticCheck() throws Exception
     {
         removeNulls();
+        SymbolTable.stepIn();
         parameters.semanticCheck();
         body.semanticCheck();
+        SymbolTable.stepOut();
     }
 }

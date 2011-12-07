@@ -4,6 +4,7 @@ import mi.run.bytecode.Code;
 import mi.run.bytecode.Instruction;
 import mi.run.bytecode.JumpInstr;
 import mi.run.semantic.FlowControl;
+import mi.run.semantic.SymbolTable;
 import mi.run.semantic.TypeCast;
 
 public class DoWhileStatement extends Statement
@@ -26,8 +27,10 @@ public class DoWhileStatement extends Statement
     @Override
     public void semanticCheck() throws Exception
     {
+        SymbolTable.stepIn();
         condition.semanticCheck();
         body.semanticCheck();
+        SymbolTable.stepOut();
     }
 
     @Override

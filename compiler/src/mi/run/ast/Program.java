@@ -7,6 +7,7 @@ import java.util.Map.Entry;
 import mi.run.bytecode.Code;
 import mi.run.bytecode.Instruction;
 import mi.run.semantic.Functions;
+import mi.run.semantic.Structures;
 
 public class Program extends Node
 {
@@ -102,16 +103,30 @@ public class Program extends Node
         if(Functions.functions.get("main") == null) // entry point!?
             throw new Exception("Semantic error: missing entry point! You must define function 'main'!");
     }
+    
+    public void buildStructuresTable() throws Exception
+    {
+        StructureDefinition structDef;
+        for(int i = 0, im = structures.size(); i < im; i++)
+        {
+            structDef = structures.get(i);
+            if(Structures.structures.get(structDef.name) == null)
+                Structures.structures.put(structDef.name, structDef);
+            else
+                throw new Exception("Semantic error: redefined structure '" + structDef.name + "'!");
+        }
+    }
 
     @Override
     public void semanticCheck() throws Exception
     {
+        buildStructuresTable();  // save defined structures into the symbol table
         buildFunctionsTable();  // save defined functions into the symbol table
+        //
+        for(int i = 0, im = structures.size(); i < im; i++)
+            structures.get(i).semanticCheck();
         //
         for(int i = 0, im = functions.size(); i < im; i++)
             functions.get(i).semanticCheck();
-        //
-        if(Functions.functions.get("main") == null)
-            throw new Exception("Missing entry point -- function main() has not been defined!");
     }
 }

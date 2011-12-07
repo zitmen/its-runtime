@@ -39,18 +39,24 @@ public class FunctionCall extends Expression
         function = (FunctionDefinition)Functions.functions.get(functionName);
         int nParams;
         if(function == null)
-        {   // check arguments count
-            if((nParams = parameters.expressions.size()) != Functions.builtInFunctionsArgs.get(functionName))
-                throw new Exception("Semantic error: the function '" + functionName + "' doesn't take " + nParams + " argument(s)!");
-            else
-                isDefined = false;
+        {   // check built-in functions
+            function = Functions.builtInFunctions.get(functionName);
+            if(function == null)
+                throw new Exception("SEMANTIC ERROR: the function '" + functionName + "' does not exist!");
+            isDefined = false;
         }
         else
         {
             isDefined = true;
-            // check arguments count
-            if((nParams = parameters.expressions.size()) != function.parameters.expressions.size())
-                throw new Exception("Semantic error: the function '" + functionName + "' doesn't take " + nParams + " argument(s)!");
+        }
+        // check arguments count
+        if((nParams = parameters.expressions.size()) != function.parameters.expressions.size())
+            throw new Exception("SEMANTIC ERROR: the function '" + functionName + "' doesn't take " + nParams + " argument(s)!");
+        // check arguments types
+        for(int i = 0, im = parameters.expressions.size(); i < im; i++)
+        {
+            if(parameters.expressions.get(i).evalDatatype() != function.parameters.expressions.get(i).evalDatatype())
+                throw new Exception("SEMANTIC ERROR: the function '" + functionName + "' doesn't take " + (i+1) + ". argument of type that was used!");
         }
     }
 
@@ -65,6 +71,8 @@ public class FunctionCall extends Expression
     @Override
     public Instruction genByteCode()
     {
+        throw new UnsupportedOperationException("Not supported yet.");
+        /*
         removeNulls();
         //
         Instruction stream = parameters.genByteCode(true);  // params will be saved on the stack
@@ -72,13 +80,13 @@ public class FunctionCall extends Expression
         if(isDefined)
         {
             stream.last().append(new CallInstr(Code.CALL, functionName));
-            /* DO NOT OPRIMIZE THIS, BECAUSE I WOULD HAVE TO DO CHECK IF ANY FLOW PATH EIGHTER RETURNS A VALUE OR NOT! worst case scenario: there will be some not assigned values on the stack
+            /* DO NOT OPTIMIZE THIS, BECAUSE I WOULD HAVE TO DO CHECK IF ANY FLOW PATH EIGHTER RETURNS A VALUE OR NOT! worst case scenario: there will be some not assigned values on the stack
              * The simpliest solution to this is to declare static Interpret::RETVAL and return values via this variable (an alternative to the AX register on x86 machines).
                     // if it is ExpressionStatement or ForStatement, the value could be removed from the stack
                     if((parent instanceof ExpressionStatement) || ((parent instanceof ForStatement) && ((((ForStatement)parent).init == this) || (((ForStatement)parent).iterator == this))))
                         stream = stream.last().append(new Instruction(Code.POP));
              */
-        }
+        /*}
         else
         {
             stream.last().append(new CallInstr(Code.INVOKE, functionName));
@@ -87,6 +95,20 @@ public class FunctionCall extends Expression
                 if(Functions.builtInFunctions.get(functionName) == Boolean.TRUE)
                     stream = stream.last().append(new Instruction(Code.POP));
         }
-        return first;
+        return first;*/
+    }
+
+    @Override
+    public int evalDatatype()
+    {
+        if(exprDataType == DataType.INVALID)
+        {
+            if(function == null)
+                function = (FunctionDefinition)Functions.functions.get(functionName);
+            //
+            return (exprDataType = function.type.type);
+        }
+        else
+            return exprDataType;
     }
 }

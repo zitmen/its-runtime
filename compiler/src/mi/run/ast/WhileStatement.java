@@ -4,6 +4,7 @@ import mi.run.bytecode.Code;
 import mi.run.bytecode.Instruction;
 import mi.run.bytecode.JumpInstr;
 import mi.run.semantic.FlowControl;
+import mi.run.semantic.SymbolTable;
 import mi.run.semantic.TypeCast;
 
 public class WhileStatement extends Statement
@@ -26,8 +27,12 @@ public class WhileStatement extends Statement
     @Override
     public void semanticCheck() throws Exception
     {
+        SymbolTable.stepIn();
         condition.semanticCheck();
+        if(condition.evalDatatype() != DataType.BOOL)
+            throw new Exception("SEMANTIC ERROR: condition must be of bool type!");
         body.semanticCheck();
+        SymbolTable.stepOut();
     }
 
     @Override

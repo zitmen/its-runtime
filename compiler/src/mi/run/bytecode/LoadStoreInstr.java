@@ -29,6 +29,8 @@ public class LoadStoreInstr extends Instruction
     @Override
     public boolean interpret(Interpreter machine) throws Exception
     {
+        throw new Exception("NOT SUPPORTED!");
+/*
         switch(code)
         {
             case Code.LD:
@@ -173,5 +175,6 @@ public class LoadStoreInstr extends Instruction
         }
         machine.IC++;
         return true;
+ */
     }
 }

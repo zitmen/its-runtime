@@ -1,1 +1,77 @@
-(Program [(FunctionDefinition main null (BlockStatement [(ExpressionStatement (BinaryExpression = (Variable f [] false null) (FunctionCall openFile (ExpressionList [(StringAtom 'vstup.txt')])))), (ExpressionStatement (BinaryExpression = (Variable n [] false null) (FunctionCall input (ExpressionList [(Variable f [] false null)])))), (ExpressionStatement (BinaryExpression = (Variable M [] false null) (FunctionCall input (ExpressionList [(Variable f [] false null)])))), (ForStatement (BinaryExpression = (Variable i [] false null) (IntegerAtom 0)) (BinaryExpression < (Variable i [] false null) (Variable n [] false null)) (BinaryExpression += (Variable i [] false null) (IntegerAtom 1)) (ExpressionStatement (BinaryExpression = (Variable stuff [(Variable i [] false null)] true null) (ArrayConstructor {(StringAtom 'cost')=(FunctionCall input (ExpressionList [(Variable f [] false null)])), (StringAtom 'weight')=(FunctionCall input (ExpressionList [(Variable f [] false null)]))})))), (ExpressionStatement (FunctionCall closeFile (ExpressionList [(Variable f [] false null)]))), (ExpressionStatement (BinaryExpression = (Variable result [] false null) (FunctionCall computeSolution (ExpressionList [(Variable n [] false null), (Variable M [] false null), (Variable stuff [] false null)])))), (ExpressionStatement (BinaryExpression = (Variable f [] false null) (FunctionCall openFile (ExpressionList [(StringAtom 'vystup.txt')])))), (ExpressionStatement (FunctionCall output (ExpressionList [(Variable f [] false null), (BinaryExpression + (StringAtom 'Cena: ') (StringAtom '\nKonfigurace: '))]))), (ForStatement (BinaryExpression = (Variable i [] false null) (IntegerAtom 0)) (BinaryExpression < (Variable i [] false null) (Variable n [] false null)) (BinaryExpression += (Variable i [] false null) (IntegerAtom 1)) (ExpressionStatement (FunctionCall output (ExpressionList [(Variable f [] false null), (BinaryExpression + (StringAtom ' ') (Variable result [(Variable i [] false null)] true null))])))), (ExpressionStatement (FunctionCall closeFile (ExpressionList [(Variable f [] false null)])))])), (FunctionDefinition iterate (ExpressionList [(Variable n [] false null), (Variable conf [] false null)]) (BlockStatement [(ForStatement (BinaryExpression = (Variable i [] false null) (IntegerAtom 0)) (BinaryExpression < (Variable i [] false null) (Variable n [] false null)) (UnaryExpression null (Variable i [] false null) ++) (BlockStatement [(IfStatement (BinaryExpression == (Variable conf [(Variable i [] false null)] true null) (IntegerAtom 1)) (ExpressionStatement (BinaryExpression = (Variable conf [(Variable i [] false null)] true null) (IntegerAtom 0))) (BlockStatement [(ExpressionStatement (BinaryExpression = (Variable conf [(Variable i [] false null)] true null) (IntegerAtom 1))), (BreakStatement)]))])), (IfStatement (BinaryExpression >= (UnaryExpression ++ (Variable counter [] false null) null) (Variable modul [] false null)) (BlockStatement [(ExpressionStatement (BinaryExpression = (Variable counter [] false null) (IntegerAtom 0))), (ReturnStatement (BooleanAtom false))]) null), (ReturnStatement (BooleanAtom true))])), (FunctionDefinition weight (ExpressionList [(Variable n [] false null), (Variable stuff [] false null), (Variable conf [] false null)]) (BlockStatement [(ExpressionStatement (BinaryExpression = (Variable w [] false null) (IntegerAtom 0))), (ForStatement (BinaryExpression = (Variable i [] false null) (IntegerAtom 0)) (BinaryExpression < (Variable i [] false null) (Variable n [] false null)) (UnaryExpression null (Variable i [] false null) ++) (IfStatement (Variable conf [(Variable i [] false null)] true null) (ExpressionStatement (BinaryExpression += (Variable w [] false null) (Variable stuff [(Variable i [] false null)] true null))) null)), (ReturnStatement (Variable w [] false null))])), (FunctionDefinition cost (ExpressionList [(Variable n [] false null), (Variable stuff [] false null), (Variable conf [] false null)]) (BlockStatement [(ExpressionStatement (BinaryExpression = (Variable c [] false null) (IntegerAtom 0))), (ForStatement (BinaryExpression = (Variable i [] false null) (IntegerAtom 0)) (BinaryExpression < (Variable i [] false null) (Variable n [] false null)) (UnaryExpression null (Variable i [] false null) ++) (IfStatement (Variable conf [(Variable i [] false null)] true null) (ExpressionStatement (BinaryExpression += (Variable c [] false null) (Variable stuff [(Variable i [] false null)] true null))) null)), (ReturnStatement (Variable c [] false null))])), (FunctionDefinition computeSolution (ExpressionList [(Variable n [] false null), (Variable M [] false null), (Variable stuff [] false null)]) (BlockStatement [(ExpressionStatement (BinaryExpression = (Variable cur_cost [] false null) (IntegerAtom 0))), (ExpressionStatement (BinaryExpression = (Variable max_cost [] false null) (IntegerAtom 0))), (ExpressionStatement (BinaryExpression = (Variable conf [] false null) (ArrayConstructor {}))), (ExpressionStatement (BinaryExpression = (Variable solution [] false null) (ArrayConstructor {}))), (WhileStatement (FunctionCall iterate (ExpressionList [(Variable n [] false null), (Variable conf [] false null)])) (BlockStatement [(IfStatement (BinaryExpression <= (FunctionCall weight (ExpressionList [(Variable n [] false null), (Variable stuff [] false null), (Variable conf [] false null)])) (Variable M [] false null)) (BlockStatement [(IfStatement (BinaryExpression > (BinaryExpression = (Variable cur_cost [] false null) (FunctionCall cost (ExpressionList [(Variable n [] false null), (Variable stuff [] false null), (Variable conf [] false null)]))) (Variable max_cost [] false null)) (BlockStatement [(ExpressionStatement (BinaryExpression = (Variable max_cost [] false null) (Variable cost [] false null))), (ExpressionStatement (BinaryExpression = (Variable solution [] false null) (Variable conf [] false null)))]) null)]) null)])), (ReturnStatement (ArrayConstructor {(StringAtom 'stuff')=(Variable solution [] false null), (StringAtom 'cost')=(Variable max_cost [] false null)}))]))])
+[(FunctionDefinition (DataType type=INTEGER name=null arg=null len=null) main (ExpressionList [])
+	(BlockStatement
+	[(ExpressionStatement (FunctionCall println (ExpressionList [(StringAtom Input file: )]))),
+	(ExpressionStatement (ExpressionList [(Variable infp [] (DataType type=STRING name=null arg=null len=null) (FunctionCall input (ExpressionList [])))])),
+	(ExpressionStatement (FunctionCall println (ExpressionList [(StringAtom Output file: )]))),
+	(ExpressionStatement (ExpressionList [(Variable outfp [] (DataType type=STRING name=null arg=null len=null) (FunctionCall input (ExpressionList [])))])),
+	(ExpressionStatement (ExpressionList [(Variable f [] (DataType type=FILE name=null arg=null len=null) (FunctionCall openRFile (ExpressionList [(Variable infp [] null null)])))])),
+	(ExpressionStatement (ExpressionList [(Variable n [] (DataType type=INTEGER name=null arg=null len=null) (FunctionCall integer (ExpressionList [(FunctionCall inputFile (ExpressionList [(Variable f [] null null)]))])))])),
+	(ExpressionStatement (ExpressionList [(Variable M [] (DataType type=INTEGER name=null arg=null len=null) (FunctionCall integer (ExpressionList [(FunctionCall inputFile (ExpressionList [(Variable f [] null null)]))])))])),
+	(ExpressionStatement (ExpressionList [(Variable stuff [] (DataType type=ARRAY name=null arg=(DataType type=STRUCTURE name=Stuff arg=null len=null) len=null) (NewExpression (Variable n [] null null)))])),
+	(ExpressionStatement (ExpressionList [(Variable init_conf [] (DataType type=ARRAY name=null arg=(DataType type=INTEGER name=null arg=null len=null) len=null) (NewExpression (Variable n [] null null)))])),
+	(ForStatement
+		(ExpressionList [(Variable i [] (DataType type=INTEGER name=null arg=null len=null) (IntegerAtom 0))])
+		(BinaryExpression 31 (Variable i [] null null) (Variable n [] null null))
+		(UnaryExpression null (Variable i [] null null) 6)
+		(BlockStatement
+			[(ExpressionStatement
+			(BinaryExpression 27 (Variable init_conf [(Variable i [] null null)] null null) (IntegerAtom 0))),
+			(ExpressionStatement (BinaryExpression 27 (Variable stuff [(Variable i [] null null)] null null) (NewExpression null))),
+			(ExpressionStatement (BinaryExpression 27 (Variable stuff [(Variable i [] null null), (StringAtom weight)] null null) (FunctionCall integer (ExpressionList [(FunctionCall inputFile (ExpressionList [(Variable f [] null null)]))])))),
+			(ExpressionStatement (BinaryExpression 27 (Variable stuff [(Variable i [] null null), (StringAtom cost)] null null) (FunctionCall integer (ExpressionList [(FunctionCall inputFile (ExpressionList [(Variable f [] null null)]))]))))])),
+			(ExpressionStatement (FunctionCall closeFile (ExpressionList [(Variable f [] null null)]))),
+			(ExpressionStatement
+				(ExpressionList
+				[(Variable result [] (DataType type=STRUCTURE name=Result arg=null len=null)
+				(FunctionCall computeSolution
+					(ExpressionList
+					[(Variable n [] null null),
+					(Variable M [] null null),
+					(Variable stuff [] null null),
+					(Variable init_conf [] null null)])))])),
+			(ExpressionStatement (ExpressionList [(Variable f [] (DataType type=FILE name=null arg=null len=null) (FunctionCall openWFile (ExpressionList [(Variable outfp [] null null), (BooleanAtom false)])))])),
+			(ExpressionStatement (FunctionCall printlnFile (ExpressionList [(Variable f [] null null), (FunctionCall concat (ExpressionList [(StringAtom Total price: ), (FunctionCall string (ExpressionList [(Variable result [(StringAtom cost)] null null)]))]))]))),
+			(ExpressionStatement (FunctionCall printFile (ExpressionList [(Variable f [] null null), (StringAtom Items configuration: )]))),
+			(ForStatement
+				(BinaryExpression 27 (Variable i [] null null) (IntegerAtom 0))
+				(BinaryExpression 31 (Variable i [] null null) (Variable n [] null null))
+				(UnaryExpression null (Variable i [] null null) 6)
+				(ExpressionStatement
+					(FunctionCall printFile
+						(ExpressionList
+						[(Variable f [] null null),
+						(FunctionCall concat (ExpressionList [(StringAtom  ), (FunctionCall string (ExpressionList [(Variable result [(StringAtom conf), (Variable i [] null null)] null null)]))]))])))),
+			(ExpressionStatement (FunctionCall closeFile (ExpressionList [(Variable f [] null null)]))),
+			(ReturnStatement (IntegerAtom 0))])),
+
+(FunctionDefinition (DataType type=STRUCTURE name=Result arg=null len=null) computeSolution
+	(ExpressionList
+	[(Variable n [] (DataType type=INTEGER name=null arg=null len=null) null),
+	(Variable M [] (DataType type=INTEGER name=null arg=null len=null) null),
+	(Variable stuff [] (DataType type=ARRAY name=null arg=(DataType type=STRUCTURE name=Stuff arg=null len=null) len=null) null),
+	(Variable conf [] (DataType type=ARRAY name=null arg=(DataType type=INTEGER name=null arg=null len=null) len=null) null)])
+	(BlockStatement
+		[(ExpressionStatement (ExpressionList [(Variable cur_cost [] (DataType type=INTEGER name=null arg=null len=null) (IntegerAtom 0))])),
+		(ExpressionStatement (ExpressionList [(Variable max_cost [] (DataType type=INTEGER name=null arg=null len=null) (IntegerAtom 0))])),
+		(ExpressionStatement (ExpressionList [(Variable solution [] (DataType type=ARRAY name=null arg=(DataType type=INTEGER name=null arg=null len=null) len=null) (Variable conf [] null null))])),
+		(ExpressionStatement (ExpressionList [(Variable retval [] (DataType type=STRUCTURE name=Result arg=null len=null) (NewExpression null))])),
+		(IfStatement
+			(BinaryExpression 33 (FunctionCall weight (ExpressionList [(Variable n [] null null), (Variable stuff [] null null), (Variable conf [] null null)])) (Variable M [] null null))
+			(IfStatement
+				(BinaryExpression 30 (BinaryExpression 27 (Variable cur_cost [] null null) (FunctionCall cost (ExpressionList [(Variable n [] null null), (Variable stuff [] null null), (Variable conf [] null null)]))) (Variable max_cost [] null null))
+				(ExpressionStatement (BinaryExpression 27 (Variable max_cost [] null null) (Variable cur_cost [] null null))))),
+		(ExpressionStatement (BinaryExpression 27 (Variable retval [(StringAtom cost)] null null) (Variable max_cost [] null null))),
+		(ExpressionStatement (BinaryExpression 27 (Variable retval [(StringAtom stuff)] null null) (Variable solution [] null null))),
+		(ForStatement
+			(ExpressionList [(Variable i [] (DataType type=INTEGER name=null arg=null len=null) (IntegerAtom 0))])
+			(BinaryExpression 31 (Variable i [] null null) (Variable n [] null null))
+			(UnaryExpression null (Variable i [] null null) 6)
+			(BlockStatement
+				[(ExpressionStatement (ExpressionList [(Variable _conf [] (DataType type=ARRAY name=null arg=(DataType type=INTEGER name=null arg=null len=null) len=null) (FunctionCall cloneArray (ExpressionList [(Variable conf [] null null)])))])),
+				(IfStatement
+					(BinaryExpression 28 (Variable conf [(Variable i [] null null)] null null) (IntegerAtom 0))
+					(BlockStatement
+						[(ExpressionStatement (BinaryExpression 27 (Variable _conf [(Variable i [] null null)] null null) (IntegerAtom 1))),
+						(ExpressionStatement (BinaryExpression 27 (Variable _retval [] null null) (FunctionCall computeSolution (ExpressionList [(Variable n [] null null), (Variable M [] null null), (Variable stuff [] null null), (Variable _conf [] null null)])))),
+						(IfStatement (BinaryExpression 30 (Variable _retval [(StringAtom cost)] null null) (Variable retval [(StringAtom cost)] null null)) (ExpressionStatement (BinaryExpression 27 (Variable retval [] null null) (Variable _retval [] null null))))]))])),
+		(ReturnStatement (Variable retval [] null null))]))])

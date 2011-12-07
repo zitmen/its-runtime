@@ -57,4 +57,10 @@ public class ExpressionList extends Expression
     {
         return genByteCode(false);
     }
+
+    @Override
+    public int evalDatatype()
+    {
+        return DataType.VOID;
+    }
 }

@@ -37,4 +37,8 @@ public class Operator
     public static final int GTE     = 32;  // >=
     public static final int LTE     = 33;  // <=
     
+    public static boolean isRelational(int op)
+    {
+        return ((op == EQ) || (op == NEQ) || (op == GT) || (op == LT) || (op == GTE) || (op == LTE));
+    }
 }

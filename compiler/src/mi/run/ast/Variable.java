@@ -5,6 +5,8 @@ import mi.run.bytecode.Code;
 import mi.run.bytecode.Instruction;
 import mi.run.bytecode.LoadStoreArrayInstr;
 import mi.run.bytecode.LoadStoreInstr;
+import mi.run.semantic.Structures;
+import mi.run.semantic.SymbolTable;
 
 public class Variable extends Atom
 {
@@ -45,12 +47,68 @@ public class Variable extends Atom
     @Override
     public void semanticCheck() throws Exception
     {
-        if(value != null)
-            value.semanticCheck();
+        if(type == null)
+        {
+            if((type = SymbolTable.isDeclared(name)) == null)
+                throw new Exception("SEMANTIC ERROR: undeclared identifier '" + name + "'!");
+        }
+        else
+        {
+            if(SymbolTable.isDeclaredInThisScope(name) != null)
+                throw new Exception("SEMANTIC ERROR: redeclared identifier '" + name + "'!");
+            // insert
+            SymbolTable.declare(name, type);
+        }
+        type.semanticCheck();
+        exprDataType = type.type;
         //
+        StructureDefinition structDef;
+        int tid;
+        DataType t = type;
         for(int i = 0, im = members.size(); i < im; i++)
+        {
             if(members.get(i) != null)
+            {
                 members.get(i).semanticCheck();
+                tid = members.get(i).evalDatatype();
+                switch(tid)
+                {
+                    case DataType.INTEGER:
+                        if((t == null) || (t.type != DataType.ARRAY))
+                            throw new Exception("SEMANTIC ERROR: invalid index!\n" + toString());
+                        t = t.arg;
+                        exprDataType = t.type;
+                        break;
+                        
+                    case DataType.STRING:
+                        if((t == null) || (t.type != DataType.STRUCTURE) || (!(members.get(i) instanceof StringAtom)))
+                            throw new Exception("SEMANTIC ERROR: invalid " + i + ". index!\n" + toString());
+                        // TODO: check structure of Structure !!!
+                        //String tmp_str = ((StringAtom)members.get(i)).value;
+                        //StructureDefinition tmp_struct = Structures.structures.get
+                        //if()
+                        if((structDef = Structures.structures.get(t.name)) == null)
+                            throw new Exception("SEMANTIC ERROR: undefined data type " + t.name + "!");
+                        t = structDef.variables.get(((StringAtom)members.get(i)).value);
+                        if(t == null)
+                            throw new Exception("SEMANTIC ERROR: invalid " + i + ". index!\n" + toString());
+                        exprDataType = t.type;
+                        break;
+                        
+                    default:
+                        throw new Exception("SEMANTIC ERROR: invalid index type!");
+                }
+            }
+        }
+        //
+        if(value != null)
+        {
+            //value.semanticCheck();
+            //
+            // for simple type checking and value semantic-checking: use BinaryExpression
+            BinaryExpression expr = new BinaryExpression(Operator.ASN, new Variable(name), value);
+            expr.semanticCheck();
+        }
     }
 
     @Override
@@ -58,6 +116,9 @@ public class Variable extends Atom
     {
         if(value != null)
             value = (Expression)value.optimize();
+        //
+        if(type != null)
+            type.optimize();
         //
         for(int i = 0, im = members.size(); i < im; i++)
             if(members.get(i) != null)
@@ -98,5 +159,34 @@ public class Variable extends Atom
         else
             return new LoadStoreInstr(Code.LD, this);
         */
+    }
+    
+    @Override
+    public int evalDatatype()
+    {
+        if(exprDataType == DataType.INVALID)
+        {
+            exprDataType = type.type;
+            DataType t = type;
+            for(int i = 0, im = members.size(); i < im; i++)
+            {
+                if(members.get(i) != null)
+                {
+                    switch(members.get(i).evalDatatype())
+                    {
+                        case DataType.INTEGER:
+                            t = t.arg;
+                            exprDataType = t.type;
+                            break;
+
+                        case DataType.STRING:
+                            t = Structures.structures.get(t.name).variables.get(((StringAtom)members.get(i)).value);
+                            exprDataType = t.type;
+                            break;
+                    }
+                }
+            }
+        }
+        return exprDataType;
     }
 }

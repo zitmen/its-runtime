@@ -41,4 +41,10 @@ public class RealAtom extends Atom
         else
             return new Instruction(Code.NOOP);
     }
+    
+    @Override
+    public int evalDatatype()
+    {
+        return DataType.DOUBLE;
+    }
 }

@@ -44,34 +44,12 @@ public class StringRoutines
             return str.endsWith(suffix);
         }
         
-        public static String string(Value val)
+        public static String concat(String str1, String str2)
         {
-            try {
-                return val.toStr();
-            } catch (Exception ex) {
-                return "";
-            }
+            return str1.concat(str2);
         }
         
-        public static int integer(Value val)
-        {
-            try {
-                return val.toInt();
-            } catch (Exception ex) {
-                return 0;
-            }
-        }
-        
-        public static double real(Value val)
-        {
-            try {
-                return val.toReal();
-            } catch (Exception ex) {
-                return 0.0;
-            }
-        }
-        
-        public static int length(String str)
+        public static int strlen(String str)
         {
             return str.length();
         }

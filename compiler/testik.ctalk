@@ -7,7 +7,7 @@ struct Stuff
 struct Result
 {
 	int cost;
-	Array<Stuff> conf;
+	Array<int> conf;
 }
 
 int main()
@@ -17,28 +17,28 @@ int main()
 	println("Output file: ");
 	String outfp = input();
 	//
-	File f = openRFile(infp);
-	int n = integer(inputFile(f));
-	int M = integer(inputFile(f));
+	File fr = openRFile(infp);
+	int n = str2int(inputFile(fr));
+	int M = str2int(inputFile(fr));
 	Array<Stuff> stuff = new[n];
 	Array<int> init_conf = new[n];
 	for(int i = 0; i < n; i++)
 	{
 		init_conf[i] = 0;
 		stuff[i] = new;
-		stuff[i].weight = integer(inputFile(f));
-		stuff[i].cost   = integer(inputFile(f));
+		stuff[i].weight = str2int(inputFile(fr));
+		stuff[i].cost   = str2int(inputFile(fr));
 	}
-	closeFile(f);
+	closeFile(fr);
 	//
 	Result result = computeSolution(n, M, stuff, init_conf);
 	//
-	File f = openWFile(outfp, false);
-	printlnFile(f, concat('Total price: ', string(result.cost)));
-	printFile(f, 'Items configuration: ');
-	for(i = 0; i < n; i++)
-		printFile(f, concat(' ', string(result.conf[i])));
-	closeFile(f);
+	File fw = openWFile(outfp, false);
+	printlnFile(fw, concat('Total price: ', int2str(result.cost)));
+	printFile(fw, 'Items configuration: ');
+	for(int i = 0; i < n; i++)
+		printFile(fw, concat(' ', int2str(result.conf[i])));
+	closeFile(fw);
 	//
 	return 0;
 }
@@ -47,7 +47,7 @@ int weight(int n, Array<Stuff> stuff, Array<int> conf)
 {
 	int w = 0;
 	for(int i = 0; i < n; i++)
-		if(conf[i])
+		if(conf[i] == 1)
 			w += stuff[i].weight;
 	return w;
 }
@@ -56,7 +56,7 @@ int cost(int n, Array<Stuff> stuff, Array<int> conf)
 {
 	int c = 0;
 	for(int i = 0; i < n; i++)
-		if(conf[i])
+		if(conf[i] == 1)
 			c += stuff[i].cost;
 	return c;
 }
@@ -72,8 +72,9 @@ Result computeSolution(int n, int M, Array<Stuff> stuff, Array<int> conf)
 		if((cur_cost = cost(n, stuff, conf)) > max_cost)
 			max_cost = cur_cost;
 	retval.cost = max_cost;
-	retval.stuff = solution;
+	retval.conf = solution;
 	//
+	Result _retval;
 	for(int i = 0; i < n; i++)
 	{
 		Array<int> _conf = cloneArray(conf);
