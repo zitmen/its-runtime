@@ -73,6 +73,7 @@ public class DataType extends Node
             case DataType.STRING: str += "STRING"; break;
             case DataType.STRUCTURE: str += "STRUCTURE"; break;
             case DataType.VOID: str += "VOID"; break;
+            case DataType.NEW_EXPR: str += "NEW_EXPR"; break;
         }
         return str + " name=" + (name==null?"null":name) + " arg=" + (arg==null?"null":arg) + " len=" + (length==null?"null":length) + ")";
     }
@@ -82,7 +83,7 @@ public class DataType extends Node
         String sig;
         switch(type)
         {
-            case DataType.ARRAY: sig = "ARRAY<" + arg + ">"; break;
+            case DataType.ARRAY: sig = "ARRAY<" + arg.getSignature() + ">"; break;
             case DataType.BOOL: sig = "BOOL"; break;
             case DataType.DOUBLE: sig = "DOUBLE"; break;
             case DataType.FILE: sig = "FILE"; break;
@@ -90,6 +91,7 @@ public class DataType extends Node
             case DataType.STRING: sig = "STRING"; break;
             case DataType.STRUCTURE: sig = "STRUCTURE<" + name + ">"; break;
             case DataType.VOID: sig = "VOID"; break;
+            case DataType.NEW_EXPR: sig = "NEW_EXPR"; break;
             default: sig = "ERROR"; break;
         }
         return sig;

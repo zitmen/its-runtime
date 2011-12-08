@@ -46,13 +46,7 @@ public class Program extends Node
     public Instruction genByteCode()
     {
         //
-        // at first specify structures & functions signatures
-        for(int i = 0, im = functions.size(); i < im; i++)
-            functions_signatures.put(functions.get(i).name, functions.get(i).getSignature());
-        for(int i = 0, im = structures.size(); i < im; i++)
-            structures_signatures.put(structures.get(i).name, structures.get(i).getSignature());
-        //
-        // then generate actual byte-code
+        // at first generate the byte-code
         // -- "main" function is the first, then other functions following
         HashMap<String, Instruction> fnCode = new HashMap<String, Instruction>();
         for(int i = 0, im = functions.size(); i < im; i++)
@@ -77,6 +71,12 @@ public class Program extends Node
                 stream = stream.last().append(removeNoOps(fnCode.get(fnName)));
             }
         }
+        //
+        // then specify structures & functions signatures
+        for(int i = 0, im = functions.size(); i < im; i++)
+            functions_signatures.put(functions.get(i).name, functions.get(i).getSignature());
+        for(int i = 0, im = structures.size(); i < im; i++)
+            structures_signatures.put(structures.get(i).name, structures.get(i).getSignature());
         return first;
     }
     

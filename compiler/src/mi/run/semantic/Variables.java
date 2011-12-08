@@ -11,19 +11,17 @@ public class Variables
     
     public static String addVar(String fnName, String varName, DataType varType)
     {
+        String uniqName = "var" + uniqueCounter;
+        uniqueNames.put(varName, uniqName);
+        uniqueCounter++;
+        //
         HashMap<String, DataType> fnVars = vars.get(fnName);
         if(fnVars == null)
         {
             fnVars = new HashMap<String, DataType>();
-            fnVars.put(varName, varType);
             vars.put(fnName, fnVars);
         }
-        else
-            fnVars.put(varName, varType);
-        //
-        String uniqName = "var" + uniqueCounter;
-        uniqueNames.put(varName, uniqName);
-        uniqueCounter++;
+        fnVars.put(uniqName, varType);
         //
         return uniqName;
     }

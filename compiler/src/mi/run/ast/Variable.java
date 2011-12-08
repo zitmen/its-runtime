@@ -3,7 +3,6 @@ package mi.run.ast;
 import java.util.ArrayList;
 import mi.run.bytecode.Code;
 import mi.run.bytecode.Instruction;
-import mi.run.bytecode.LoadStoreArrayInstr;
 import mi.run.bytecode.LoadStoreInstr;
 import mi.run.semantic.Functions;
 import mi.run.semantic.Structures;
@@ -71,7 +70,7 @@ public class Variable extends Atom
             SymbolTable.declare(name, type);
             //
             if(Functions.actualFunction != null)    // inside of a function?
-                uniqName = Variables.addVar(Functions.actualFunction, name, type);
+                uniqName = Variables.addVar(functionName = Functions.actualFunction, name, type);
         }
         type.semanticCheck();
         exprDataType = type.type;
@@ -144,32 +143,14 @@ public class Variable extends Atom
     @Override
     public Instruction genByteCode()
     {
-        if(type.type == DataType.ARRAY)
+        if(value != null)
         {
-            boolean dump_indices = false;
-            for(int i = 0, im = members.size(); i < im; i++)
-            {
-                if(!(members.get(i) instanceof StringAtom) && !((members.get(i) instanceof IntegerAtom)))
-                {
-                    dump_indices = true;
-                    break;
-                }
-            }
-            if(dump_indices)    // dump + reverse indices (stack is LIFO)
-            {
-                Instruction stream = new Instruction(Code.NOOP);   // helper
-                Instruction first = stream;
-                for(int i = members.size() - 1; i >= 0; i--)
-                    stream = stream.last().append(members.get(i).genByteCode());
-                stream.last().append(new LoadStoreArrayInstr(Code.LDAI, members.size(), new Variable(name, type)));
-                //
-                return first;
-            }
-            else
-                return new LoadStoreInstr(Code.LDA, this);
+            Instruction stream = value.genByteCode();
+            stream.last().append(new LoadStoreInstr(Code.ST, uniqName, value.resultVariable));
+            return stream.first();
         }
-        else
-            return new LoadStoreInstr(Code.LD, this);
+        resultVariable = uniqName;
+        return new Instruction(Code.NOOP);
     }
     
     @Override

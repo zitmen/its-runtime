@@ -1,7 +1,6 @@
 package mi.run.bytecode;
 
 import mi.run.runtime.Interpreter;
-import mi.run.runtime.Value;
 
 public class JumpInstr extends Instruction
 {   // JZ,JNZ,JMP
@@ -24,12 +23,6 @@ public class JumpInstr extends Instruction
     @Override
     public boolean interpret(Interpreter machine) throws Exception
     {
-        switch(code)
-        {
-            case Code.JZ : machine.IC = (!((Value)machine.memory.stack.pop()).toBool()) ? (address.getIC() + addr_offset) : (machine.IC + 1); break;
-            case Code.JNZ: machine.IC = ( ((Value)machine.memory.stack.pop()).toBool()) ? (address.getIC() + addr_offset) : (machine.IC + 1); break;
-            case Code.JMP: machine.IC = address.getIC() + addr_offset; break;
-        }
-        return true;
+        throw new Exception("NOT SUPPORTED!");
     }
 }

@@ -2,6 +2,8 @@ package mi.run.ast;
 
 import mi.run.bytecode.Code;
 import mi.run.bytecode.Instruction;
+import mi.run.bytecode.ReturnInstr;
+import mi.run.semantic.Functions;
 
 public class ReturnStatement extends Statement
 {
@@ -66,10 +68,10 @@ public class ReturnStatement extends Statement
         if(returnValue != null)
         {
             stream = stream.last().append(returnValue.genByteCode()); // result is on the stack
-            stream = stream.last().append(new Instruction(Code.RETV));
+            stream = stream.last().append(new ReturnInstr(returnValue.resultVariable));
         }
         else
-            stream = stream.last().append(new Instruction(Code.RET));
+            stream = stream.last().append(new ReturnInstr());
         //
         return first;
     }

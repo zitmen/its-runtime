@@ -1,7 +1,9 @@
 package mi.run.ast;
 
-import mi.run.bytecode.Code;
 import mi.run.bytecode.Instruction;
+import mi.run.bytecode.NewInstr;
+import mi.run.semantic.Functions;
+import mi.run.semantic.Variables;
 
 public class NewExpression extends Atom
 {
@@ -41,20 +43,27 @@ public class NewExpression extends Atom
     @Override
     public Instruction genByteCode()
     {
-        Instruction stream;
+        Instruction stream, first;
         if(count != null)
+        {
             stream = count.genByteCode();
+            first = stream.first();
+            stream = stream.last().append(new NewInstr(resultVariable = Variables.addVar(functionName, "tmp", new DataType(DataType.NEW_EXPR)), count.resultVariable));
+        }
         else
-            stream = new Instruction(Code.NOOP);
+        {
+            stream = new NewInstr(resultVariable = Variables.addVar(functionName, "tmp", new DataType(DataType.NEW_EXPR)), null);
+            first = stream.first();
+        }
         //
-        Instruction first = stream.first();
-        stream = stream.last().append(new Instruction(Code.NEW));
         return first;
     }
 
     @Override
     public void semanticCheck() throws Exception
     {
+        functionName = Functions.actualFunction;
+        //
         if(count != null)
         {
             count.semanticCheck();

@@ -7,47 +7,54 @@ import mi.run.runtime.Value;
 public class LoadConstInstr extends Instruction
 {   // LDCB,LDCI,LDCR,LDCS,LDCA,LDCN
     public Value value; // String, Real, Integer, Boolean, Array, Null
+    public String dest;
     
-    public LoadConstInstr(boolean val)
+    public LoadConstInstr(String var, boolean val)
     {
         super(Code.LDCB);
         value = new Value(val);
+        dest = var;
     }
     
-    public LoadConstInstr(int val)
+    public LoadConstInstr(String var, int val)
     {
         super(Code.LDCI);
         value = new Value(val);
+        dest = var;
     }
     
-    public LoadConstInstr(double val)
+    public LoadConstInstr(String var, double val)
     {
         super(Code.LDCR);
         value = new Value(val);
+        dest = var;
     }
     
-    public LoadConstInstr(String val)
+    public LoadConstInstr(String var, String val)
     {
         super(Code.LDCS);
         value = new Value(val);
+        dest = var;
     }
     
-    public LoadConstInstr()
+    public LoadConstInstr(String var)
     {
         super(Code.LDCN);
         value = new Value();
+        dest = var;
     }
     
-    public LoadConstInstr(ArrayList<Value> val)
+    public LoadConstInstr(String var, ArrayList<Value> val)
     {
         super(Code.LDCA);
         value = new Value(val);
+        dest = var;
     }
     
     @Override
     public String toString()
     {
-        String str = super.toString() + " ";
+        String str = super.toString() + " " + dest + " ";
         try
         {
             switch(code)
@@ -55,7 +62,7 @@ public class LoadConstInstr extends Instruction
                 case Code.LDCB: str += (value.toBool() ? "TRUE" : "FALSE"); break;
                 case Code.LDCI: str += value.toInt(); break;
                 case Code.LDCR: str += value.toReal(); break;
-                case Code.LDCS: str += value.toStr(); break;
+                case Code.LDCS: str += "\"" + value.toStr() + "\""; break;
                 case Code.LDCN: str += "NULL"; break;
                 default: str += value.toString(); break;
             }
@@ -70,45 +77,6 @@ public class LoadConstInstr extends Instruction
     @Override
     public boolean interpret(Interpreter machine) throws Exception
     {
-        switch(code)
-        {
-            case Code.LDCB:
-                machine.memory.stack.push(value);
-                machine.ZF = (value.toBool() == false);
-                machine.SF = false;
-                break;
-                
-            case Code.LDCI:
-                machine.memory.stack.push(value);
-                machine.ZF = (value.toInt() == 0);
-                machine.SF = (value.toInt()  < 0);
-                break;
-                
-            case Code.LDCR:
-                machine.memory.stack.push(value);
-                machine.ZF = (value.toReal() == 0.0);
-                machine.SF = (value.toReal()  < 0.0);
-                break;
-                
-            case Code.LDCS:
-                machine.memory.stack.push(value);
-                machine.ZF = false;
-                machine.SF = false;
-                break;
-                
-            case Code.LDCA:
-                machine.memory.stack.push(value);
-                machine.ZF = false;
-                machine.SF = false;
-                break;
-                
-            case Code.LDCN:
-                machine.memory.stack.push(value);
-                machine.ZF = true;
-                machine.SF = false;
-                break;
-        }
-        machine.IC++;
-        return true;
+        throw new Exception("NOT SUPPORTED!");
     }
 }

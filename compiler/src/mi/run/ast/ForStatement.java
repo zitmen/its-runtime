@@ -5,7 +5,6 @@ import mi.run.bytecode.Instruction;
 import mi.run.bytecode.JumpInstr;
 import mi.run.semantic.FlowControl;
 import mi.run.semantic.SymbolTable;
-import mi.run.semantic.TypeCast;
 
 public class ForStatement extends Statement
 {

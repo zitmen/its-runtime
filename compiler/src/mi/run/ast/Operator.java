@@ -41,4 +41,10 @@ public class Operator
     {
         return ((op == EQ) || (op == NEQ) || (op == GT) || (op == LT) || (op == GTE) || (op == LTE));
     }
+
+    static boolean isAssign(int op)
+    {
+        return ((op == ASN) || (op == AND_ASN) || (op == OR_ASN) || (op == LSH_ASN) || (op == RSH_ASN) || (op == XOR_ASN) ||
+                (op == ADD_ASN) || (op == SUB_ASN) || (op == MUL_ASN) || (op == DIV_ASN) || (op == MOD_ASN));
+    }
 }

@@ -1,9 +1,11 @@
 package mi.run.ast;
 
+import mi.run.bytecode.ArithmeticInstr;
 import mi.run.bytecode.Code;
 import mi.run.bytecode.Instruction;
-import mi.run.bytecode.LoadConstInstr;
+import mi.run.semantic.Functions;
 import mi.run.semantic.TypeCast;
+import mi.run.semantic.Variables;
 
 public class UnaryExpression extends Atom
 {
@@ -38,6 +40,8 @@ public class UnaryExpression extends Atom
     @Override
     public void semanticCheck() throws Exception
     {
+        functionName = Functions.actualFunction;
+        //
         operand.semanticCheck();
         //
         exprDataType = operand.evalDatatype();
@@ -92,79 +96,19 @@ public class UnaryExpression extends Atom
     @Override
     public Instruction genByteCode()
     {
-        if(operator == Operator.NOT)
+        Instruction stream = operand.genByteCode();
+        Instruction first = stream.first();
+        if(operator == Operator.PLUS)
         {
-            Instruction stream = operand.genByteCode();
-            Instruction first = stream.first();
-            stream = stream.last().append(new Instruction(Code.NOT));
-            //
-            // if it is ExpressionStatement or ForStatement, the value could be removed from the stack
-            if((parent instanceof ExpressionStatement) || ((parent instanceof ForStatement) && ((((ForStatement)parent).init == this) || (((ForStatement)parent).iterator == this))))
-                stream = stream.last().append(new Instruction(Code.POP));
-            //
+            resultVariable = operand.resultVariable;
             return first;
         }
-        else if(operator == Operator.NEG)
-        {
-            Instruction stream = operand.genByteCode();
-            Instruction first = stream.first();
-            stream = stream.last().append(new Instruction(Code.NEG));
-            //
-            // if it is ExpressionStatement or ForStatement, the value could be removed from the stack
-            if((parent instanceof ExpressionStatement) || ((parent instanceof ForStatement) && ((((ForStatement)parent).init == this) || (((ForStatement)parent).iterator == this))))
-                stream = stream.last().append(new Instruction(Code.POP));
-            //
-            return first;
-        }
-        else if(operator == Operator.MINUS)
-        {
-            Instruction stream = new LoadConstInstr(0);
-            Instruction first = stream;
-            stream = stream.last().append(operand.genByteCode());
-            stream = stream.last().append(new Instruction(Code.SUB));
-            //
-            // if it is ExpressionStatement or ForStatement, the value could be removed from the stack
-            if((parent instanceof ExpressionStatement) || ((parent instanceof ForStatement) && ((((ForStatement)parent).init == this) || (((ForStatement)parent).iterator == this))))
-                stream = stream.last().append(new Instruction(Code.POP));
-            //
-            return first;
-        }
-        else if(operator == Operator.DEC)
-        {
-            Instruction stream = operand.genByteCode();
-            Instruction first = stream.first();
-            stream = stream.last().append(new Instruction(Code.DEC));
-            //
-            // if it is ExpressionStatement or ForStatement, the value could be removed from the stack
-            if((parent instanceof ExpressionStatement) || ((parent instanceof ForStatement) && ((((ForStatement)parent).init == this) || (((ForStatement)parent).iterator == this))))
-                stream = stream.last().append(new Instruction(Code.POP));
-            //
-            return first;
-        }
-        else if(operator == Operator.PLUS)
-        {
-            Instruction stream = operand.genByteCode();
-            Instruction first = stream.first();
-            //
-            // if it is ExpressionStatement or ForStatement, the value could be removed from the stack
-            if((parent instanceof ExpressionStatement) || ((parent instanceof ForStatement) && ((((ForStatement)parent).init == this) || (((ForStatement)parent).iterator == this))))
-                stream = stream.last().append(new Instruction(Code.POP));
-            //
-            return first;
-        }
-        else if(operator == Operator.INC)
-        {
-            Instruction stream = operand.genByteCode();
-            Instruction first = stream.first();
-            stream = stream.last().append(new Instruction(Code.INC));
-            //
-            // if it is ExpressionStatement or ForStatement, the value could be removed from the stack
-            if((parent instanceof ExpressionStatement) || ((parent instanceof ForStatement) && ((((ForStatement)parent).init == this) || (((ForStatement)parent).iterator == this))))
-                stream = stream.last().append(new Instruction(Code.POP));
-            //
-            return first;
-        }
-        return null;    // can't happen due to the previous semantic check
+        if((operator == Operator.DEC) || (operator == Operator.INC))
+            stream = stream.last().append(new ArithmeticInstr(Code.getByOperator(operator, true), resultVariable = operand.resultVariable));
+        else
+            stream = stream.last().append(new ArithmeticInstr(Code.getByOperator(operator, true), resultVariable = Variables.addVar(functionName, "tmp", new DataType(operand.exprDataType)), operand.resultVariable));
+        //
+        return first;
     }
 
     @Override

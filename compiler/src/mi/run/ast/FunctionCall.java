@@ -7,7 +7,6 @@ import mi.run.semantic.Functions;
 
 public class FunctionCall extends Expression
 {
-    public String functionName;
     public FunctionDefinition function;
     public ExpressionList parameters;
     private boolean isDefined;  // if it's not then it's a built-in function
@@ -75,24 +74,8 @@ public class FunctionCall extends Expression
         //
         Instruction stream = parameters.genByteCode(true);  // params will be saved on the stack
         Instruction first = stream.first();
-        if(isDefined)
-        {
-            stream.last().append(new CallInstr(Code.CALL, functionName));
-            /* DO NOT OPTIMIZE THIS, BECAUSE I WOULD HAVE TO DO CHECK IF ANY FLOW PATH EIGHTER RETURNS A VALUE OR NOT! worst case scenario: there will be some not assigned values on the stack
-             * The simpliest solution to this is to declare static Interpret::RETVAL and return values via this variable (an alternative to the AX register on x86 machines).
-                    // if it is ExpressionStatement or ForStatement, the value could be removed from the stack
-                    if((parent instanceof ExpressionStatement) || ((parent instanceof ForStatement) && ((((ForStatement)parent).init == this) || (((ForStatement)parent).iterator == this))))
-                        stream = stream.last().append(new Instruction(Code.POP));
-             */
-        }
-        else
-        {
-            stream.last().append(new CallInstr(Code.INVOKE, functionName));
-            // if it is not ExpressionStatement, the return value (if any) could be removed from the stack
-            if(parent instanceof ExpressionStatement)
-                if(Functions.builtInFunctions.get(functionName).type.type != DataType.VOID)
-                    stream = stream.last().append(new Instruction(Code.POP));
-        }
+        stream.last().append(new CallInstr((isDefined ? Code.CALL : Code.INVOKE), functionName, parameters.expressions));
+        resultVariable = function.name;
         return first;
     }
 

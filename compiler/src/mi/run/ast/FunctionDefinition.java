@@ -5,7 +5,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import mi.run.bytecode.Code;
 import mi.run.bytecode.Instruction;
-import mi.run.bytecode.LoadStoreInstr;
 import mi.run.semantic.Functions;
 import mi.run.semantic.SymbolTable;
 import mi.run.semantic.Variables;
@@ -57,7 +56,7 @@ public class FunctionDefinition extends Node
         {
             pair = (Entry)it.next();
             sig += ((DataType)pair.getValue()).getSignature() + " ";
-            sig += Variables.getVarFnUniqueName((String)pair.getKey()) + " ";
+            sig += ((String)pair.getKey()) + " ";
         }
         sig += "]";
         return sig;
@@ -76,21 +75,13 @@ public class FunctionDefinition extends Node
     public Instruction genByteCode()
     {
         removeNulls();
-        // all parameters are strictly 'flat' Variables (no arrays) --> it's defined in syntax
-        // -- can't just call parameters.genByteCode(), because it would generate LOAD instructions
-        //    and here are needed STORE instructions
         Instruction stream = new Instruction(Code.NOOP);   // helper
-        Instruction first = stream;
-        if(parameters != null)
-        {
-            for (int i = 0, im = parameters.expressions.size(); i < im; i++)
-                stream = stream.last().append(new LoadStoreInstr(Code.ST, (Variable)parameters.expressions.get(i)));
-        }
+        Instruction first = stream.first();
         // body
         stream = stream.last().append(body.genByteCode());
-        // RET iff body.last != RET
+        // RET iff body.last != (RET || RETV)
         stream = stream.last();
-        if(stream.code != Code.RET)
+        if((stream.code != Code.RET) && (stream.code != Code.RETV))
             stream = stream.append(new Instruction(Code.RET));
         //
         return first;

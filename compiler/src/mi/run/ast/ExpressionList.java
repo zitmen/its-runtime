@@ -1,11 +1,12 @@
 package mi.run.ast;
 
+import java.util.ArrayList;
 import mi.run.bytecode.Code;
 import mi.run.bytecode.Instruction;
 
 public class ExpressionList extends Expression
 {
-    public java.util.ArrayList<Expression> expressions;
+    public ArrayList<Expression> expressions;
     
     public ExpressionList()
     {

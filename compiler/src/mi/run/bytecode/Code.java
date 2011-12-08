@@ -1,6 +1,7 @@
 package mi.run.bytecode;
 
 import java.util.HashMap;
+import mi.run.ast.Operator;
 
 public class Code
 {
@@ -55,6 +56,14 @@ public class Code
     
     public static final int NEW = 48;     // NEW -- for the purpose of allocation of memory
     
+    public static final int MINUS = 49;     // unary minus -
+    
+    public static final int LT  = 50;    // <
+    public static final int GT  = 51;    // >
+    public static final int LTE = 52;    // <=
+    public static final int GTE = 53;    // >=
+    public static final int EQ  = 54;    // ==
+    public static final int NEQ = 55;    // !=
     
     
     private static HashMap<Integer, String> codes = null;
@@ -64,14 +73,14 @@ public class Code
         if(codes == null)
         {
             codes = new HashMap<Integer, String>();
-            codes.put(JZ , "JZ ");
+            codes.put(JZ , "JZ");
             codes.put(JNZ, "JNZ");
             codes.put(JMP, "JMP");
             codes.put(RET, "RET");
             codes.put(RETV, "RETV");
             codes.put(POP, "POP");
-            codes.put(LD , "LD ");
-            codes.put(ST , "ST ");
+            codes.put(LD , "LD");
+            codes.put(ST , "ST");
             codes.put(LDA, "LDA");
             codes.put(STA, "STA");
             codes.put(ADD, "ADD");
@@ -80,7 +89,7 @@ public class Code
             codes.put(DIV, "DIV");
             codes.put(MOD, "MOD");
             codes.put(AND, "AND");
-            codes.put(OR , "OR ");
+            codes.put(OR , "OR");
             codes.put(XOR, "XOR");
             codes.put(LSH, "LSH");
             codes.put(RSH, "RSH");
@@ -107,7 +116,56 @@ public class Code
             codes.put(NEG, "NEG");
             codes.put(NOOP, "NOOP");
             codes.put(NEW, "NEW");
+            codes.put(MINUS, "MINUS");
+            codes.put(LT, "LT");
+            codes.put(GT, "GT");
+            codes.put(LTE, "LTE");
+            codes.put(GTE, "GTE");
+            codes.put(EQ, "EQ");
+            codes.put(NEQ, "NEQ");
         }
         return codes.get(code);
+    }
+    
+    static public int getByOperator(int op, boolean unary)
+    {
+        switch(op)
+        {
+            case Operator.PLUS:
+            case Operator.ADD_ASN: return ADD;
+            case Operator.MINUS: if(unary) return MINUS;
+            case Operator.SUB_ASN: return SUB;
+            case Operator.MUL:
+            case Operator.MUL_ASN: return MUL;
+            case Operator.DIV:
+            case Operator.DIV_ASN: return DIV;
+            case Operator.MOD:
+            case Operator.MOD_ASN: return MOD;
+            case Operator.NEG: return NEG;
+            case Operator.NOT: return NOT;
+            case Operator.DEC: return DEC;
+            case Operator.INC: return INC;
+            case Operator.RSH:
+            case Operator.RSH_ASN: return RSH;
+            case Operator.LSH:
+            case Operator.LSH_ASN: return LSH;
+            case Operator.AND:
+            case Operator.LOG_AND:
+            case Operator.AND_ASN: return AND;
+            case Operator.OR:
+            case Operator.LOG_OR:
+            case Operator.OR_ASN: return OR;
+            case Operator.XOR:
+            case Operator.XOR_ASN: return XOR;
+            //
+            case Operator.LTE: return LTE;
+            case Operator.LT:  return LT;
+            case Operator.GTE: return GTE;
+            case Operator.GT:  return GT;
+            case Operator.EQ:  return EQ;
+            case Operator.NEQ: return NEQ;
+            //
+            default: return -1;
+        }
     }
 }
