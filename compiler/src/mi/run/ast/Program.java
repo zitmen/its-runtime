@@ -1,5 +1,7 @@
 package mi.run.ast;
 
+import java.io.PrintStream;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -11,13 +13,18 @@ import mi.run.semantic.Structures;
 
 public class Program extends Node
 {
-    public java.util.ArrayList<StructureDefinition> structures;
-    public java.util.ArrayList<FunctionDefinition> functions;
+    public ArrayList<StructureDefinition> structures;
+    public ArrayList<FunctionDefinition> functions;
+    
+    public HashMap<String, String> structures_signatures;   // key -> structName, value -> structSignatire
+    public HashMap<String, String> functions_signatures;    // key -> fnName, value -> fnSignatire
     
     public Program()
     {
-        functions  = new java.util.ArrayList<FunctionDefinition>();
-        structures = new java.util.ArrayList<StructureDefinition>();
+        functions  = new ArrayList<FunctionDefinition>();
+        structures = new ArrayList<StructureDefinition>();
+        functions_signatures  = new HashMap<String, String>();
+        structures_signatures = new HashMap<String, String>();
     }
 
     @Override
@@ -38,11 +45,15 @@ public class Program extends Node
     @Override
     public Instruction genByteCode()
     {
-        // TODO: struktury --nejak musim uvest jejich popis!!
-        throw new UnsupportedOperationException("Not supported yet.");
-        /*
-        // "main" function is the first, then other functions following
         //
+        // at first specify structures & functions signatures
+        for(int i = 0, im = functions.size(); i < im; i++)
+            functions_signatures.put(functions.get(i).name, functions.get(i).getSignature());
+        for(int i = 0, im = structures.size(); i < im; i++)
+            structures_signatures.put(structures.get(i).name, structures.get(i).getSignature());
+        //
+        // then generate actual byte-code
+        // -- "main" function is the first, then other functions following
         HashMap<String, Instruction> fnCode = new HashMap<String, Instruction>();
         for(int i = 0, im = functions.size(); i < im; i++)
             fnCode.put(functions.get(i).name, functions.get(i).genByteCode());
@@ -67,7 +78,6 @@ public class Program extends Node
             }
         }
         return first;
-        */
     }
     
     private Instruction removeNoOps(Instruction instr)
@@ -128,5 +138,14 @@ public class Program extends Node
         //
         for(int i = 0, im = functions.size(); i < im; i++)
             functions.get(i).semanticCheck();
+    }
+    
+    public void printStructsAndFuncsSignature(PrintStream stream)
+    {
+        for(int i = 0, im = structures.size(); i < im; i++)
+            stream.println(structures.get(i).getSignature());
+        //
+        for(int i = 0, im = functions.size(); i < im; i++)
+            stream.println(functions.get(i).getSignature());
     }
 }

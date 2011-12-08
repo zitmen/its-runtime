@@ -1,26 +1,30 @@
-000: LDCI (INTEGER: 0)
-001: ST  (Variable i [] false null)
-002: LDCI (INTEGER: 1000)
-003: LD  (Variable i [] false null)
-004: SUB
-005: POP
-006: LDSF
-007: JZ  18 + 1
-008: LD  (Variable i [] false null)
-009: CALL sqr
-010: LDCS (STRING: ^2=)
-011: ADD
-012: LD  (Variable i [] false null)
-013: ADD
-014: INVOKE println
-015: LD  (Variable i [] false null)
-016: INC
-017: POP
-018: JMP 2 + 0
-019: RET
-020: ST  (Variable x [] false null)
-021: LD  (Variable x [] false null)
-022: LD  (Variable x [] false null)
-023: MUL
-024: RETV
-025: RET
+FUNCTION<INTEGER> sqr [ INTEGER x ] [ INTEGER var1 ] @ 21
+FUNCTION<VOID> main [ ] [ INTEGER var0 ] @ 0
+CODE
+000: LD  var0
+001: LDCI 1000
+002: LD  var0
+003: SUB
+004: POP
+005: LDSF
+006: JZ  20
+007: LD  var0
+008: CALL sqr
+009: INVOKE int2str
+010: LDCS ^2=
+011: LD  var0
+012: INVOKE int2str
+013: INVOKE concat
+014: INVOKE concat
+015: INVOKE println
+016: LD  var0
+017: INC
+018: POP
+019: JMP 1
+020: RET
+021: ST  var1
+022: LD  var1
+023: LD  var1
+024: MUL
+025: RETV
+026: RET

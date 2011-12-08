@@ -35,6 +35,7 @@ public class Code
     public static final int LDCI = 31;    // load an integer constant -push to the stack
     public static final int LDCR = 32;    // load a real constant -push to the stack
     public static final int LDCS = 33;    // load a string constant -push to the stack
+    public static final int LDCN = 38;    // load a NULL constant -push to the stack
     
     public static final int LDZF = 34;    // load the Zero Flag -push to the stack
     public static final int LDSF = 35;    // load the Sign Flag -push to the stack
@@ -51,6 +52,9 @@ public class Code
     public static final int NEG = 45;     // bit inversion
     
     public static final int NOOP = 46;     // NO OPeration -- just a padding for easier implementation of some AST nodes generation
+    
+    public static final int NEW = 48;     // NEW -- for the purpose of allocation of memory
+    
     
     
     private static HashMap<Integer, String> codes = null;
@@ -89,6 +93,7 @@ public class Code
             codes.put(LDCI, "LDCI");
             codes.put(LDCR, "LDCR");
             codes.put(LDCS, "LDCS");
+            codes.put(LDCN, "LDCN");
             codes.put(LDZF, "LDZF");
             codes.put(LDSF, "LDSF");
             codes.put(LDNZF, "LDNZF");
@@ -101,6 +106,7 @@ public class Code
             codes.put(NOT, "NOT");
             codes.put(NEG, "NEG");
             codes.put(NOOP, "NOOP");
+            codes.put(NEW, "NEW");
         }
         return codes.get(code);
     }

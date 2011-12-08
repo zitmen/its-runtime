@@ -16,6 +16,8 @@ public class Functions
     public static HashMap<String, Integer> fnIC = new HashMap<String, Integer>();   // what IC jump to, when calling a function?
     //
     public static HashMap<String, FunctionDefinition> builtInFunctions = new HashMap<String, FunctionDefinition>();   // all built-in fn definitions
+    //
+    public static String actualFunction = null;
     
     public static void init()
     {

@@ -29,6 +29,8 @@ public class DoWhileStatement extends Statement
     {
         SymbolTable.stepIn();
         condition.semanticCheck();
+        if(condition.evalDatatype() != DataType.BOOL)
+            throw new Exception("SEMANTIC ERROR: 'do-while' condition must be of bool type!");
         body.semanticCheck();
         SymbolTable.stepOut();
     }
@@ -37,10 +39,9 @@ public class DoWhileStatement extends Statement
     public Node optimize() throws Exception
     {
         condition = (Expression)condition.optimize();
-        if((condition instanceof StringAtom ) || (condition instanceof RealAtom) ||
-           (condition instanceof IntegerAtom) || (condition instanceof BooleanAtom))
+        if(condition instanceof BooleanAtom)
         {
-            if(TypeCast.toBoolean((Atom)condition).value == false)
+            if(((BooleanAtom)condition).value == false)
                 return null;
         }
         //

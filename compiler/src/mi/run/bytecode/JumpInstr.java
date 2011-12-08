@@ -18,7 +18,7 @@ public class JumpInstr extends Instruction
     @Override
     public String toString()
     {
-        return super.toString() + " " + address.getIC() + " + " + addr_offset;
+        return super.toString() + " " + (address.getIC() + addr_offset);
     }
     
     @Override

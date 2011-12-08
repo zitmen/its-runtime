@@ -35,7 +35,7 @@ public class NullAtom extends Atom
         //
         // if it is not assign statement or foor loop, the value has to be kept on the stack!!
         if(!((parent instanceof ExpressionStatement) || ((parent instanceof ForStatement) && ((((ForStatement)parent).init == this) || (((ForStatement)parent).iterator == this)))))
-            return new LoadConstInstr(0);
+            return new LoadConstInstr();
         else
             return new Instruction(Code.NOOP);
     }

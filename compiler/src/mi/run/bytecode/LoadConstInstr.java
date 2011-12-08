@@ -1,13 +1,12 @@
 package mi.run.bytecode;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import mi.run.runtime.Interpreter;
 import mi.run.runtime.Value;
 
 public class LoadConstInstr extends Instruction
-{   // LDCB,LDCI,LDCR,LDCS,LDCA
-    public Value value; // String, Real, Integer, Boolean, Variable
+{   // LDCB,LDCI,LDCR,LDCS,LDCA,LDCN
+    public Value value; // String, Real, Integer, Boolean, Array, Null
     
     public LoadConstInstr(boolean val)
     {
@@ -33,6 +32,12 @@ public class LoadConstInstr extends Instruction
         value = new Value(val);
     }
     
+    public LoadConstInstr()
+    {
+        super(Code.LDCN);
+        value = new Value();
+    }
+    
     public LoadConstInstr(ArrayList<Value> val)
     {
         super(Code.LDCA);
@@ -42,7 +47,24 @@ public class LoadConstInstr extends Instruction
     @Override
     public String toString()
     {
-        return super.toString() + " " + value.toString();
+        String str = super.toString() + " ";
+        try
+        {
+            switch(code)
+            {
+                case Code.LDCB: str += (value.toBool() ? "TRUE" : "FALSE"); break;
+                case Code.LDCI: str += value.toInt(); break;
+                case Code.LDCR: str += value.toReal(); break;
+                case Code.LDCS: str += value.toStr(); break;
+                case Code.LDCN: str += "NULL"; break;
+                default: str += value.toString(); break;
+            }
+        }
+        catch(Exception e)
+        {
+            str += value.toString();
+        }
+        return str;
     }
     
     @Override
@@ -77,6 +99,12 @@ public class LoadConstInstr extends Instruction
             case Code.LDCA:
                 machine.memory.stack.push(value);
                 machine.ZF = false;
+                machine.SF = false;
+                break;
+                
+            case Code.LDCN:
+                machine.memory.stack.push(value);
+                machine.ZF = true;
                 machine.SF = false;
                 break;
         }

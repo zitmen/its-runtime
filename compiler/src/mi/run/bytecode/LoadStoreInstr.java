@@ -23,7 +23,7 @@ public class LoadStoreInstr extends Instruction
     @Override
     public String toString()
     {
-        return super.toString() + " " + variable.toString();
+        return super.toString() + " " + variable.uniqName;
     }
     
     @Override

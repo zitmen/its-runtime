@@ -1,5 +1,6 @@
 package mi.run.ast;
 
+import mi.run.bytecode.Code;
 import mi.run.bytecode.Instruction;
 
 public class NewExpression extends Atom
@@ -28,6 +29,11 @@ public class NewExpression extends Atom
         if(count != null)
         {
             count.optimize();
+            //
+            // check for a non-positive value
+            if(count instanceof IntegerAtom)
+                if(((IntegerAtom)count).value <= 0)
+                    throw new Exception("SEMANTIC ERROR: argument of NEW expression must be POSITIVE integer!");
         }
         return this;
     }
@@ -35,7 +41,15 @@ public class NewExpression extends Atom
     @Override
     public Instruction genByteCode()
     {
-        throw new UnsupportedOperationException("Not supported yet.");
+        Instruction stream;
+        if(count != null)
+            stream = count.genByteCode();
+        else
+            stream = new Instruction(Code.NOOP);
+        //
+        Instruction first = stream.first();
+        stream = stream.last().append(new Instruction(Code.NEW));
+        return first;
     }
 
     @Override
@@ -45,7 +59,11 @@ public class NewExpression extends Atom
         {
             count.semanticCheck();
             if(count.evalDatatype() != DataType.INTEGER)
-                throw new Exception("SEMANTIC ERROR: argument of NEW expression must be INTEGER");
+                throw new Exception("SEMANTIC ERROR: argument of NEW expression must be positive INTEGER!");
+            //
+            if(count instanceof IntegerAtom)
+                if(((IntegerAtom)count).value <= 0)
+                    throw new Exception("SEMANTIC ERROR: argument of NEW expression must be POSITIVE integer!");
         }
     }
 

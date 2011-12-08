@@ -49,7 +49,7 @@ public class ExpressionStatement extends Statement
            (expression instanceof UnaryExpression) ||
            (expression instanceof Variable) ||
            ((expression instanceof BinaryExpression) && !isAssign(((BinaryExpression)expression).operator)))
-        {   // f.e.: x; 3+5; i+y; 5; [0:'foo','bar':1]; ~x; --> those kind of 'statements' are useless
+        {   // f.e.: x; 3+5; i+y; 5; ~x; --> those kind of 'statements' are useless
             return null;
         }
         return this;

@@ -3,7 +3,6 @@ package mi.run.runtime;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.util.ArrayList;
-import java.util.HashMap;
 
 public final class Value
 {
@@ -14,6 +13,7 @@ public final class Value
     static public final int RFILE   = 5;
     static public final int WFILE   = 6;
     static public final int ARRAY   = 7;
+    static public final int NULL    = 8;
     
     int type;       // data type
     //
@@ -25,10 +25,16 @@ public final class Value
     BufferedWriter fwVal;   // File Writer
     ArrayList<Value> aVal;   // Array
 
+    public Value()
+    {
+        set();
+    }
+    
     public Value(int val)
     {
         set(val);
     }
+    
     public Value(double val)
     {
         set(val);
@@ -68,6 +74,11 @@ public final class Value
     public int type()
     {
         return type;
+    }
+    
+    public void set()
+    {
+        type = NULL;
     }
     
     public void set(int i)
@@ -123,6 +134,7 @@ public final class Value
             case ARRAY:   throw new Exception("Runtime: illegal conversion ARRAY -> INTEGER");
             case RFILE:
             case WFILE:   throw new Exception("Runtime: illegal conversion FILE -> INTEGER");
+            case NULL:    return iVal = 0;
         }
         return 0;   // can't happen
     }
@@ -138,6 +150,7 @@ public final class Value
             case ARRAY:   throw new Exception("Runtime: illegal conversion ARRAY -> REAL");
             case RFILE:
             case WFILE:   throw new Exception("Runtime: illegal conversion FILE -> REAL");
+            case NULL:    return rVal = 0.0;
         }
         return 0.0;   // can't happen
     }
@@ -153,6 +166,7 @@ public final class Value
             case ARRAY:   throw new Exception("Runtime: illegal conversion ARRAY -> BOOLEAN");
             case RFILE:
             case WFILE:   throw new Exception("Runtime: illegal conversion FILE -> BOOLEAN");
+            case NULL:    return bVal = false;
         }
         return false;   // can't happen
     }
@@ -168,6 +182,7 @@ public final class Value
             case ARRAY:   return sVal = this.aVal.toString();
             case RFILE:
             case WFILE:   throw new Exception("Runtime: illegal conversion FILE -> STRING");
+            case NULL:    throw new Exception("Runtime: illegal conversion NULL -> STRING");
         }
         return null;   // can't happen
     }
@@ -182,6 +197,7 @@ public final class Value
             case STRING:  throw new Exception("Runtime: illegal conversion STRING -> FILE");
             case ARRAY:   throw new Exception("Runtime: illegal conversion ARRAY -> FILE");
             case RFILE:   return frVal;
+            case NULL:    throw new Exception("Runtime: illegal conversion NULL -> FILE");
         }
         return null;   // WFILE
     }
@@ -195,7 +211,8 @@ public final class Value
             case BOOLEAN: throw new Exception("Runtime: illegal conversion BOOLEAN -> FILE");
             case STRING:  throw new Exception("Runtime: illegal conversion STRING -> FILE");
             case ARRAY:   throw new Exception("Runtime: illegal conversion ARRAY -> FILE");
-            case WFILE:    return fwVal;
+            case WFILE:   return fwVal;
+            case NULL:    throw new Exception("Runtime: illegal conversion NULL -> FILE");
         }
         return null;   // RFILE
     }
@@ -215,6 +232,7 @@ public final class Value
                 aVal.add(this);
             case ARRAY:
                 return aVal;
+            case NULL:    throw new Exception("Runtime: illegal conversion NULL -> ARRAY");
         }
         return null;   // can't happen
     }
@@ -231,6 +249,7 @@ public final class Value
             case ARRAY:   return "(ARRAY: " + aVal.toString() + ")";
             case RFILE:   return "(FILE: [READ])";
             case WFILE:   return "(FILE: [WRITE])";
+            case NULL:    return "(NULL)";
         }
         return null;    // can't happen
     }
@@ -241,6 +260,7 @@ public final class Value
     {
         switch(type)
         {
+            case NULL   : return new Value();
             case INTEGER: return new Value(iVal);
             case REAL   : return new Value(rVal);
             case BOOLEAN: return new Value(bVal);

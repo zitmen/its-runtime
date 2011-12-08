@@ -76,6 +76,24 @@ public class DataType extends Node
         }
         return str + " name=" + (name==null?"null":name) + " arg=" + (arg==null?"null":arg) + " len=" + (length==null?"null":length) + ")";
     }
+    
+    public String getSignature()
+    {
+        String sig;
+        switch(type)
+        {
+            case DataType.ARRAY: sig = "ARRAY<" + arg + ">"; break;
+            case DataType.BOOL: sig = "BOOL"; break;
+            case DataType.DOUBLE: sig = "DOUBLE"; break;
+            case DataType.FILE: sig = "FILE"; break;
+            case DataType.INTEGER: sig = "INTEGER"; break;
+            case DataType.STRING: sig = "STRING"; break;
+            case DataType.STRUCTURE: sig = "STRUCTURE<" + name + ">"; break;
+            case DataType.VOID: sig = "VOID"; break;
+            default: sig = "ERROR"; break;
+        }
+        return sig;
+    }
 
     @Override
     public Node optimize() throws Exception

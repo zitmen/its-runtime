@@ -1,9 +1,14 @@
 package mi.run.ast;
 
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Map.Entry;
 import mi.run.bytecode.Code;
 import mi.run.bytecode.Instruction;
 import mi.run.bytecode.LoadStoreInstr;
+import mi.run.semantic.Functions;
 import mi.run.semantic.SymbolTable;
+import mi.run.semantic.Variables;
 
 public class FunctionDefinition extends Node
 {
@@ -33,6 +38,29 @@ public class FunctionDefinition extends Node
     {
         removeNulls();
         return "(FunctionDefinition " + type + " " + name + " " + parameters + " " + body.toString() + ")";
+    }
+    
+    public String getSignature()
+    {
+        String sig = "FUNCTION<" + type.getSignature() + "> " + name + " [ ";
+        // params
+        for(int i = 0, im = parameters.expressions.size(); i < im; i++)
+        {
+            sig += ((Variable)parameters.expressions.get(i)).type.getSignature() + " ";
+            sig += ((Variable)parameters.expressions.get(i)).name + " ";
+        }
+        sig += "] [ ";
+        // declared variables
+        Iterator it = Variables.getVarsInFn(name).entrySet().iterator();
+        Map.Entry pair;
+        while(it.hasNext())
+        {
+            pair = (Entry)it.next();
+            sig += ((DataType)pair.getValue()).getSignature() + " ";
+            sig += Variables.getVarFnUniqueName((String)pair.getKey()) + " ";
+        }
+        sig += "]";
+        return sig;
     }
     
     @Override
@@ -72,9 +100,11 @@ public class FunctionDefinition extends Node
     public void semanticCheck() throws Exception
     {
         removeNulls();
+        Functions.actualFunction = name;
         SymbolTable.stepIn();
         parameters.semanticCheck();
         body.semanticCheck();
         SymbolTable.stepOut();
+        Functions.actualFunction = null;
     }
 }

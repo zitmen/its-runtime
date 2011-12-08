@@ -33,9 +33,9 @@ public class BinaryExpression extends Expression
         //
         // left & right operands have to be atoms
         if(((leftOperand instanceof StringAtom ) || (leftOperand instanceof RealAtom) ||
-           (leftOperand instanceof IntegerAtom) || (leftOperand instanceof BooleanAtom)) &&
+           (leftOperand instanceof IntegerAtom) || (leftOperand instanceof BooleanAtom) || (leftOperand instanceof NullAtom)) &&
            ((rightOperand instanceof StringAtom ) || (rightOperand instanceof RealAtom) ||
-           (rightOperand instanceof IntegerAtom) || (rightOperand instanceof BooleanAtom)))
+           (rightOperand instanceof IntegerAtom) || (rightOperand instanceof BooleanAtom) || (rightOperand instanceof NullAtom)))
         {
             return TypeCast.builtInArithmetic(operator, (Atom)leftOperand, (Atom)rightOperand);  // replace this by pre-computed node
         }
@@ -45,8 +45,6 @@ public class BinaryExpression extends Expression
     @Override
     public Instruction genByteCode()
     {
-        throw new UnsupportedOperationException("Not supported yet.");
-        /*
         Variable var;
         Instruction stream, first, arr_stream;
         //
@@ -68,11 +66,11 @@ public class BinaryExpression extends Expression
             }
             else // array with constant indices
             {
-                stream = stream.last().append(new LoadStoreInstr(var.isArray ? Code.STA : Code.ST, var));
+                stream = stream.last().append(new LoadStoreInstr((var.type.type == DataType.ARRAY) ? Code.STA : Code.ST, var));
                 //
                 // if it is not assign statement or foor loop, the value has to stay on the stack!!
                 if(!((parent instanceof ExpressionStatement) || ((parent instanceof ForStatement) && ((((ForStatement)parent).init == this) || (((ForStatement)parent).iterator == this)))))
-                    stream = stream.last().append(new LoadStoreInstr(var.isArray ? Code.LDA : Code.LD, var));
+                    stream = stream.last().append(new LoadStoreInstr((var.type.type == DataType.ARRAY) ? Code.LDA : Code.LD, var));
             }
         }
         else if(operator == Operator.GT)
@@ -124,11 +122,11 @@ public class BinaryExpression extends Expression
                 }
                 else // array with constant indices
                 {
-                    stream = stream.last().append(new LoadStoreInstr(var.isArray ? Code.STA : Code.ST, var));
+                    stream = stream.last().append(new LoadStoreInstr((var.type.type == DataType.ARRAY) ? Code.STA : Code.ST, var));
                     //
                     // if it is not assign statement or foor loop, the value has to stay on the stack!!
                     if(!((parent instanceof ExpressionStatement) || ((parent instanceof ForStatement) && ((((ForStatement)parent).init == this) || (((ForStatement)parent).iterator == this)))))
-                        stream = stream.last().append(new LoadStoreInstr(var.isArray ? Code.LDA : Code.LD, var));
+                        stream = stream.last().append(new LoadStoreInstr((var.type.type == DataType.ARRAY) ? Code.LDA : Code.LD, var));
                 }
             }
             else if(operator == Operator.MINUS)
@@ -150,11 +148,11 @@ public class BinaryExpression extends Expression
                 }
                 else // array with constant indices
                 {
-                    stream = stream.last().append(new LoadStoreInstr(var.isArray ? Code.STA : Code.ST, var));
+                    stream = stream.last().append(new LoadStoreInstr((var.type.type == DataType.ARRAY) ? Code.STA : Code.ST, var));
                     //
                     // if it is not assign statement or foor loop, the value has to stay on the stack!!
                     if(!((parent instanceof ExpressionStatement) || ((parent instanceof ForStatement) && ((((ForStatement)parent).init == this) || (((ForStatement)parent).iterator == this)))))
-                        stream = stream.last().append(new LoadStoreInstr(var.isArray ? Code.LDA : Code.LD, var));
+                        stream = stream.last().append(new LoadStoreInstr((var.type.type == DataType.ARRAY) ? Code.LDA : Code.LD, var));
                 }
             }
             else if(operator == Operator.MUL)
@@ -176,11 +174,11 @@ public class BinaryExpression extends Expression
                 }
                 else // array with constant indices
                 {
-                    stream = stream.last().append(new LoadStoreInstr(var.isArray ? Code.STA : Code.ST, var));
+                    stream = stream.last().append(new LoadStoreInstr((var.type.type == DataType.ARRAY) ? Code.STA : Code.ST, var));
                     //
                     // if it is not assign statement or foor loop, the value has to stay on the stack!!
                     if(!((parent instanceof ExpressionStatement) || ((parent instanceof ForStatement) && ((((ForStatement)parent).init == this) || (((ForStatement)parent).iterator == this)))))
-                        stream = stream.last().append(new LoadStoreInstr(var.isArray ? Code.LDA : Code.LD, var));
+                        stream = stream.last().append(new LoadStoreInstr((var.type.type == DataType.ARRAY) ? Code.LDA : Code.LD, var));
                 }
             }
             else if(operator == Operator.DIV)
@@ -202,11 +200,11 @@ public class BinaryExpression extends Expression
                 }
                 else // array with constant indices
                 {
-                    stream = stream.last().append(new LoadStoreInstr(var.isArray ? Code.STA : Code.ST, var));
+                    stream = stream.last().append(new LoadStoreInstr((var.type.type == DataType.ARRAY) ? Code.STA : Code.ST, var));
                     //
                     // if it is not assign statement or foor loop, the value has to stay on the stack!!
                     if(!((parent instanceof ExpressionStatement) || ((parent instanceof ForStatement) && ((((ForStatement)parent).init == this) || (((ForStatement)parent).iterator == this)))))
-                        stream = stream.last().append(new LoadStoreInstr(var.isArray ? Code.LDA : Code.LD, var));
+                        stream = stream.last().append(new LoadStoreInstr((var.type.type == DataType.ARRAY) ? Code.LDA : Code.LD, var));
                 }
             }
             else if(operator == Operator.MOD)        
@@ -228,11 +226,11 @@ public class BinaryExpression extends Expression
                 }
                 else // array with constant indices
                 {
-                    stream = stream.last().append(new LoadStoreInstr(var.isArray ? Code.STA : Code.ST, var));
+                    stream = stream.last().append(new LoadStoreInstr((var.type.type == DataType.ARRAY) ? Code.STA : Code.ST, var));
                     //
                     // if it is not assign statement or foor loop, the value has to stay on the stack!!
                     if(!((parent instanceof ExpressionStatement) || ((parent instanceof ForStatement) && ((((ForStatement)parent).init == this) || (((ForStatement)parent).iterator == this)))))
-                        stream = stream.last().append(new LoadStoreInstr(var.isArray ? Code.LDA : Code.LD, var));
+                        stream = stream.last().append(new LoadStoreInstr((var.type.type == DataType.ARRAY) ? Code.LDA : Code.LD, var));
                 }
             }
             else if(operator == Operator.OR)        
@@ -254,11 +252,11 @@ public class BinaryExpression extends Expression
                 }
                 else // array with constant indices
                 {
-                    stream = stream.last().append(new LoadStoreInstr(var.isArray ? Code.STA : Code.ST, var));
+                    stream = stream.last().append(new LoadStoreInstr((var.type.type == DataType.ARRAY) ? Code.STA : Code.ST, var));
                     //
                     // if it is not assign statement or foor loop, the value has to stay on the stack!!
                     if(!((parent instanceof ExpressionStatement) || ((parent instanceof ForStatement) && ((((ForStatement)parent).init == this) || (((ForStatement)parent).iterator == this)))))
-                        stream = stream.last().append(new LoadStoreInstr(var.isArray ? Code.LDA : Code.LD, var));
+                        stream = stream.last().append(new LoadStoreInstr((var.type.type == DataType.ARRAY) ? Code.LDA : Code.LD, var));
                 }
             }
             else if(operator == Operator.AND)
@@ -280,11 +278,11 @@ public class BinaryExpression extends Expression
                 }
                 else // array with constant indices
                 {
-                    stream = stream.last().append(new LoadStoreInstr(var.isArray ? Code.STA : Code.ST, var));
+                    stream = stream.last().append(new LoadStoreInstr((var.type.type == DataType.ARRAY) ? Code.STA : Code.ST, var));
                     //
                     // if it is not assign statement or foor loop, the value has to stay on the stack!!
                     if(!((parent instanceof ExpressionStatement) || ((parent instanceof ForStatement) && ((((ForStatement)parent).init == this) || (((ForStatement)parent).iterator == this)))))
-                        stream = stream.last().append(new LoadStoreInstr(var.isArray ? Code.LDA : Code.LD, var));
+                        stream = stream.last().append(new LoadStoreInstr((var.type.type == DataType.ARRAY) ? Code.LDA : Code.LD, var));
                 }
             }
             else if(operator == Operator.XOR)
@@ -306,11 +304,11 @@ public class BinaryExpression extends Expression
                 }
                 else // array with constant indices
                 {
-                    stream = stream.last().append(new LoadStoreInstr(var.isArray ? Code.STA : Code.ST, var));
+                    stream = stream.last().append(new LoadStoreInstr((var.type.type == DataType.ARRAY) ? Code.STA : Code.ST, var));
                     //
                     // if it is not assign statement or foor loop, the value has to stay on the stack!!
                     if(!((parent instanceof ExpressionStatement) || ((parent instanceof ForStatement) && ((((ForStatement)parent).init == this) || (((ForStatement)parent).iterator == this)))))
-                        stream = stream.last().append(new LoadStoreInstr(var.isArray ? Code.LDA : Code.LD, var));
+                        stream = stream.last().append(new LoadStoreInstr((var.type.type == DataType.ARRAY) ? Code.LDA : Code.LD, var));
                 }
             }
             else if(operator == Operator.LOG_AND)
@@ -336,11 +334,11 @@ public class BinaryExpression extends Expression
                 }
                 else // array with constant indices
                 {
-                    stream = stream.last().append(new LoadStoreInstr(var.isArray ? Code.STA : Code.ST, var));
+                    stream = stream.last().append(new LoadStoreInstr((var.type.type == DataType.ARRAY) ? Code.STA : Code.ST, var));
                     //
                     // if it is not assign statement or foor loop, the value has to stay on the stack!!
                     if(!((parent instanceof ExpressionStatement) || ((parent instanceof ForStatement) && ((((ForStatement)parent).init == this) || (((ForStatement)parent).iterator == this)))))
-                        stream = stream.last().append(new LoadStoreInstr(var.isArray ? Code.LDA : Code.LD, var));
+                        stream = stream.last().append(new LoadStoreInstr((var.type.type == DataType.ARRAY) ? Code.LDA : Code.LD, var));
                 }
             }
             else if(operator == Operator.RSH)
@@ -362,11 +360,11 @@ public class BinaryExpression extends Expression
                 }
                 else // array with constant indices
                 {
-                    stream = stream.last().append(new LoadStoreInstr(var.isArray ? Code.STA : Code.ST, var));
+                    stream = stream.last().append(new LoadStoreInstr((var.type.type == DataType.ARRAY) ? Code.STA : Code.ST, var));
                     //
                     // if it is not assign statement or foor loop, the value has to stay on the stack!!
                     if(!((parent instanceof ExpressionStatement) || ((parent instanceof ForStatement) && ((((ForStatement)parent).init == this) || (((ForStatement)parent).iterator == this)))))
-                        stream = stream.last().append(new LoadStoreInstr(var.isArray ? Code.LDA : Code.LD, var));
+                        stream = stream.last().append(new LoadStoreInstr((var.type.type == DataType.ARRAY) ? Code.LDA : Code.LD, var));
                 }
             }
             else if(operator == Operator.EQ)
@@ -402,7 +400,6 @@ public class BinaryExpression extends Expression
             }
         }
         return first;
-        */
     }
 
     @Override

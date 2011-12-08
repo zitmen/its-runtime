@@ -34,7 +34,7 @@ public class IfStatement extends Statement
         SymbolTable.stepIn();
         condition.semanticCheck();
         if(condition.evalDatatype() != DataType.BOOL)
-            throw new Exception("SEMANTIC ERROR: condition must be of bool type!");
+            throw new Exception("SEMANTIC ERROR: 'if-else' condition must be of bool type!");
         trueBody.semanticCheck();
         if(falseBody != null) falseBody.semanticCheck();
         SymbolTable.stepOut();
@@ -45,11 +45,10 @@ public class IfStatement extends Statement
     {
         boolean optimized = false;
         condition = (Expression)condition.optimize();
-        if((condition instanceof StringAtom ) || (condition instanceof RealAtom) ||
-           (condition instanceof IntegerAtom) || (condition instanceof BooleanAtom))
+        if(condition instanceof BooleanAtom)
         {
             optimized = true;
-            if(TypeCast.toBoolean((Atom)condition).value)
+            if(((BooleanAtom)condition).value)
                 falseBody = null;
             else
                 trueBody = null;

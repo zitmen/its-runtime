@@ -71,8 +71,6 @@ public class FunctionCall extends Expression
     @Override
     public Instruction genByteCode()
     {
-        throw new UnsupportedOperationException("Not supported yet.");
-        /*
         removeNulls();
         //
         Instruction stream = parameters.genByteCode(true);  // params will be saved on the stack
@@ -86,16 +84,16 @@ public class FunctionCall extends Expression
                     if((parent instanceof ExpressionStatement) || ((parent instanceof ForStatement) && ((((ForStatement)parent).init == this) || (((ForStatement)parent).iterator == this))))
                         stream = stream.last().append(new Instruction(Code.POP));
              */
-        /*}
+        }
         else
         {
             stream.last().append(new CallInstr(Code.INVOKE, functionName));
             // if it is not ExpressionStatement, the return value (if any) could be removed from the stack
             if(parent instanceof ExpressionStatement)
-                if(Functions.builtInFunctions.get(functionName) == Boolean.TRUE)
+                if(Functions.builtInFunctions.get(functionName).type.type != DataType.VOID)
                     stream = stream.last().append(new Instruction(Code.POP));
         }
-        return first;*/
+        return first;
     }
 
     @Override

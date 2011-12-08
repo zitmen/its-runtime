@@ -31,13 +31,16 @@ public class Ctalk
             program.optimize(); // optimizations at statements/expressions level: constant-folding, dead-code elimination
             //System.out.println("Optimized AST = " + program + '\n');
             //
-            System.out.println("GENERATING BYTECODE & INTERPRETING");
-            Interpreter machine = new Interpreter(program.genByteCode());
+            Interpreter machine = new Interpreter(program);
             //
+            System.out.println("GENERATING BYTECODE");
             FileOutputStream out = new FileOutputStream(args[1]);
             PrintStream printer = new PrintStream(out);
             machine.printByteCode(printer);
             printer.close();
+            //
+            //System.out.println("INTERPRETING");
+            //machine.interpret();
         //}
         //catch(Exception ex)
         //{

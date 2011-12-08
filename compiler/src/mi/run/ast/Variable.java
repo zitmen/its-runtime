@@ -5,8 +5,10 @@ import mi.run.bytecode.Code;
 import mi.run.bytecode.Instruction;
 import mi.run.bytecode.LoadStoreArrayInstr;
 import mi.run.bytecode.LoadStoreInstr;
+import mi.run.semantic.Functions;
 import mi.run.semantic.Structures;
 import mi.run.semantic.SymbolTable;
+import mi.run.semantic.Variables;
 
 public class Variable extends Atom
 {
@@ -14,12 +16,17 @@ public class Variable extends Atom
     public Expression value;
     public DataType type;
     public ArrayList<Expression> members;
+    public boolean isThisdeclaration;
+    
+    public String uniqName;
+    
     
     public Variable(String name)
     {
         value = null;
         this.name = name;
         members = new ArrayList<Expression>();
+        isThisdeclaration = false;
     }
     
     public Variable(String name, DataType type)
@@ -28,6 +35,7 @@ public class Variable extends Atom
         value = null;
         this.name = name;
         members = new ArrayList<Expression>();
+        isThisdeclaration = true;
     }
     
     public Variable()
@@ -51,13 +59,19 @@ public class Variable extends Atom
         {
             if((type = SymbolTable.isDeclared(name)) == null)
                 throw new Exception("SEMANTIC ERROR: undeclared identifier '" + name + "'!");
+            //
+            if(Functions.actualFunction != null)    // inside of a function?
+                uniqName = Variables.getVarFnUniqueName(name);
         }
         else
         {
             if(SymbolTable.isDeclaredInThisScope(name) != null)
                 throw new Exception("SEMANTIC ERROR: redeclared identifier '" + name + "'!");
-            // insert
+            // declare
             SymbolTable.declare(name, type);
+            //
+            if(Functions.actualFunction != null)    // inside of a function?
+                uniqName = Variables.addVar(Functions.actualFunction, name, type);
         }
         type.semanticCheck();
         exprDataType = type.type;
@@ -130,9 +144,7 @@ public class Variable extends Atom
     @Override
     public Instruction genByteCode()
     {
-        throw new UnsupportedOperationException("Not supported yet.");
-        /*
-        if(isArray)
+        if(type.type == DataType.ARRAY)
         {
             boolean dump_indices = false;
             for(int i = 0, im = members.size(); i < im; i++)
@@ -149,7 +161,7 @@ public class Variable extends Atom
                 Instruction first = stream;
                 for(int i = members.size() - 1; i >= 0; i--)
                     stream = stream.last().append(members.get(i).genByteCode());
-                stream.last().append(new LoadStoreArrayInstr(Code.LDAI, members.size(), new Variable(name, isArray)));
+                stream.last().append(new LoadStoreArrayInstr(Code.LDAI, members.size(), new Variable(name, type)));
                 //
                 return first;
             }
@@ -158,7 +170,6 @@ public class Variable extends Atom
         }
         else
             return new LoadStoreInstr(Code.LD, this);
-        */
     }
     
     @Override

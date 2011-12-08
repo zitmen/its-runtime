@@ -26,7 +26,7 @@ public class BreakStatement extends Statement
             //
             n = n.parent;
         }
-        throw new Exception("'break' must not be used outside of a loop!");
+        throw new Exception("SEMANTIC ERROR: 'break' must not be used outside of a loop!");
     }
 
     @Override

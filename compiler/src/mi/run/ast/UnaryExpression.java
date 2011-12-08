@@ -84,7 +84,7 @@ public class UnaryExpression extends Atom
     {
         operand = (Expression)operand.optimize();
         if((operand instanceof StringAtom ) || (operand instanceof RealAtom) ||
-           (operand instanceof IntegerAtom) || (operand instanceof BooleanAtom))
+           (operand instanceof IntegerAtom) || (operand instanceof BooleanAtom) || operand instanceof NullAtom)
             return TypeCast.builtInArithmetic(operator, (Atom)operand);  // replace this by pre-computed node
         return this;
     }

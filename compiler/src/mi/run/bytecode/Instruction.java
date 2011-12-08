@@ -148,6 +148,12 @@ public class Instruction
                 return true;
             }
             case Code.POP: machine.memory.stack.pop(); break;
+            case Code.NEW:
+            {
+                // POP size
+                // PUSH allocated memory
+                throw new Exception("RUNTIME ERROR: operator NEW is not supported yet!");
+            }
             case Code.NOT:
             {
                 Value op = (Value)machine.memory.stack.pop();

@@ -1,233 +1,218 @@
+STRUCTURE Result [ ARRAY<(DataType type=INTEGER name=null arg=null len=null)> conf INTEGER cost ]
+STRUCTURE Stuff [ INTEGER weight INTEGER cost ]
+FUNCTION<STRUCTURE<Result>> computeSolution [ INTEGER n INTEGER M ARRAY<(DataType type=STRUCTURE name=Stuff arg=null len=null)> stuff ARRAY<(DataType type=INTEGER name=null arg=null len=null)> conf ] [ TODO: fori variables: sig += type + name ] @ 75
+FUNCTION<INTEGER> weight [ INTEGER n ARRAY<(DataType type=STRUCTURE name=Stuff arg=null len=null)> stuff ARRAY<(DataType type=INTEGER name=null arg=null len=null)> conf ] [ TODO: fori variables: sig += type + name ] @ 149
+FUNCTION<INTEGER> cost [ INTEGER n ARRAY<(DataType type=STRUCTURE name=Stuff arg=null len=null)> stuff ARRAY<(DataType type=INTEGER name=null arg=null len=null)> conf ] [ TODO: fori variables: sig += type + name ] @ 180
+FUNCTION<INTEGER> main [ ] [ TODO: fori variables: sig += type + name ] @ 0
+CODE
 000: LDCS (STRING: Input file: )
 001: INVOKE println
-002: INVOKE input
-003: ST  (Variable infp [] false null)
-004: LDCS (STRING: Output file: )
-005: INVOKE println
-006: INVOKE input
-007: ST  (Variable outfp [] false null)
-008: LD  (Variable infp [] false null)
-009: INVOKE openRFile
-010: ST  (Variable f [] false null)
-011: LD  (Variable f [] false null)
-012: INVOKE inputFile
-013: INVOKE integer
-014: ST  (Variable n [] false null)
-015: LD  (Variable f [] false null)
-016: INVOKE inputFile
-017: INVOKE integer
-018: ST  (Variable M [] false null)
-019: LDCI (INTEGER: 0)
-020: ST  (Variable i [] false null)
-021: LD  (Variable n [] false null)
-022: LD  (Variable i [] false null)
-023: SUB
-024: POP
-025: LDSF
-026: JZ  47 + 1
-027: LD  (Variable f [] false null)
-028: INVOKE inputFile
-029: INVOKE integer
-030: ST  (Variable w [] false null)
-031: LD  (Variable f [] false null)
-032: INVOKE inputFile
-033: INVOKE integer
-034: ST  (Variable c [] false null)
-035: LD  (Variable c [] false null)
-036: LDCS (STRING: cost)
-037: STAI 1 (Variable [] [] true null)
-038: LD  (Variable w [] false null)
-039: LDCS (STRING: weight)
-040: STAI 1 (Variable [] [] true null)
-041: LDR (Variable [] [] true null)
-042: LD  (Variable i [] false null)
-043: STAI 1 (Variable stuff [] true null)
-044: LD  (Variable i [] false null)
-045: INC
-046: POP
-047: JMP 21 + 0
-048: LD  (Variable f [] false null)
-049: INVOKE closeFile
-050: LDCA (ARRAY: {})
-051: LD  (Variable stuff [] false null)
-052: LD  (Variable M [] false null)
-053: LD  (Variable n [] false null)
-054: CALL computeSolution
-055: ST  (Variable result [] false null)
-056: LDCB (BOOLEAN: false)
-057: LD  (Variable outfp [] false null)
-058: INVOKE openWFile
-059: ST  (Variable f [] false null)
-060: LDA (Variable result [(StringAtom cost)] true null)
-061: LDCS (STRING: Total price: )
-062: ADD
-063: LD  (Variable f [] false null)
-064: INVOKE printlnFile
-065: LDCS (STRING: Items configuration: )
-066: LD  (Variable f [] false null)
-067: INVOKE printFile
-068: LDCI (INTEGER: 0)
-069: ST  (Variable i [] false null)
-070: LD  (Variable n [] false null)
-071: LD  (Variable i [] false null)
-072: SUB
-073: POP
-074: LDSF
-075: JZ  86 + 1
-076: LD  (Variable i [] false null)
-077: LDCS (STRING: stuff)
-078: LDAI 2 (Variable result [] true null)
-079: LDCS (STRING:  )
-080: ADD
-081: LD  (Variable f [] false null)
-082: INVOKE printFile
-083: LD  (Variable i [] false null)
-084: INC
-085: POP
-086: JMP 70 + 0
-087: LD  (Variable f [] false null)
-088: INVOKE closeFile
-089: LDCI (INTEGER: 0)
-090: RETV
-091: RET
-092: ST  (Variable n [] false null)
-093: ST  (Variable M [] false null)
-094: ST  (Variable stuff [] false null)
-095: ST  (Variable conf [] false null)
-096: LDCI (INTEGER: 0)
-097: ST  (Variable cur_cost [] false null)
-098: LDCI (INTEGER: 0)
-099: ST  (Variable max_cost [] false null)
-100: LD  (Variable conf [] false null)
-101: ST  (Variable solution [] false null)
-102: LD  (Variable conf [] false null)
-103: LD  (Variable stuff [] false null)
-104: LD  (Variable n [] false null)
-105: CALL weight
-106: LD  (Variable M [] false null)
-107: SUB
-108: POP
-109: LDNSF
-110: JZ  123 + 1
-111: LD  (Variable conf [] false null)
-112: LD  (Variable stuff [] false null)
-113: LD  (Variable n [] false null)
-114: CALL cost
-115: ST  (Variable cur_cost [] false null)
-116: LD  (Variable cur_cost [] false null)
-117: LD  (Variable max_cost [] false null)
-118: SUB
-119: POP
-120: LDSF
-121: JZ  123 + 1
-122: LD  (Variable cur_cost [] false null)
-123: ST  (Variable max_cost [] false null)
-124: LD  (Variable max_cost [] false null)
-125: LDCS (STRING: cost)
-126: STAI 1 (Variable [] [] true null)
-127: LD  (Variable solution [] false null)
-128: LDCS (STRING: stuff)
-129: STAI 1 (Variable [] [] true null)
-130: LDR (Variable [] [] true null)
-131: ST  (Variable retval [] false null)
-132: LDCI (INTEGER: 0)
-133: ST  (Variable i [] false null)
-134: LD  (Variable n [] false null)
-135: LD  (Variable i [] false null)
+002: LD  (Variable infp [] (DataType type=STRING name=null arg=null len=null) (FunctionCall input (ExpressionList [])))
+003: LDCS (STRING: Output file: )
+004: INVOKE println
+005: LD  (Variable outfp [] (DataType type=STRING name=null arg=null len=null) (FunctionCall input (ExpressionList [])))
+006: LD  (Variable fr [] (DataType type=FILE name=null arg=null len=null) (FunctionCall openRFile (ExpressionList [(Variable infp [] (DataType type=STRING name=null arg=null len=null) null)])))
+007: LD  (Variable n [] (DataType type=INTEGER name=null arg=null len=null) (FunctionCall str2int (ExpressionList [(FunctionCall inputFile (ExpressionList [(Variable fr [] (DataType type=FILE name=null arg=null len=null) null)]))])))
+008: LD  (Variable M [] (DataType type=INTEGER name=null arg=null len=null) (FunctionCall str2int (ExpressionList [(FunctionCall inputFile (ExpressionList [(Variable fr [] (DataType type=FILE name=null arg=null len=null) null)]))])))
+009: LDA (Variable stuff [] (DataType type=ARRAY name=null arg=(DataType type=STRUCTURE name=Stuff arg=null len=null) len=null) (NewExpression (Variable n [] (DataType type=INTEGER name=null arg=null len=null) null)))
+010: LDA (Variable init_conf [] (DataType type=ARRAY name=null arg=(DataType type=INTEGER name=null arg=null len=null) len=null) (NewExpression (Variable n [] (DataType type=INTEGER name=null arg=null len=null) null)))
+011: LD  (Variable i [] (DataType type=INTEGER name=null arg=null len=null) (IntegerAtom 0))
+012: LD  (Variable n [] (DataType type=INTEGER name=null arg=null len=null) null)
+013: LD  (Variable i [] (DataType type=INTEGER name=null arg=null len=null) null)
+014: SUB
+015: POP
+016: LDSF
+017: JZ  39 + 1
+018: LDCI (INTEGER: 0)
+019: LD  (Variable i [] (DataType type=INTEGER name=null arg=null len=null) null)
+020: STAI 1 (Variable init_conf [] (DataType type=ARRAY name=null arg=(DataType type=INTEGER name=null arg=null len=null) len=null) null)
+021: NEW
+022: LD  (Variable i [] (DataType type=INTEGER name=null arg=null len=null) null)
+023: STAI 1 (Variable stuff [] (DataType type=ARRAY name=null arg=(DataType type=STRUCTURE name=Stuff arg=null len=null) len=null) null)
+024: LD  (Variable fr [] (DataType type=FILE name=null arg=null len=null) null)
+025: INVOKE inputFile
+026: INVOKE str2int
+027: LDCS (STRING: weight)
+028: LD  (Variable i [] (DataType type=INTEGER name=null arg=null len=null) null)
+029: STAI 2 (Variable stuff [] (DataType type=ARRAY name=null arg=(DataType type=STRUCTURE name=Stuff arg=null len=null) len=null) null)
+030: LD  (Variable fr [] (DataType type=FILE name=null arg=null len=null) null)
+031: INVOKE inputFile
+032: INVOKE str2int
+033: LDCS (STRING: cost)
+034: LD  (Variable i [] (DataType type=INTEGER name=null arg=null len=null) null)
+035: STAI 2 (Variable stuff [] (DataType type=ARRAY name=null arg=(DataType type=STRUCTURE name=Stuff arg=null len=null) len=null) null)
+036: LD  (Variable i [] (DataType type=INTEGER name=null arg=null len=null) null)
+037: INC
+038: POP
+039: JMP 12 + 0
+040: LD  (Variable fr [] (DataType type=FILE name=null arg=null len=null) null)
+041: INVOKE closeFile
+042: LD  (Variable result [] (DataType type=STRUCTURE name=Result arg=null len=null) (FunctionCall computeSolution (ExpressionList [(Variable n [] (DataType type=INTEGER name=null arg=null len=null) null), (Variable M [] (DataType type=INTEGER name=null arg=null len=null) null), (Variable stuff [] (DataType type=ARRAY name=null arg=(DataType type=STRUCTURE name=Stuff arg=null len=null) len=null) null), (Variable init_conf [] (DataType type=ARRAY name=null arg=(DataType type=INTEGER name=null arg=null len=null) len=null) null)])))
+043: LD  (Variable fw [] (DataType type=FILE name=null arg=null len=null) (FunctionCall openWFile (ExpressionList [(Variable outfp [] (DataType type=STRING name=null arg=null len=null) null), (BooleanAtom false)])))
+044: LD  (Variable result [(StringAtom cost)] (DataType type=STRUCTURE name=Result arg=null len=null) null)
+045: INVOKE int2str
+046: LDCS (STRING: Total price: )
+047: INVOKE concat
+048: LD  (Variable fw [] (DataType type=FILE name=null arg=null len=null) null)
+049: INVOKE printlnFile
+050: LDCS (STRING: Items configuration: )
+051: LD  (Variable fw [] (DataType type=FILE name=null arg=null len=null) null)
+052: INVOKE printFile
+053: LD  (Variable i [] (DataType type=INTEGER name=null arg=null len=null) (IntegerAtom 0))
+054: LD  (Variable n [] (DataType type=INTEGER name=null arg=null len=null) null)
+055: LD  (Variable i [] (DataType type=INTEGER name=null arg=null len=null) null)
+056: SUB
+057: POP
+058: LDSF
+059: JZ  69 + 1
+060: LD  (Variable result [(StringAtom conf), (Variable i [] (DataType type=INTEGER name=null arg=null len=null) null)] (DataType type=STRUCTURE name=Result arg=null len=null) null)
+061: INVOKE int2str
+062: LDCS (STRING:  )
+063: INVOKE concat
+064: LD  (Variable fw [] (DataType type=FILE name=null arg=null len=null) null)
+065: INVOKE printFile
+066: LD  (Variable i [] (DataType type=INTEGER name=null arg=null len=null) null)
+067: INC
+068: POP
+069: JMP 54 + 0
+070: LD  (Variable fw [] (DataType type=FILE name=null arg=null len=null) null)
+071: INVOKE closeFile
+072: LDCI (INTEGER: 0)
+073: RETV
+074: RET
+075: ST  (Variable n [] (DataType type=INTEGER name=null arg=null len=null) null)
+076: ST  (Variable M [] (DataType type=INTEGER name=null arg=null len=null) null)
+077: ST  (Variable stuff [] (DataType type=ARRAY name=null arg=(DataType type=STRUCTURE name=Stuff arg=null len=null) len=null) null)
+078: ST  (Variable conf [] (DataType type=ARRAY name=null arg=(DataType type=INTEGER name=null arg=null len=null) len=null) null)
+079: LD  (Variable cur_cost [] (DataType type=INTEGER name=null arg=null len=null) (IntegerAtom 0))
+080: LD  (Variable max_cost [] (DataType type=INTEGER name=null arg=null len=null) (IntegerAtom 0))
+081: LDA (Variable solution [] (DataType type=ARRAY name=null arg=(DataType type=INTEGER name=null arg=null len=null) len=null) (Variable conf [] (DataType type=ARRAY name=null arg=(DataType type=INTEGER name=null arg=null len=null) len=null) null))
+082: LD  (Variable retval [] (DataType type=STRUCTURE name=Result arg=null len=null) (NewExpression null))
+083: LDA (Variable conf [] (DataType type=ARRAY name=null arg=(DataType type=INTEGER name=null arg=null len=null) len=null) null)
+084: LDA (Variable stuff [] (DataType type=ARRAY name=null arg=(DataType type=STRUCTURE name=Stuff arg=null len=null) len=null) null)
+085: LD  (Variable n [] (DataType type=INTEGER name=null arg=null len=null) null)
+086: CALL weight
+087: LD  (Variable M [] (DataType type=INTEGER name=null arg=null len=null) null)
+088: SUB
+089: POP
+090: LDNSF
+091: JZ  104 + 1
+092: LDA (Variable conf [] (DataType type=ARRAY name=null arg=(DataType type=INTEGER name=null arg=null len=null) len=null) null)
+093: LDA (Variable stuff [] (DataType type=ARRAY name=null arg=(DataType type=STRUCTURE name=Stuff arg=null len=null) len=null) null)
+094: LD  (Variable n [] (DataType type=INTEGER name=null arg=null len=null) null)
+095: CALL cost
+096: ST  (Variable cur_cost [] (DataType type=INTEGER name=null arg=null len=null) null)
+097: LD  (Variable cur_cost [] (DataType type=INTEGER name=null arg=null len=null) null)
+098: LD  (Variable max_cost [] (DataType type=INTEGER name=null arg=null len=null) null)
+099: SUB
+100: POP
+101: LDSF
+102: JZ  104 + 1
+103: LD  (Variable cur_cost [] (DataType type=INTEGER name=null arg=null len=null) null)
+104: ST  (Variable max_cost [] (DataType type=INTEGER name=null arg=null len=null) null)
+105: LD  (Variable max_cost [] (DataType type=INTEGER name=null arg=null len=null) null)
+106: ST  (Variable retval [(StringAtom cost)] (DataType type=STRUCTURE name=Result arg=null len=null) null)
+107: LDA (Variable solution [] (DataType type=ARRAY name=null arg=(DataType type=INTEGER name=null arg=null len=null) len=null) null)
+108: ST  (Variable retval [(StringAtom conf)] (DataType type=STRUCTURE name=Result arg=null len=null) null)
+109: LD  (Variable _retval [] (DataType type=STRUCTURE name=Result arg=null len=null) null)
+110: LD  (Variable i [] (DataType type=INTEGER name=null arg=null len=null) (IntegerAtom 0))
+111: LD  (Variable n [] (DataType type=INTEGER name=null arg=null len=null) null)
+112: LD  (Variable i [] (DataType type=INTEGER name=null arg=null len=null) null)
+113: SUB
+114: POP
+115: LDSF
+116: JZ  145 + 1
+117: LDA (Variable _conf [] (DataType type=ARRAY name=null arg=(DataType type=INTEGER name=null arg=null len=null) len=null) (FunctionCall cloneArray (ExpressionList [(Variable conf [] (DataType type=ARRAY name=null arg=(DataType type=INTEGER name=null arg=null len=null) len=null) null)])))
+118: LDCI (INTEGER: 0)
+119: LD  (Variable i [] (DataType type=INTEGER name=null arg=null len=null) null)
+120: LDAI 1 (Variable conf [] (DataType type=ARRAY name=null arg=(DataType type=INTEGER name=null arg=null len=null) len=null) null)
+121: SUB
+122: POP
+123: LDZF
+124: JZ  141 + 1
+125: LDCI (INTEGER: 1)
+126: LD  (Variable i [] (DataType type=INTEGER name=null arg=null len=null) null)
+127: STAI 1 (Variable _conf [] (DataType type=ARRAY name=null arg=(DataType type=INTEGER name=null arg=null len=null) len=null) null)
+128: LDA (Variable _conf [] (DataType type=ARRAY name=null arg=(DataType type=INTEGER name=null arg=null len=null) len=null) null)
+129: LDA (Variable stuff [] (DataType type=ARRAY name=null arg=(DataType type=STRUCTURE name=Stuff arg=null len=null) len=null) null)
+130: LD  (Variable M [] (DataType type=INTEGER name=null arg=null len=null) null)
+131: LD  (Variable n [] (DataType type=INTEGER name=null arg=null len=null) null)
+132: CALL computeSolution
+133: ST  (Variable _retval [] (DataType type=STRUCTURE name=Result arg=null len=null) null)
+134: LD  (Variable _retval [(StringAtom cost)] (DataType type=STRUCTURE name=Result arg=null len=null) null)
+135: LD  (Variable retval [(StringAtom cost)] (DataType type=STRUCTURE name=Result arg=null len=null) null)
 136: SUB
 137: POP
 138: LDSF
-139: JZ  171 + 1
-140: LD  (Variable conf [] false null)
-141: INVOKE cloneArray
-142: ST  (Variable _conf [] false null)
-143: LDCI (INTEGER: 0)
-144: LD  (Variable i [] false null)
-145: LDAI 1 (Variable conf [] true null)
-146: SUB
-147: POP
-148: LDZF
-149: JZ  167 + 1
-150: LDCI (INTEGER: 1)
-151: LD  (Variable i [] false null)
-152: STAI 1 (Variable _conf [] true null)
-153: LD  (Variable _conf [] false null)
-154: LD  (Variable stuff [] false null)
-155: LD  (Variable M [] false null)
-156: LD  (Variable n [] false null)
-157: CALL computeSolution
-158: ST  (Variable _retval [] false null)
-159: LDA (Variable _retval [(StringAtom cost)] true null)
-160: LDA (Variable retval [(StringAtom cost)] true null)
-161: SUB
-162: POP
-163: LDSF
-164: JZ  167 + 1
-165: LD  (Variable _retval [] false null)
-166: INVOKE cloneArray
-167: ST  (Variable retval [] false null)
-168: LD  (Variable i [] false null)
-169: INC
-170: POP
-171: JMP 134 + 0
-172: LD  (Variable retval [] false null)
-173: RETV
-174: RET
-175: ST  (Variable n [] false null)
-176: ST  (Variable stuff [] false null)
-177: ST  (Variable conf [] false null)
-178: LDCI (INTEGER: 0)
-179: ST  (Variable w [] false null)
-180: LDCI (INTEGER: 0)
-181: ST  (Variable i [] false null)
-182: LD  (Variable n [] false null)
-183: LD  (Variable i [] false null)
-184: SUB
-185: POP
-186: LDSF
-187: JZ  200 + 1
-188: LD  (Variable i [] false null)
-189: LDAI 1 (Variable conf [] true null)
-190: JZ  196 + 1
-191: LDCS (STRING: weight)
-192: LD  (Variable i [] false null)
-193: LDAI 2 (Variable stuff [] true null)
-194: LD  (Variable w [] false null)
-195: ADD
-196: ST  (Variable w [] false null)
-197: LD  (Variable i [] false null)
-198: INC
-199: POP
-200: JMP 182 + 0
-201: LD  (Variable w [] false null)
-202: RETV
-203: RET
-204: ST  (Variable n [] false null)
-205: ST  (Variable stuff [] false null)
-206: ST  (Variable conf [] false null)
-207: LDCI (INTEGER: 0)
-208: ST  (Variable c [] false null)
-209: LDCI (INTEGER: 0)
-210: ST  (Variable i [] false null)
-211: LD  (Variable n [] false null)
-212: LD  (Variable i [] false null)
-213: SUB
-214: POP
-215: LDSF
-216: JZ  229 + 1
-217: LD  (Variable i [] false null)
-218: LDAI 1 (Variable conf [] true null)
-219: JZ  225 + 1
-220: LDCS (STRING: cost)
-221: LD  (Variable i [] false null)
-222: LDAI 2 (Variable stuff [] true null)
-223: LD  (Variable c [] false null)
-224: ADD
-225: ST  (Variable c [] false null)
-226: LD  (Variable i [] false null)
-227: INC
-228: POP
-229: JMP 211 + 0
-230: LD  (Variable c [] false null)
-231: RETV
-232: RET
+139: JZ  141 + 1
+140: LD  (Variable _retval [] (DataType type=STRUCTURE name=Result arg=null len=null) null)
+141: ST  (Variable retval [] (DataType type=STRUCTURE name=Result arg=null len=null) null)
+142: LD  (Variable i [] (DataType type=INTEGER name=null arg=null len=null) null)
+143: INC
+144: POP
+145: JMP 111 + 0
+146: LD  (Variable retval [] (DataType type=STRUCTURE name=Result arg=null len=null) null)
+147: RETV
+148: RET
+149: ST  (Variable n [] (DataType type=INTEGER name=null arg=null len=null) null)
+150: ST  (Variable stuff [] (DataType type=ARRAY name=null arg=(DataType type=STRUCTURE name=Stuff arg=null len=null) len=null) null)
+151: ST  (Variable conf [] (DataType type=ARRAY name=null arg=(DataType type=INTEGER name=null arg=null len=null) len=null) null)
+152: LD  (Variable w [] (DataType type=INTEGER name=null arg=null len=null) (IntegerAtom 0))
+153: LD  (Variable i [] (DataType type=INTEGER name=null arg=null len=null) (IntegerAtom 0))
+154: LD  (Variable n [] (DataType type=INTEGER name=null arg=null len=null) null)
+155: LD  (Variable i [] (DataType type=INTEGER name=null arg=null len=null) null)
+156: SUB
+157: POP
+158: LDSF
+159: JZ  176 + 1
+160: LDCI (INTEGER: 1)
+161: LD  (Variable i [] (DataType type=INTEGER name=null arg=null len=null) null)
+162: LDAI 1 (Variable conf [] (DataType type=ARRAY name=null arg=(DataType type=INTEGER name=null arg=null len=null) len=null) null)
+163: SUB
+164: POP
+165: LDZF
+166: JZ  172 + 1
+167: LDCS (STRING: weight)
+168: LD  (Variable i [] (DataType type=INTEGER name=null arg=null len=null) null)
+169: LDAI 2 (Variable stuff [] (DataType type=ARRAY name=null arg=(DataType type=STRUCTURE name=Stuff arg=null len=null) len=null) null)
+170: LD  (Variable w [] (DataType type=INTEGER name=null arg=null len=null) null)
+171: ADD
+172: ST  (Variable w [] (DataType type=INTEGER name=null arg=null len=null) null)
+173: LD  (Variable i [] (DataType type=INTEGER name=null arg=null len=null) null)
+174: INC
+175: POP
+176: JMP 154 + 0
+177: LD  (Variable w [] (DataType type=INTEGER name=null arg=null len=null) null)
+178: RETV
+179: RET
+180: ST  (Variable n [] (DataType type=INTEGER name=null arg=null len=null) null)
+181: ST  (Variable stuff [] (DataType type=ARRAY name=null arg=(DataType type=STRUCTURE name=Stuff arg=null len=null) len=null) null)
+182: ST  (Variable conf [] (DataType type=ARRAY name=null arg=(DataType type=INTEGER name=null arg=null len=null) len=null) null)
+183: LD  (Variable c [] (DataType type=INTEGER name=null arg=null len=null) (IntegerAtom 0))
+184: LD  (Variable i [] (DataType type=INTEGER name=null arg=null len=null) (IntegerAtom 0))
+185: LD  (Variable n [] (DataType type=INTEGER name=null arg=null len=null) null)
+186: LD  (Variable i [] (DataType type=INTEGER name=null arg=null len=null) null)
+187: SUB
+188: POP
+189: LDSF
+190: JZ  207 + 1
+191: LDCI (INTEGER: 1)
+192: LD  (Variable i [] (DataType type=INTEGER name=null arg=null len=null) null)
+193: LDAI 1 (Variable conf [] (DataType type=ARRAY name=null arg=(DataType type=INTEGER name=null arg=null len=null) len=null) null)
+194: SUB
+195: POP
+196: LDZF
+197: JZ  203 + 1
+198: LDCS (STRING: cost)
+199: LD  (Variable i [] (DataType type=INTEGER name=null arg=null len=null) null)
+200: LDAI 2 (Variable stuff [] (DataType type=ARRAY name=null arg=(DataType type=STRUCTURE name=Stuff arg=null len=null) len=null) null)
+201: LD  (Variable c [] (DataType type=INTEGER name=null arg=null len=null) null)
+202: ADD
+203: ST  (Variable c [] (DataType type=INTEGER name=null arg=null len=null) null)
+204: LD  (Variable i [] (DataType type=INTEGER name=null arg=null len=null) null)
+205: INC
+206: POP
+207: JMP 185 + 0
+208: LD  (Variable c [] (DataType type=INTEGER name=null arg=null len=null) null)
+209: RETV
+210: RET
