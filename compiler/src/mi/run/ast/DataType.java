@@ -83,7 +83,7 @@ public class DataType extends Node
         String sig;
         switch(type)
         {
-            case DataType.ARRAY: sig = "ARRAY<" + arg.getSignature() + ">"; break;
+            case DataType.ARRAY: sig = "ARRAY <" + arg.getSignature() + ">"; break;
             case DataType.BOOL: sig = "BOOL"; break;
             case DataType.DOUBLE: sig = "DOUBLE"; break;
             case DataType.FILE: sig = "FILE"; break;

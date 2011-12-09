@@ -41,7 +41,7 @@ public class FunctionDefinition extends Node
     
     public String getSignature()
     {
-        String sig = "FUNCTION<" + type.getSignature() + "> " + name + " [ ";
+        String sig = "FUNCTION <" + type.getSignature() + "> " + name + " [ ";
         // params
         for(int i = 0, im = parameters.expressions.size(); i < im; i++)
         {

@@ -1,0 +1,10 @@
+void main()
+{
+	for(int x = 0; x < 1000; x++)
+		println(concat(concat(int2str(x), "^2="), int2str(sqr(x))));
+}
+
+int sqr(int x)
+{
+	return x*x;
+}

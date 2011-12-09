@@ -1,23 +1,27 @@
-#include <cstdio>
-#include <cstring>
+#include <iostream>
+#include <exception>
+#include <cmath>
 
-void notify()
-{
-	printf("ahoj :)\n");
-}
+#include "ProgramLoader.h"
+#include "Interpreter.h"
 
 int main()
 {
-	/* ========= JIT COMPILER ===========
-	typedef int (*func)(int, int);
-	char *compiledCode = new char[32];
-	strcpy(compiledCode, "\x55\x8b\xec\xb8????\xff\xd0\x8b\x45\x08\x8b\x55\x0c\x03\xc2\x5d\xc3");
-	int addr = (int)(&notify);
-	memcpy(compiledCode + 4, &addr, 4);
-	func f = (func)compiledCode;
-	printf("2+3=%d\n", f(2, 3));
-	delete [] compiledCode;
-	*/
-	// TODO: interpret, GC, hotspot(tracebased) JIT-compiling
+	try
+	{
+		ProgramLoader loader("jit.run");
+		loader.printProgram(std::cout);
+		Interpreter interpreter(loader.getProgram());
+		interpreter.setOption(Interpreter::Options::HeapSize, 1024*1024*32);	// 32MB
+		interpreter.setOption(Interpreter::Options::StackSize, 1024*1024*32);	// 32MB
+		interpreter.setOption(Interpreter::Options::GarbageCollector, 0.9);
+		interpreter.setOption(Interpreter::Options::JITCompiler, 10);
+		interpreter.run();
+	}
+	catch(std::exception *e)
+	{
+		std::cerr << e->what() << std::endl;
+		delete e;
+	}
 	return 0;
 }
