@@ -36,7 +36,7 @@ class Interpreter
 		}
 
 		void _call(FunctionSignature *fn, const vector<Argument *> &args);
-		void _invoke(const Variable *name, const vector<Argument *> &args);
+		void _invoke(Variable *name, const vector<Argument *> &args);
 		void _jz(const Integer *to);
 		void _jnz(const Integer * to);
 		void _jmp(const Integer * to);
@@ -95,6 +95,7 @@ class Interpreter
 		{
 			init();
 			Instruction first; first.code = InstructionCode::CALL; first.args.push_back(new Variable("main"));
+			IP = program->size();	// it will jump out of program after return from main
 			step(&first);
 			while((IP >= 0) && (IP < program->size()))
 				step(program->at(IP));

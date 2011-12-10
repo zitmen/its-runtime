@@ -15,6 +15,7 @@ class MemoryManager
 		void *heap;
 
 	public:
+		void *SFB;	// StackFrame Base - top of the stack before the last CALL
 		void *SB;	// Stack Base
 		void *SP;	// Stack Pointer - top of the stack
 		void *HB;	// Heap Base
@@ -23,6 +24,7 @@ class MemoryManager
 		MemoryManager(int stackSize, int heapSize)
 		{
 			stack = heap = NULL;
+			SFB = SB = SP = HB = HP = NULL;
 			try
 			{
 				SB = SP = stack = new char[stack_size = stackSize];
@@ -65,10 +67,10 @@ class MemoryManager
 			if(!fitsToStack(bytes)) throw new std::exception("MemoryManager::push: pushed variable couldn't fit into the memory - stack overflow!");
 			switch(arg->getType())
 			{
-				case DataType::ARRAY:     SP = ((Array *)arg)->getAddress(); break;
-				case DataType::STRUCTURE: SP = ((Structure *)arg)->getAddress(); break;
-				case DataType::REFERENCE: SP = ((Reference *)arg)->getValue(); break;
-				case DataType::STRING:    SP = (void *)((String *)arg)->getValue(); break;
+				case DataType::ARRAY:     (*((void **)SP))  = ((Array *)arg)->getAddress(); break;
+				case DataType::STRUCTURE: (*((void **)SP))  = ((Structure *)arg)->getAddress(); break;
+				case DataType::REFERENCE: (*((void **)SP))  = ((Reference *)arg)->getValue(); break;
+				case DataType::STRING:    (*((void **)SP))  = (void *)((String *)arg)->getValue(); break;
 				case DataType::INTEGER:   (*((int *)SP))    = ((Integer *)arg)->getValue(); break;
 				case DataType::DOUBLE:    (*((double *)SP)) = ((Double *)arg)->getValue(); break;
 				case DataType::BOOLEAN:   (*((bool *)SP))   = ((Boolean *)arg)->getValue(); break;
@@ -80,11 +82,12 @@ class MemoryManager
 			return retval;
 		}
 
-		void * push(const Variable *var, bool save_val = true)
+		void * push(const Variable *var)
 		{
+			if(var->getAddress() != NULL) return push(var->getValue());
+			//
 			int bytes = DataType::getTypeSize(var->getType());
 			if(!fitsToStack(bytes)) throw new std::exception("MemoryManager::push: pushed variable couldn't fit into the memory - stack overflow!");
-			if(save_val) memcpy(SP, var->getValue(), bytes);
 			void *retval = SP;
 			SP = (((char *)SP) + bytes);
 			return retval;
@@ -106,6 +109,20 @@ class MemoryManager
 				case DataType::FILE:      return new File(*((FILE **)SP));
 				default: throw new std::exception("MemoryManager::pop: unsupported argument type!");
 			}
+		}
+
+		void * popAndGetTopValAddr(int data_type)
+		{
+			SP = (void *)(((char *)SP) - DataType::getTypeSize(data_type));
+			if(SP < SB) throw new std::exception("MemoryManager::popAndGetTopValAddr: stack underflow!");
+			return SP;
+		}
+
+		void * peekAndGetTopValAddr(int data_type)
+		{
+			void *ptr = (void *)(((char *)SP) - DataType::getTypeSize(data_type));
+			if(SP < SB) throw new std::exception("MemoryManager::peekAndGetTopValAddr: stack underflow!");
+			return ptr;
 		}
 };
 

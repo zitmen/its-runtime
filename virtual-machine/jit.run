@@ -1,27 +1,35 @@
-FUNCTION <INTEGER> sqr [ INTEGER var2 ] [ INTEGER var9 INTEGER var2 ] @ 22
-FUNCTION <VOID> main [ ] [ STRING var8 INTEGER var7 INTEGER var5 INTEGER var6 DOUBLE var3 STRING var4 INTEGER var1 DOUBLE var0 ] @ 0
+FUNCTION <INTEGER> sqr [ INTEGER var2 ] [ INTEGER var17 INTEGER var2 ] @ 30
+FUNCTION <VOID> main [ ] [ STRING var5 STRING var6 DOUBLE var3 DOUBLE var4 INTEGER var1 DOUBLE var0 STRING var15 STRING var14 STRING var13 STRING var12 INTEGER var9 INTEGER var8 STRING var16 STRING var7 INTEGER var11 INTEGER var10 ] @ 0
 CODE
 000: LDCR var3 10.0
 001: INVOKE sqrt var3
-002: ST var0 sqrt
-003: INVOKE double2str var0
-004: LDCS var4 "sqrt(10)="
-005: INVOKE concat var4 double2str
-006: INVOKE println concat
-007: LDCI var5 0
-008: ST var1 var5
-009: LDCI var6 1000
-010: LT var7 var1 var6
-011: JZ 21
-012: CALL sqr var1
-013: INVOKE int2str sqr
-014: LDCS var8 "^2="
-015: INVOKE int2str var1
-016: INVOKE concat int2str var8
-017: INVOKE concat concat int2str
-018: INVOKE println concat
-019: INC var1
-020: JMP 9
-021: RET
-022: MUL var9 var2 var2
-023: RETV var9
+002: POP var4
+003: ST var0 var4
+004: INVOKE double2str var0
+005: POP var5
+006: LDCS var6 "sqrt(10)="
+007: INVOKE concat var6 var5
+008: POP var7
+009: INVOKE println var7
+010: LDCI var8 0
+011: ST var1 var8
+012: LDCI var9 100
+013: LT var10 var1 var9
+014: JZ 29
+015: CALL sqr var1
+016: POP var11
+017: INVOKE int2str var11
+018: POP var12
+019: LDCS var13 "^2="
+020: INVOKE int2str var1
+021: POP var14
+022: INVOKE concat var14 var13
+023: POP var15
+024: INVOKE concat var15 var12
+025: POP var16
+026: INVOKE println var16
+027: INC var1
+028: JMP 12
+029: RET
+030: MUL var17 var2 var2
+031: RETV var17

@@ -397,13 +397,15 @@ class Variable : public Argument
 		string m_name;
 		DataType *m_type;
 		void *m_address;
+		bool m_retval;
 
 	public:
-		Variable(const char *name, DataType *type = NULL)
+		Variable(const char *name, DataType *type = NULL, bool retval = false)	// retval specifies if it is return value of a function or not
 		{
 			m_name = name;
 			m_type = type;
 			m_address = NULL;
+			m_retval = retval;
 		}
 
 		virtual int getType() const
@@ -421,7 +423,7 @@ class Variable : public Argument
 			m_address = addr;
 		}
 
-		string getName() const
+		string & getName()
 		{
 			return m_name;
 		}
@@ -430,15 +432,35 @@ class Variable : public Argument
 		{
 			switch(val->getType())
 			{
-				case DataType::ARRAY:     m_address = ((Array *)val)->getAddress(); break;
-				case DataType::STRUCTURE: m_address = ((Structure *)val)->getAddress(); break;
-				case DataType::REFERENCE:  m_address = ((Reference *)val)->getValue(); break;
-				case DataType::STRING:    m_address = (void *)((String *)val)->getValue(); break;
-				case DataType::INTEGER:   (*((int *)m_address)) = ((Integer *)val)->getValue(); break;
-				case DataType::DOUBLE:    (*((double *)m_address)) = ((Double *)val)->getValue(); break;
-				case DataType::BOOLEAN:   (*((bool *)m_address)) = ((Boolean *)val)->getValue(); break;
-				case DataType::FILE:      (*((FILE **)m_address)) = ((File *)val)->getValue(); break;
+				case DataType::ARRAY:      (*((void **)m_address)) = ((Array *)val)->getAddress(); break;
+				case DataType::STRUCTURE:  (*((void **)m_address)) = ((Structure *)val)->getAddress(); break;
+				case DataType::REFERENCE:  (*((void **)m_address)) = ((Reference *)val)->getValue(); break;
+				case DataType::STRING:     (*((void **)m_address)) = (void *)((String *)val)->getValue(); break;
+				case DataType::INTEGER:    (*((int *)m_address)) = ((Integer *)val)->getValue(); break;
+				case DataType::DOUBLE:     (*((double *)m_address)) = ((Double *)val)->getValue(); break;
+				case DataType::BOOLEAN:    (*((bool *)m_address)) = ((Boolean *)val)->getValue(); break;
+				case DataType::FILE:       (*((FILE **)m_address)) = ((File *)val)->getValue(); break;
 				default: throw new std::exception("Argument::setValue: unsupported argument type!");
+			}
+		}
+
+		void setValue(Variable *var)
+		{
+			switch(var->getType())
+			{
+				case DataType::ARRAY:
+				case DataType::STRUCTURE:
+				case DataType::REFERENCE:
+				case DataType::STRING:
+				case DataType::INTEGER:
+				case DataType::DOUBLE:
+				case DataType::BOOLEAN:
+				case DataType::FILE:
+					setValue(var->getValue());
+					break;
+
+				default:
+					throw new std::exception("Argument::setValue: unsupported argument type!");
 			}
 		}
 
@@ -449,11 +471,11 @@ class Variable : public Argument
 				case DataType::INTEGER: return new Integer(getAddress()); break;
 				case DataType::DOUBLE: return new Double(getAddress()); break;
 				case DataType::BOOLEAN: return new Boolean(getAddress()); break;
-				case DataType::REFERENCE: return new Reference(getAddress()); break;
-				case DataType::FILE: return new File(getAddress()); break;
-				case DataType::STRING: return new String(getAddress()); break;
-				case DataType::ARRAY: return new Array(getAddress()); break;
-				//case DataType::STRUCTURE: return new Structure(getAddress()); break;
+				case DataType::REFERENCE: return new Reference((void *)(*((void **)(getAddress())))); break;
+				case DataType::FILE: return new File((FILE *)(*((FILE **)(getAddress())))); break;
+				case DataType::STRING: return new String((char *)(*((char **)(getAddress())))); break;
+				case DataType::ARRAY: return new Array((void *)(*((void **)(getAddress())))); break;
+				//case DataType::STRUCTURE: return new Structure((void *)(*((void **)(getAddress())))); break;
 				default: throw new std::exception("Variable::getValue: invalid type!");
 			}
 		}

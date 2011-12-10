@@ -13,3 +13,4 @@ ostringstream Reference::os;
 
 bool BuiltInRoutines::m_first_rand = true;
 time_t BuiltInRoutines::m_rand_seed = time(NULL);
+map<string, DataType *> BuiltInRoutines::routinesList;

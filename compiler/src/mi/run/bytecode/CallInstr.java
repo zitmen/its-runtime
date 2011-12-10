@@ -5,7 +5,7 @@ import mi.run.ast.Expression;
 import mi.run.runtime.Interpreter;
 
 public class CallInstr extends Instruction
-{   // CALL, INVOKE
+{   // CALL, INVOKE, POP (because of RETV)
     public String functionName;
     public ArrayList<Expression> parameters;
     

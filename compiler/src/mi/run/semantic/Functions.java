@@ -176,4 +176,11 @@ public class Functions
         params.expressions.add(new Variable("modul", new DataType(DataType.DOUBLE)));
         builtInFunctions.put("rand", new FunctionDefinition(new DataType(DataType.INTEGER), "rand", params, null));
     }
+    
+    public static boolean isFunctionName(String name)
+    {
+        if(functions.get(name) != null) return true;
+        if(builtInFunctions.get(name)!= null) return true;
+        return false;
+    }
 }

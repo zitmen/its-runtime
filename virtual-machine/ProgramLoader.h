@@ -18,6 +18,7 @@ using std::pair;
 
 #include "InstructionSet.h"
 #include "Signatures.h"
+#include "BuiltInRoutines.h"
 
 class ProgramLoader
 {
@@ -30,6 +31,7 @@ class ProgramLoader
 	public:
 		ProgramLoader(const string &source)
 		{
+			BuiltInRoutines::init();
 			load(source);
 		}
 
@@ -57,7 +59,6 @@ class ProgramLoader
 			istringstream line;
 			StructureSignature *structSig;
 			FunctionSignature *funcSig;
-			Instruction *instr;
 			while(1)
 			{
 				getline(fin, token);
@@ -80,19 +81,17 @@ class ProgramLoader
 				else if(token == "CODE")	// only informative, that signature declarations are done
 				{	// make list of all variables in the program
 					for(map<string, FunctionSignature *>::iterator it = m_functions.begin(); it != m_functions.end(); ++it)
+					{
+						m_variables[it->first] = new Variable(it->second->name.c_str(), it->second->return_type, true);	// return value of a function
 						for(map<string, Variable *>::iterator jt = it->second->variables.begin(); jt != it->second->variables.end(); ++jt)
 							m_variables[jt->first] = jt->second;
+					}
+					// then add return variables for built-in functions
+					for(map<string, DataType *>::iterator it = BuiltInRoutines::routinesList.begin(); it != BuiltInRoutines::routinesList.end(); ++it)
+						m_variables[it->first] = new Variable(it->first.c_str(), it->second, true);	// return value of a function
 				}
 				else	// instruction
-				{
-					instr = Instruction::parse(m_variables, token, line);
-					if(instr->code == InstructionCode::ST)	// check if it's return value from a function
-					{
-						if(instr->args[1] == NULL)
-							instr->code = InstructionCode::POP;	// yes, it is --> change this instruction into POP arg[0]
-					}
-					m_program.push_back(instr);
-				}
+					m_program.push_back(Instruction::parse(m_variables, token, line));
 			}
 			//
 			fin.close();

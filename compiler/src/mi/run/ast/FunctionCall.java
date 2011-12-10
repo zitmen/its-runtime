@@ -1,15 +1,18 @@
 package mi.run.ast;
 
+import java.util.ArrayList;
 import mi.run.bytecode.CallInstr;
 import mi.run.bytecode.Code;
 import mi.run.bytecode.Instruction;
 import mi.run.semantic.Functions;
+import mi.run.semantic.Variables;
 
 public class FunctionCall extends Expression
 {
     public FunctionDefinition function;
     public ExpressionList parameters;
     private boolean isDefined;  // if it's not then it's a built-in function
+    private String callerName;
     
     private void removeNulls()
     {
@@ -33,6 +36,7 @@ public class FunctionCall extends Expression
     @Override
     public void semanticCheck() throws Exception
     {
+        callerName = Functions.actualFunction;
         removeNulls();
         parameters.semanticCheck();
         function = (FunctionDefinition)Functions.functions.get(functionName);
@@ -74,8 +78,16 @@ public class FunctionCall extends Expression
         //
         Instruction stream = parameters.genByteCode(true);  // params will be saved on the stack
         Instruction first = stream.first();
-        stream.last().append(new CallInstr((isDefined ? Code.CALL : Code.INVOKE), functionName, parameters.expressions));
-        resultVariable = function.name;
+        stream = stream.last().append(new CallInstr((isDefined ? Code.CALL : Code.INVOKE), functionName, parameters.expressions));
+        if(function.type.type == DataType.VOID)
+        {   // void is never stored anywhere
+            resultVariable = functionName;
+        }
+        else
+        {   // others are stored at the stack
+            resultVariable = Variables.addVar(callerName, "tmp", new DataType(this.function.type.type));
+            stream = stream.last().append(new CallInstr(Code.POP, resultVariable, new ArrayList<Expression>()));
+        }
         return first;
     }
 

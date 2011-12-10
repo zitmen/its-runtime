@@ -3,6 +3,8 @@
 
 #include <sstream>
 #include <map>
+#include <vector>
+using std::vector;
 using std::map;
 using std::pair;
 using std::istringstream;
@@ -60,6 +62,7 @@ class FunctionSignature
 		int length;		// number of instructions of a function
 		string name;
 		DataType *return_type;
+		vector<string> arguments_ordering;	// arguments int the order from the left to rhe right
 		map<string, DataType *> arguments;
 		map<string, DataType *> declarations;	// declarations inside of a function
 		map<string, Variable *> variables;	// list of all variables in a function
@@ -97,6 +100,7 @@ class FunctionSignature
 				is >> token;	// name
 				fn->arguments[token] = type;
 				fn->variables[token] = new Variable(token.c_str(), type);
+				fn->arguments_ordering.push_back(token);
 			}
 			while(is.get() != '[');
 			while(1)

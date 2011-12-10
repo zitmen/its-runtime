@@ -20,6 +20,47 @@ class BuiltInRoutines
 		static time_t m_rand_seed;
 
 	public:
+		static map<string, DataType *> routinesList;	// first is routine name, second is returned datatype
+
+		static void init()
+		{
+			routinesList["cloneArray"] = new DataType(DataType::ARRAY);
+			routinesList["clearArray"] = new DataType(DataType::VOID);
+			routinesList["length"] = new DataType(DataType::INTEGER);
+			routinesList["openRFile"] = new DataType(DataType::FILE);
+			routinesList["openWFile"] = new DataType(DataType::FILE);
+			routinesList["closeFile"] = new DataType(DataType::VOID);
+			routinesList["flushFile"] = new DataType(DataType::VOID);
+			routinesList["printFile"] = new DataType(DataType::VOID);
+			routinesList["printlnFile"] = new DataType(DataType::VOID);
+			routinesList["print"] = new DataType(DataType::VOID);
+			routinesList["println"] = new DataType(DataType::VOID);
+			routinesList["inputFile"] = new DataType(DataType::STRING);
+			routinesList["input"] = new DataType(DataType::STRING);
+			routinesList["eof"] = new DataType(DataType::VOID);
+			routinesList["eoi"] = new DataType(DataType::VOID);
+			routinesList["pow"] = new DataType(DataType::DOUBLE);
+			routinesList["sqrt"] = new DataType(DataType::DOUBLE);
+			routinesList["log"] = new DataType(DataType::DOUBLE);
+			routinesList["rand"] = new DataType(DataType::INTEGER);
+			routinesList["indexOf"] = new DataType(DataType::INTEGER);
+			routinesList["lastIndexOf"] = new DataType(DataType::INTEGER);
+			routinesList["substring"] = new DataType(DataType::STRING);
+			routinesList["toLower"] = new DataType(DataType::STRING);
+			routinesList["toUpper"] = new DataType(DataType::STRING);
+			routinesList["trim"] = new DataType(DataType::STRING);
+			routinesList["startsWith"] = new DataType(DataType::BOOLEAN);
+			routinesList["endsWith"] = new DataType(DataType::BOOLEAN);
+			routinesList["concat"] = new DataType(DataType::STRING);
+			routinesList["strlen"] = new DataType(DataType::INTEGER);
+			routinesList["int2str"] = new DataType(DataType::STRING);
+			routinesList["double2str"] = new DataType(DataType::STRING);
+			routinesList["str2int"] = new DataType(DataType::INTEGER);
+			routinesList["double2int"] = new DataType(DataType::INTEGER);
+			routinesList["str2double"] = new DataType(DataType::DOUBLE);
+			routinesList["int2double"] = new DataType(DataType::DOUBLE);
+		}
+
 		static Array * cloneArray(MemoryManager *mem, const Array *arr)
 		{
 			Array *new_arr = new Array(mem->alloc(arr->getAllocSize()));
@@ -82,9 +123,9 @@ class BuiltInRoutines
 			char *tmp = new char[255];
 			fscanf(fp->getValue(), "%s", tmp);
 			int len = ::strlen(tmp);
-			char *str = (char *)mem->alloc(sizeof(int) + sizeof(char) * (len + 1));
-			(*((int *)str)) = len;
-			strcpy(str + sizeof(int), tmp);
+			char *str = (char *)mem->alloc(sizeof(char) * (len + 1));
+			strcpy(str, tmp);
+			delete [] tmp;
 			return new String(str);
 		}
     
@@ -93,9 +134,9 @@ class BuiltInRoutines
 			char *tmp = new char[255];
 			scanf("%s", tmp);
 			int len = ::strlen(tmp);
-			char *str = (char *)mem->alloc(sizeof(int) + sizeof(char) * (len + 1));
-			(*((int *)str)) = len;
-			strcpy(str + sizeof(int), tmp);
+			char *str = (char *)mem->alloc(sizeof(char) * (len + 1));
+			strcpy(str, tmp);
+			delete [] tmp;
 			return new String(str);
 		}
     
@@ -149,9 +190,9 @@ class BuiltInRoutines
 			char *tmp = new char[strlen(str)->getValue()+1];
 			strcpy(tmp, string(str->getValue()).substr(start->getValue(), end->getValue() - start->getValue() + 1).c_str());
 			int len = ::strlen(tmp);
-			char *sstr = (char *)mem->alloc(sizeof(int) + sizeof(char) * (len + 1));
-			(*((int *)sstr)) = len;
-			strcpy(sstr + sizeof(int), tmp);
+			char *sstr = (char *)mem->alloc(sizeof(char) * (len + 1));
+			strcpy(sstr, tmp);
+			delete [] tmp;
 			return new String(sstr);
         }
         
@@ -159,11 +200,10 @@ class BuiltInRoutines
         {
 			const char *cstr = str->getValue();
 			int len = ::strlen(cstr);
-			char *sstr = (char *)mem->alloc(sizeof(int) + sizeof(char) * (len + 1));
-			(*((int *)sstr)) = len;
+			char *sstr = (char *)mem->alloc(sizeof(char) * (len + 1));
 			for(int i = 0; i < len; i++)
-				sstr[sizeof(int)/sizeof(char)+i] = tolower(cstr[i]);
-			sstr[sizeof(int)/sizeof(char)+len] = '\0';
+				sstr[i] = tolower(cstr[i]);
+			sstr[len] = '\0';
             return new String(sstr);
         }
         
@@ -171,11 +211,10 @@ class BuiltInRoutines
         {
             const char *cstr = str->getValue();
 			int len = ::strlen(cstr);
-			char *sstr = (char *)mem->alloc(sizeof(int) + sizeof(char) * (len + 1));
-			(*((int *)sstr)) = len;
+			char *sstr = (char *)mem->alloc(sizeof(char) * (len + 1));
 			for(int i = 0; i < len; i++)
-				sstr[sizeof(int)/sizeof(char)+i] = toupper(cstr[i]);
-			sstr[sizeof(int)/sizeof(char)+len] = '\0';
+				sstr[i] = toupper(cstr[i]);
+			sstr[len] = '\0';
             return new String(sstr);
         }
         
@@ -216,7 +255,7 @@ class BuiltInRoutines
         static String * concat(MemoryManager *mem, const String *str1, const String *str2)
         {
 			int len1 = ::strlen(str1->getValue()), len2 = ::strlen(str2->getValue());
-			char *str = (char *)mem->alloc(sizeof(int) + sizeof(char) * (len1 + len2 + 1));
+			char *str = (char *)mem->alloc(sizeof(char) * (len1 + len2 + 1));
 			strcpy(str, str1->getValue());
 			strcat(str, str2->getValue());
             return new String(str);
@@ -231,17 +270,19 @@ class BuiltInRoutines
 		{
 			char *tmp = new char[32];
 			sprintf(tmp, "%d", i->getValue());
-			char *str = (char *)mem->alloc(sizeof(int) + sizeof(char) * (::strlen(tmp) + 1));
+			char *str = (char *)mem->alloc(sizeof(char) * (::strlen(tmp) + 1));
 			strcpy(str, tmp);
+			delete [] tmp;
 			return new String(str);
 		}
     
 		static String * double2str(MemoryManager *mem, const Double *d)
 		{
 			char *tmp = new char[32];
-			sprintf(tmp, "%f", d->getValue());
-			char *str = (char *)mem->alloc(sizeof(int) + sizeof(char) * (::strlen(tmp) + 1));
+			sprintf(tmp, "%lf", d->getValue());
+			char *str = (char *)mem->alloc(sizeof(char) * (::strlen(tmp) + 1));
 			strcpy(str, tmp);
+			delete [] tmp;
 			return new String(str);
 		}
     

@@ -13,10 +13,10 @@ class DataType
 		int type;
 		DataType *subtype;
 
-		DataType()
+		DataType(int type = INVALID, DataType *subtype = NULL)
 		{
-			type = INVALID;
-			subtype = NULL;
+			this->type = type;
+			this->subtype = subtype;
 		}
 
 		~DataType()

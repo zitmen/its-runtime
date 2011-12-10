@@ -187,11 +187,17 @@ class Instruction
 				case InstructionCode::RETV:
 				case InstructionCode::INC:
 				case InstructionCode::DEC:
+				case InstructionCode::POP:
+					instr->args.push_back(variables[Variable::parse(is)->getName()]);
+					break;
+
+				// 2 arguments (variables)
+				case InstructionCode::ST:
+					instr->args.push_back(variables[Variable::parse(is)->getName()]);
 					instr->args.push_back(variables[Variable::parse(is)->getName()]);
 					break;
 
 				// 3 arguments (variables)
-				case InstructionCode::ST:
 				case InstructionCode::ADD:
 				case InstructionCode::SUB:
 				case InstructionCode::MUL:
@@ -226,8 +232,8 @@ class Instruction
 					instr->args.push_back(Variable::parse(is));	// function/routine name
 					while(1)
 					{	// arguments
-						arg = variables[Variable::parse(is)->getName()];
 						if(!is.good()) break;
+						arg = variables[Variable::parse(is)->getName()];
 						instr->args.push_back(arg);
 					}
 					break;
