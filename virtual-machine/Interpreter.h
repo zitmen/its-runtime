@@ -25,54 +25,53 @@ class Interpreter
 		map<string, StructureSignature *> *structures;
 		map<string, FunctionSignature *> *functions;
 		int IP;	// Instruction Pointer -- points to an instruction after the currently processed one
-		int SP;	// Stack Pointer -- top of the stack
-		bool ZF;	// Zero Flag -- was the result of the previous instruction zero-valued?
+		bool ZF;	// Zero Flag -- was the result of the previous arithmetic/bit/logic instruction zero?
 
 	protected:
 		void init()
 		{
 			IP = 0;
-			SP = 0;
 			ZF = false;
 			memory = new MemoryManager(options[Options::StackSize], options[Options::HeapSize]);
 		}
 
-		void _call(const FunctionSignature *fn, const vector<Argument *> &args);
+		void _call(FunctionSignature *fn, const vector<Argument *> &args);
 		void _invoke(const Variable *name, const vector<Argument *> &args);
 		void _jz(const Integer *to);
 		void _jnz(const Integer * to);
 		void _jmp(const Integer * to);
 		void _ret();
 		void _retv(const Variable *var);
-		void _st(const Variable *dest, const Variable *src);
+		void _pop(Variable *dest);
+		void _st(Variable *dest, Variable *src);
 		void _sta();	// ???
-		void _add(const Variable *dest, const Variable *op1, const Variable *op2);
-		void _sub(const Variable *dest, const Variable *op1, const Variable *op2);
-		void _mul(const Variable *dest, const Variable *op1, const Variable *op2);
-		void _div(const Variable *dest, const Variable *op1, const Variable *op2);
-		void _mod(const Variable *dest, const Variable *op1, const Variable *op2);
-		void _and(const Variable *dest, const Variable *op1, const Variable *op2);
-		void _or(const Variable *dest, const Variable *op1, const Variable *op2);
-		void _xor(const Variable *dest, const Variable *op1, const Variable *op2);
-		void _lsh(const Variable *dest, const Variable *op1, const Variable *op2);
-		void _rsh(const Variable *dest, const Variable *op1, const Variable *op2);
-		void _inc(const Variable *var);
-		void _dec(const Variable *var);
-		void _not(const Variable *dest, const Variable *src);
-		void _neg(const Variable *dest, const Variable *src);
-		void _minus(const Variable *dest, const Variable *src);
-		void _ldci(const Variable *var, const Integer *constant);
-		void _ldcb(const Variable *var, const Boolean *constant);
-		void _ldcr(const Variable *var, const Double *constant);
-		void _ldcs(const Variable *var, const String *constant);
-		void _ldcn(const Variable *var, const Null *constant);
-		void _new(const Variable *var, const Variable *size);
-		void _lt(const Variable *dest, const Variable *op1, const Variable *op2);
-		void _gt(const Variable *dest, const Variable *op1, const Variable *op2);
-		void _lte(const Variable *dest, const Variable *op1, const Variable *op2);
-		void _gte(const Variable *dest, const Variable *op1, const Variable *op2);
-		void _eq(const Variable *dest, const Variable *op1, const Variable *op2);
-		void _neq(const Variable *dest, const Variable *op1, const Variable *op2);
+		void _add(Variable *dest, const Variable *op1, const Variable *op2);
+		void _sub(Variable *dest, const Variable *op1, const Variable *op2);
+		void _mul(Variable *dest, const Variable *op1, const Variable *op2);
+		void _div(Variable *dest, const Variable *op1, const Variable *op2);
+		void _mod(Variable *dest, const Variable *op1, const Variable *op2);
+		void _and(Variable *dest, const Variable *op1, const Variable *op2);
+		void _or(Variable *dest, const Variable *op1, const Variable *op2);
+		void _xor(Variable *dest, const Variable *op1, const Variable *op2);
+		void _lsh(Variable *dest, const Variable *op1, const Variable *op2);
+		void _rsh(Variable *dest, const Variable *op1, const Variable *op2);
+		void _inc(Variable *var);
+		void _dec(Variable *var);
+		void _not(Variable *dest, const Variable *src);
+		void _neg(Variable *dest, const Variable *src);
+		void _minus(Variable *dest, const Variable *src);
+		void _ldci(Variable *var, Integer *constant);
+		void _ldcb(Variable *var, Boolean *constant);
+		void _ldcr(Variable *var, Double *constant);
+		void _ldcs(Variable *var, String *constant);
+		void _ldcn(Variable *var, Reference *constant);
+		void _new(Variable *var, const Variable *size);
+		void _lt(Variable *dest, const Variable *op1, const Variable *op2);
+		void _gt(Variable *dest, const Variable *op1, const Variable *op2);
+		void _lte(Variable *dest, const Variable *op1, const Variable *op2);
+		void _gte(Variable *dest, const Variable *op1, const Variable *op2);
+		void _eq(Variable *dest, const Variable *op1, const Variable *op2);
+		void _neq(Variable *dest, const Variable *op1, const Variable *op2);
 
 	public:
 		Interpreter(vector<Instruction *> *program, map<string, StructureSignature *> *structures, map<string, FunctionSignature *> *functions)
@@ -98,7 +97,7 @@ class Interpreter
 			Instruction first; first.code = InstructionCode::CALL; first.args.push_back(new Variable("main"));
 			step(&first);
 			while((IP >= 0) && (IP < program->size()))
-				step(program->at(IP++));
+				step(program->at(IP));
 		}
 
 		void step(const Instruction *instr)
@@ -110,6 +109,7 @@ class Interpreter
 				case InstructionCode::JMP: _jmp((Integer *)instr->args[0]); break;
 				case InstructionCode::RET: _ret(); break;
 				case InstructionCode::RETV: _retv((Variable *)instr->args[0]); break;
+				case InstructionCode::POP: _pop((Variable *)instr->args[0]); break;
 				case InstructionCode::ST: _st((Variable *)instr->args[0], (Variable *)instr->args[1]); break;
 				case InstructionCode::STA: _sta(); break;	// ??!!
 				case InstructionCode::ADD: _add((Variable *)instr->args[0], (Variable *)instr->args[1], (Variable *)instr->args[2]); break;
@@ -133,7 +133,7 @@ class Interpreter
 				case InstructionCode::LDCB: _ldcb((Variable *)instr->args[0], (Boolean *)instr->args[1]); break;
 				case InstructionCode::LDCR: _ldcr((Variable *)instr->args[0], (Double *)instr->args[1]); break;
 				case InstructionCode::LDCS: _ldcs((Variable *)instr->args[0], (String *)instr->args[1]); break;
-				case InstructionCode::LDCN: _ldcn((Variable *)instr->args[0], (Null *)instr->args[1]); break;
+				case InstructionCode::LDCN: _ldcn((Variable *)instr->args[0], (Reference *)instr->args[1]); break;
 				case InstructionCode::NEW: _new((Variable *)instr->args[0], (Variable *)instr->args[1]); break;
 				case InstructionCode::LT: _lt((Variable *)instr->args[0], (Variable *)instr->args[1], (Variable *)instr->args[2]); break;
 				case InstructionCode::GT: _gt((Variable *)instr->args[0], (Variable *)instr->args[1], (Variable *)instr->args[2]); break;

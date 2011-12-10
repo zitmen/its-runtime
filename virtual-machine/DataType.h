@@ -8,7 +8,7 @@ using std::string;
 class DataType
 {
 	public:
-		static enum { INVALID, VOID, INTEGER, DOUBLE, FILE, ARRAY, STRING, STRUCTURE };
+		static enum { INVALID, VOID, INTEGER, BOOLEAN, DOUBLE, FILE, ARRAY, STRING, STRUCTURE, REFERENCE };
 
 		int type;
 		DataType *subtype;
@@ -44,11 +44,13 @@ class DataType
 			string tmp = ((ptr == string::npos) ? strVal : strVal.substr(0, ptr));
 			if(tmp == "VOID") return VOID;
 			if(tmp == "INTEGER") return INTEGER;
+			if(tmp == "BOOLEAN") return BOOLEAN;
 			if(tmp == "DOUBLE") return DOUBLE;
 			if(tmp == "FILE") return FILE;
 			if(tmp == "ARRAY") return ARRAY;
 			if(tmp == "STRING") return STRING;
 			if(tmp == "STRUCTURE") return STRUCTURE;
+			if(tmp == "REFERENCE") return REFERENCE;
 			return INVALID;
 		}
 
@@ -59,6 +61,9 @@ class DataType
 				case INTEGER:
 					return sizeof(int);
 
+				case BOOLEAN:
+					return sizeof(bool);
+
 				case FILE:
 					return sizeof(::FILE *);
 				
@@ -68,6 +73,7 @@ class DataType
 				case ARRAY:
 				case STRING: 
 				case STRUCTURE:
+				case REFERENCE:
 					return sizeof(void *);	// stored as a pointer
 
 				default:
@@ -83,11 +89,13 @@ class DataType
 				case INVALID: str = "INVALID"; break;
 				case VOID: str = "VOID"; break;
 				case INTEGER: str = "INTEGER"; break;
+				case BOOLEAN: str = "BOOLEAN"; break;
 				case DOUBLE: str = "DOUBLE"; break;
 				case FILE: str = "FILE"; break;
 				case ARRAY: str = "ARRAY<" + subtype->toString() + ">"; break;
 				case STRING: str = "STRING"; break;
 				case STRUCTURE: str = "STRUCTURE<" + subtype->toString() + ">"; break;
+				case REFERENCE: str = "REFERENCE"; break;
 			}
 			return str;
 		}

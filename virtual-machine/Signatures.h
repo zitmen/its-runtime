@@ -9,6 +9,7 @@ using std::istringstream;
 using std::ostringstream;
 
 #include "DataType.h"
+#include "Argument.h"
 
 class StructureSignature
 {
@@ -61,15 +62,21 @@ class FunctionSignature
 		DataType *return_type;
 		map<string, DataType *> arguments;
 		map<string, DataType *> declarations;	// declarations inside of a function
+		map<string, Variable *> variables;	// list of all variables in a function
 
 		~FunctionSignature()
 		{
+			/*
 			for(map<string, DataType *>::iterator it = arguments.begin(); it != arguments.end(); ++it)
 				delete it->second;
 			arguments.clear();
 			for(map<string, DataType *>::iterator it = declarations.begin(); it != declarations.end(); ++it)
 				delete it->second;
 			declarations.clear();
+			for(map<string, Variable *>::iterator it = variables.begin(); it != variables.end(); ++it)
+				delete it->second;
+			variables.clear();
+			*/
 		}
 
 		static FunctionSignature * parse(istringstream &is)
@@ -89,6 +96,7 @@ class FunctionSignature
 				type = DataType::parse(token);
 				is >> token;	// name
 				fn->arguments[token] = type;
+				fn->variables[token] = new Variable(token.c_str(), type);
 			}
 			while(is.get() != '[');
 			while(1)
@@ -98,6 +106,7 @@ class FunctionSignature
 				type = DataType::parse(token);
 				is >> token;	// name
 				fn->declarations[token] = type;
+				fn->variables[token] = new Variable(token.c_str(), type);
 			}
 			while(is.get() != '@');
 			is >> fn->pointer;

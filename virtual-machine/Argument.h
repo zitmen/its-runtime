@@ -16,6 +16,7 @@ class Argument
 {
 	public:
 		virtual string toString() const = 0 { }
+		virtual int getType() const = 0 { }
 };
 
 class Integer : public Argument
@@ -28,6 +29,16 @@ class Integer : public Argument
 		Integer(int val)
 		{
 			m_value = val;
+		}
+
+		Integer(void *addr)
+		{
+			m_value = (*((int *)addr));
+		}
+
+		virtual int getType() const
+		{
+			return DataType::INTEGER;
 		}
 
 		int getValue() const
@@ -62,12 +73,22 @@ class Double : public Argument
 			m_value = val;
 		}
 
+		Double(void *addr)
+		{
+			m_value = (*((double *)addr));
+		}
+
+		virtual int getType() const
+		{
+			return DataType::DOUBLE;
+		}
+
 		double getValue() const
 		{
 			return m_value;
 		}
 
-		static Argument * parse(istringstream &is)
+		static Double * parse(istringstream &is)
 		{
 			double val;
 			is >> val;
@@ -93,12 +114,22 @@ class Boolean : public Argument
 			m_value = val;
 		}
 
+		Boolean(void *addr)
+		{
+			m_value = (*((bool *)addr));
+		}
+
+		virtual int getType() const
+		{
+			return DataType::BOOLEAN;
+		}
+
 		bool getValue() const
 		{
 			return m_value;
 		}
 
-		static Argument * parse(istringstream &is)
+		static Boolean * parse(istringstream &is)
 		{
 			string val;
 			is >> val;
@@ -122,9 +153,24 @@ class String : public Argument
 			//
 		}
 
+		String(void *addr)
+		{
+			m_address = ((char *)addr);
+		}
+
 		String(char *str)
 		{
 			m_address = str;
+		}
+
+		void setValue(char *str)
+		{
+			m_address = str;
+		}
+
+		virtual int getType() const
+		{
+			return DataType::STRING;
 		}
 
 		const char * getValue() const
@@ -132,8 +178,13 @@ class String : public Argument
 			return m_address;
 		}
 
-		static Argument * parse(istringstream &is)	// TODO: alokace na halde programu??!!
+		char * getValue()
 		{
+			return m_address;
+		}
+
+		static String * parse(istringstream &is)
+		{	// allocation of the string will be done in LDCS instruction
 			string val;
 			is >> val;
 			val = val.substr(1, val.length() - 2);
@@ -164,13 +215,6 @@ class Array : public Argument
 			m_address = addr;
 		}
 
-		/*
-		??? getValue() const
-		{
-			//
-		}
-		*/
-
 		// returns base address of the array
 		void * getAddress() const
 		{
@@ -191,7 +235,7 @@ class Array : public Argument
 		}
 
 		// returns type code of the array elements
-		int getType() const
+		virtual int getType() const
 		{
 			return (*(((int *)m_address)+1));
 		}
@@ -217,15 +261,79 @@ class Array : public Argument
 		}
 };
 
-class Null : public Argument
+class Structure : public Argument
 {
 	private:
+		static ostringstream os;
+		void *m_address;
+
+	public:
+		Structure(void *addr = NULL)
+		{
+			m_address = addr;
+		}
+
+		// returns base address of the array
+		void * getAddress() const
+		{
+			return m_address;
+		}
+/*
+		// returns count of bytes that are needed for the allocation
+		int getAllocSize() const
+		{
+			// [int]length + [int]type + (length*item_size)
+			return ((2*sizeof(int)) + (getLength()*getItemSize()));
+		}
+
+		// returns length of the array
+		int getLength() const
+		{
+			return (*((int *)m_address));
+		}
+*/
+		// returns type code of the array elements
+		virtual int getType() const
+		{
+			return DataType::STRUCTURE;
+		}
+/*
+		// returns size of item size
+		int getItemSize() const
+		{
+			return DataType::getTypeSize(getType());
+		}
+
+		// returns pointer to an element of the array
+		void * getElementAt(int index)
+		{
+			if(index >= getLength()) throw new std::exception("Array::getElementAt: Array index out of bound!");
+			return (((int *)(((char *)m_address)+(index*getItemSize())))+1);
+		}
+*/
+		virtual string toString() const
+		{
+			os.str("");
+			os << std::hex << "0x" << m_address;
+			return os.str();
+		}
+};
+
+class Reference : public Argument
+{
+	private:
+		static ostringstream os;
 		void *m_value;
 
 	public:
-		Null()
+		Reference(void *value = NULL)
 		{
-			m_value = NULL;
+			m_value = value;
+		}
+
+		virtual int getType() const
+		{
+			return DataType::REFERENCE;
 		}
 
 		void * getValue() const
@@ -233,16 +341,18 @@ class Null : public Argument
 			return m_value;
 		}
 
-		static Argument * parse(istringstream &is)
-		{
+		static Reference * parse(istringstream &is)
+		{	// only reference that is parsed is NULL
 			string val;
 			is >> val;
-			return new Null();
+			return new Reference();
 		}
 
 		virtual string toString() const
 		{
-			return "NULL";
+			os.str("");
+			os << "REFERENCE[0x" << std::hex << m_value << "]";
+			return os.str();
 		}
 };
 
@@ -253,9 +363,19 @@ class File : public Argument
 		FILE *m_value;
 
 	public:
+		File(void *addr)
+		{
+			m_value = ((FILE *)addr);
+		}
+
 		File(FILE *fp)
 		{
 			m_value = fp;
+		}
+
+		virtual int getType() const
+		{
+			return DataType::FILE;
 		}
 
 		FILE * getValue() const
@@ -275,17 +395,20 @@ class Variable : public Argument
 {
 	private:
 		string m_name;
+		DataType *m_type;
 		void *m_address;
 
 	public:
-		Variable(const char *name)
+		Variable(const char *name, DataType *type = NULL)
 		{
 			m_name = name;
+			m_type = type;
+			m_address = NULL;
 		}
 
-		Variable(string &name)
+		virtual int getType() const
 		{
-			m_name = name;
+			return m_type->type;
 		}
 
 		void * getAddress() const
@@ -293,21 +416,53 @@ class Variable : public Argument
 			return m_address;
 		}
 
+		void setAddress(void *addr)
+		{
+			m_address = addr;
+		}
+
 		string getName() const
 		{
 			return m_name;
 		}
 
-		string getValue() const
+		void setValue(Argument *val)
 		{
-			return m_name;
+			switch(val->getType())
+			{
+				case DataType::ARRAY:     m_address = ((Array *)val)->getAddress(); break;
+				case DataType::STRUCTURE: m_address = ((Structure *)val)->getAddress(); break;
+				case DataType::REFERENCE:  m_address = ((Reference *)val)->getValue(); break;
+				case DataType::STRING:    m_address = (void *)((String *)val)->getValue(); break;
+				case DataType::INTEGER:   (*((int *)m_address)) = ((Integer *)val)->getValue(); break;
+				case DataType::DOUBLE:    (*((double *)m_address)) = ((Double *)val)->getValue(); break;
+				case DataType::BOOLEAN:   (*((bool *)m_address)) = ((Boolean *)val)->getValue(); break;
+				case DataType::FILE:      (*((FILE **)m_address)) = ((File *)val)->getValue(); break;
+				default: throw new std::exception("Argument::setValue: unsupported argument type!");
+			}
 		}
 
-		static Argument * parse(istringstream &is)
+		Argument * getValue() const
+		{
+			switch(getType())
+			{
+				case DataType::INTEGER: return new Integer(getAddress()); break;
+				case DataType::DOUBLE: return new Double(getAddress()); break;
+				case DataType::BOOLEAN: return new Boolean(getAddress()); break;
+				case DataType::REFERENCE: return new Reference(getAddress()); break;
+				case DataType::FILE: return new File(getAddress()); break;
+				case DataType::STRING: return new String(getAddress()); break;
+				case DataType::ARRAY: return new Array(getAddress()); break;
+				//case DataType::STRUCTURE: return new Structure(getAddress()); break;
+				default: throw new std::exception("Variable::getValue: invalid type!");
+			}
+		}
+
+		static Variable * parse(istringstream &is)
 		{
 			string name;
 			is >> name;
-			return new Variable(name);
+			return new Variable(name.c_str());
 		}
 
 		virtual string toString() const

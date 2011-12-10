@@ -10,6 +10,7 @@ using std::pair;
 using std::string;
 
 #include "Argument.h"
+#include "Signatures.h"
 
 class InstructionCode
 {
@@ -25,6 +26,7 @@ class InstructionCode
 			JMP,	// JuMP
 			RET,	// RETurn
 			RETV,	// RETurn Value
+			POP,	// POP from the stack
 			ST,		// STore
 			STA,	// STore Array - stores array's or structure's items by indices(Integer) or member names(String)
 			ADD,	// ADD
@@ -62,7 +64,7 @@ class InstructionCode
 		{
 			static string convertor[] =
 			{
-				"INVALID", "JZ", "JNZ", "JMP", "RET", "RETV", "ST", "STA", "ADD", "SUB", "MUL", "DIV", "MOD", "AND",
+				"INVALID", "JZ", "JNZ", "JMP", "RET", "RETV", "POP", "ST", "STA", "ADD", "SUB", "MUL", "DIV", "MOD", "AND",
 				"OR", "XOR", "LSH", "RSH", "INC", "DEC", "NOT", "NEG", "MINUS", "CALL", "INVOKE", "LDCI", "LDCB",
 				"LDCR", "LDCS", "LDCN", "NEW", "LT", "GT", "LTE", "GTE", "EQ", "NEQ"
 			};
@@ -79,6 +81,7 @@ class InstructionCode
 				convertor->insert(std::pair<string, int>("JMP", JMP));
 				convertor->insert(std::pair<string, int>("RET", RET));
 				convertor->insert(std::pair<string, int>("RETV", RETV));
+				convertor->insert(std::pair<string, int>("POP", POP));
 				convertor->insert(std::pair<string, int>("ST", ST));
 				convertor->insert(std::pair<string, int>("STA", STA));
 				convertor->insert(std::pair<string, int>("ADD", ADD));
@@ -122,13 +125,13 @@ class Instruction
 		vector<Argument *> args;
 
 		~Instruction()
-		{
-			for(vector<Argument *>::iterator it = args.begin(); it != args.end(); ++it)
-				delete (*it);
+		{	// DO NOT DELETE! IT'll BE DELETED IN FUNCTION's ARGS AND DECLS!
+			/*for(vector<Argument *>::iterator it = args.begin(); it != args.end(); ++it)
+				delete (*it);*/
 			args.clear();
 		}
 
-		static Instruction * parse(string &token, istringstream &is)
+		static Instruction * parse(map<string, Variable *> &variables, string &token, istringstream &is)
 		{	// LINE: INSTRUCTION_CODE ARGUMENT1 ARGUMENT2 ... ARGUMENTn
 			// line number is ignored (it's saved in token argument)
 			Instruction *instr = new Instruction;
@@ -148,32 +151,32 @@ class Instruction
 				// 2 arguments (variable and constant)
 				// -- integer
 				case InstructionCode::LDCI:
-					instr->args.push_back(Variable::parse(is));
+					instr->args.push_back(variables[Variable::parse(is)->getName()]);
 					instr->args.push_back(Integer::parse(is));
 					break;
 
 				// -- boolean
 				case InstructionCode::LDCB:
-					instr->args.push_back(Variable::parse(is));
+					instr->args.push_back(variables[Variable::parse(is)->getName()]);
 					instr->args.push_back(Boolean::parse(is));
 					break;
 
 				// -- double
 				case InstructionCode::LDCR:
-					instr->args.push_back(Variable::parse(is));
+					instr->args.push_back(variables[Variable::parse(is)->getName()]);
 					instr->args.push_back(Double::parse(is));
 					break;
 
 				// -- string
 				case InstructionCode::LDCS:
-					instr->args.push_back(Variable::parse(is));
+					instr->args.push_back(variables[Variable::parse(is)->getName()]);
 					instr->args.push_back(String::parse(is));
 					break;
 
 				// -- null
 				case InstructionCode::LDCN:
-					instr->args.push_back(Variable::parse(is));
-					instr->args.push_back(Null::parse(is));
+					instr->args.push_back(variables[Variable::parse(is)->getName()]);
+					instr->args.push_back(Reference::parse(is));
 					break;
 
 				// 0 arguments
@@ -184,7 +187,7 @@ class Instruction
 				case InstructionCode::RETV:
 				case InstructionCode::INC:
 				case InstructionCode::DEC:
-					instr->args.push_back(Variable::parse(is));
+					instr->args.push_back(variables[Variable::parse(is)->getName()]);
 					break;
 
 				// 3 arguments (variables)
@@ -209,9 +212,9 @@ class Instruction
 				case InstructionCode::GTE:
 				case InstructionCode::EQ:
 				case InstructionCode::NEQ:
-					instr->args.push_back(Variable::parse(is));
-					instr->args.push_back(Variable::parse(is));
-					instr->args.push_back(Variable::parse(is));
+					instr->args.push_back(variables[Variable::parse(is)->getName()]);
+					instr->args.push_back(variables[Variable::parse(is)->getName()]);
+					instr->args.push_back(variables[Variable::parse(is)->getName()]);
 					break;
 
 				// Unknown count of arguments (all variables)
@@ -219,10 +222,11 @@ class Instruction
 				case InstructionCode::CALL:
 				case InstructionCode::INVOKE:
 				{
-					Argument *arg;
+					Variable *arg;
+					instr->args.push_back(Variable::parse(is));	// function/routine name
 					while(1)
-					{
-						arg = Variable::parse(is);
+					{	// arguments
+						arg = variables[Variable::parse(is)->getName()];
 						if(!is.good()) break;
 						instr->args.push_back(arg);
 					}

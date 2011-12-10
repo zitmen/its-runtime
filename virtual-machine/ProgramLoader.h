@@ -25,6 +25,7 @@ class ProgramLoader
 		vector<Instruction *> m_program;
 		map<string, StructureSignature *> m_structures;
 		map<string, FunctionSignature *> m_functions;
+		map<string, Variable *> m_variables;	// list of all variables in the program
 
 	public:
 		ProgramLoader(const string &source)
@@ -34,17 +35,17 @@ class ProgramLoader
 
 		~ProgramLoader()
 		{
+			/*
 			for(vector<Instruction *>::iterator it = m_program.begin(); it != m_program.end(); ++it)
 				delete (*it);
 			m_program.clear();
-			//
 			for(map<string, StructureSignature *>::iterator it = m_structures.begin(); it != m_structures.end(); ++it)
 				delete it->second;
 			m_structures.clear();
-			//
 			for(map<string, FunctionSignature *>::iterator it = m_functions.begin(); it != m_functions.end(); ++it)
 				delete it->second;
 			m_functions.clear();
+			*/
 		}
 
 		void load(const string &source)
@@ -56,6 +57,7 @@ class ProgramLoader
 			istringstream line;
 			StructureSignature *structSig;
 			FunctionSignature *funcSig;
+			Instruction *instr;
 			while(1)
 			{
 				getline(fin, token);
@@ -75,10 +77,22 @@ class ProgramLoader
 					funcSig = FunctionSignature::parse(line);
 					m_functions[funcSig->name] = funcSig;
 				}
-				else if(token == "CODE")	// only informative
-					continue;
+				else if(token == "CODE")	// only informative, that signature declarations are done
+				{	// make list of all variables in the program
+					for(map<string, FunctionSignature *>::iterator it = m_functions.begin(); it != m_functions.end(); ++it)
+						for(map<string, Variable *>::iterator jt = it->second->variables.begin(); jt != it->second->variables.end(); ++jt)
+							m_variables[jt->first] = jt->second;
+				}
 				else	// instruction
-					m_program.push_back(Instruction::parse(token, line));
+				{
+					instr = Instruction::parse(m_variables, token, line);
+					if(instr->code == InstructionCode::ST)	// check if it's return value from a function
+					{
+						if(instr->args[1] == NULL)
+							instr->code = InstructionCode::POP;	// yes, it is --> change this instruction into POP arg[0]
+					}
+					m_program.push_back(instr);
+				}
 			}
 			//
 			fin.close();

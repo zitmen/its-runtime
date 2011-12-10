@@ -77,17 +77,25 @@ class BuiltInRoutines
 			printf("%s\n", str->getValue());
 		}
     
-		static String * inputFile(const File *fp)
+		static String * inputFile(MemoryManager *mem, const File *fp)
 		{
-			char *str = new char[255];
-			fscanf(fp->getValue(), "%s", str);
+			char *tmp = new char[255];
+			fscanf(fp->getValue(), "%s", tmp);
+			int len = ::strlen(tmp);
+			char *str = (char *)mem->alloc(sizeof(int) + sizeof(char) * (len + 1));
+			(*((int *)str)) = len;
+			strcpy(str + sizeof(int), tmp);
 			return new String(str);
 		}
     
-		static String * input()
+		static String * input(MemoryManager *mem)
 		{
-			char *str = new char[255];
-			scanf("%s", str);
+			char *tmp = new char[255];
+			scanf("%s", tmp);
+			int len = ::strlen(tmp);
+			char *str = (char *)mem->alloc(sizeof(int) + sizeof(char) * (len + 1));
+			(*((int *)str)) = len;
+			strcpy(str + sizeof(int), tmp);
 			return new String(str);
 		}
     
@@ -136,35 +144,42 @@ class BuiltInRoutines
 			return new Integer(string(haystack->getValue()).rfind(needle->getValue()));
         }
         
-        static String * substring(const String *str, const Integer *start, const Integer *end)
+        static String * substring(MemoryManager *mem, const String *str, const Integer *start, const Integer *end)
         {
-			char *sstr = new char[strlen(str)->getValue()+1];
-			return new String(strcpy(sstr, string(str->getValue()).substr(start->getValue(), end->getValue() - start->getValue() + 1).c_str()));
+			char *tmp = new char[strlen(str)->getValue()+1];
+			strcpy(tmp, string(str->getValue()).substr(start->getValue(), end->getValue() - start->getValue() + 1).c_str());
+			int len = ::strlen(tmp);
+			char *sstr = (char *)mem->alloc(sizeof(int) + sizeof(char) * (len + 1));
+			(*((int *)sstr)) = len;
+			strcpy(sstr + sizeof(int), tmp);
+			return new String(sstr);
         }
         
-        static String * toLower(const String *str)
+        static String * toLower(MemoryManager *mem, const String *str)
         {
 			const char *cstr = str->getValue();
-			char *sstr = new char[strlen(str)->getValue()+1];
 			int len = ::strlen(cstr);
+			char *sstr = (char *)mem->alloc(sizeof(int) + sizeof(char) * (len + 1));
+			(*((int *)sstr)) = len;
 			for(int i = 0; i < len; i++)
-				sstr[i] = tolower(cstr[i]);
-			sstr[len] = '\0';
+				sstr[sizeof(int)/sizeof(char)+i] = tolower(cstr[i]);
+			sstr[sizeof(int)/sizeof(char)+len] = '\0';
             return new String(sstr);
         }
         
-        static String * toUpper(const String *str)
+        static String * toUpper(MemoryManager *mem, const String *str)
         {
             const char *cstr = str->getValue();
-			char *sstr = new char[strlen(str)->getValue()+1];
 			int len = ::strlen(cstr);
+			char *sstr = (char *)mem->alloc(sizeof(int) + sizeof(char) * (len + 1));
+			(*((int *)sstr)) = len;
 			for(int i = 0; i < len; i++)
-				sstr[i] = toupper(cstr[i]);
-			sstr[len] = '\0';
+				sstr[sizeof(int)/sizeof(char)+i] = toupper(cstr[i]);
+			sstr[sizeof(int)/sizeof(char)+len] = '\0';
             return new String(sstr);
         }
         
-        static String * trim(const String *str)
+        static String * trim(MemoryManager *mem, const String *str)
         {
 			const char *cstr = str->getValue();
 			int len = ::strlen(cstr);
@@ -185,7 +200,7 @@ class BuiltInRoutines
 					break;
 				}
 			}
-			return substring(str, new Integer(start), new Integer(end));
+			return substring(mem, str, new Integer(start), new Integer(end));
         }
         
         static Boolean * startsWith(const String *str, const String *prefix)
@@ -198,9 +213,10 @@ class BuiltInRoutines
 			return new Boolean(lastIndexOf(str, suffix)->getValue() == (strlen(str)->getValue() - strlen(suffix)->getValue()));
         }
         
-        static String * concat(const String *str1, const String *str2)
+        static String * concat(MemoryManager *mem, const String *str1, const String *str2)
         {
-			char *str = new char[strlen(str1)->getValue()+strlen(str2)->getValue()+1];
+			int len1 = ::strlen(str1->getValue()), len2 = ::strlen(str2->getValue());
+			char *str = (char *)mem->alloc(sizeof(int) + sizeof(char) * (len1 + len2 + 1));
 			strcpy(str, str1->getValue());
 			strcat(str, str2->getValue());
             return new String(str);
@@ -211,17 +227,21 @@ class BuiltInRoutines
 			return new Integer(::strlen(str->getValue()));
         }
 
-		static String * int2str(const Integer *i)
+		static String * int2str(MemoryManager *mem, const Integer *i)
 		{
-			char *str = new char[32];
-			sprintf(str, "%d", i->getValue());
+			char *tmp = new char[32];
+			sprintf(tmp, "%d", i->getValue());
+			char *str = (char *)mem->alloc(sizeof(int) + sizeof(char) * (::strlen(tmp) + 1));
+			strcpy(str, tmp);
 			return new String(str);
 		}
     
-		static String * double2str(const Double *d)
+		static String * double2str(MemoryManager *mem, const Double *d)
 		{
-			char *str = new char[32];
-			sprintf(str, "%f", d->getValue());
+			char *tmp = new char[32];
+			sprintf(tmp, "%f", d->getValue());
+			char *str = (char *)mem->alloc(sizeof(int) + sizeof(char) * (::strlen(tmp) + 1));
+			strcpy(str, tmp);
 			return new String(str);
 		}
     
