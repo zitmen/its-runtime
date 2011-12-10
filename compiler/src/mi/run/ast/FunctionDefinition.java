@@ -46,7 +46,7 @@ public class FunctionDefinition extends Node
         for(int i = 0, im = parameters.expressions.size(); i < im; i++)
         {
             sig += ((Variable)parameters.expressions.get(i)).type.getSignature() + " ";
-            sig += ((Variable)parameters.expressions.get(i)).name + " ";
+            sig += ((Variable)parameters.expressions.get(i)).uniqName + " ";
         }
         sig += "] [ ";
         // declared variables

@@ -67,13 +67,13 @@ class ProgramLoader
 				if(token.length() == 0) continue;
 				if(token == "STRUCTURE")
 				{
-					//structSig = StructureSignature::parse(line);
-					//m_structures[structSig->name] = structSig;
+					structSig = StructureSignature::parse(line);
+					m_structures[structSig->name] = structSig;
 				}
 				else if(token == "FUNCTION")
 				{
-					//funcSig = FunctionSignature::parse(line);
-					//m_functions[funcSig->name] = funcSig;
+					funcSig = FunctionSignature::parse(line);
+					m_functions[funcSig->name] = funcSig;
 				}
 				else if(token == "CODE")	// only informative
 					continue;
@@ -89,11 +89,16 @@ class ProgramLoader
 			return &m_program;
 		}
 
-		void printProgram(ostream &os)
+		void printProgram(ostream &os) const
 		{
+			for(map<string, StructureSignature *>::const_iterator it = m_structures.begin(); it != m_structures.end(); ++it)
+				os << it->second->toString() << '\n';
+			for(map<string, FunctionSignature *>::const_iterator it = m_functions.begin(); it != m_functions.end(); ++it)
+				os << it->second->toString() << '\n';
+			os << "CODE\n";
 			for(size_t i = 0, im = m_program.size(); i < im; i++)
 			{
-				os << InstructionCode::getStrCode(m_program[i]->code);
+				os << i << ':' << InstructionCode::getStrCode(m_program[i]->code);
 				for(size_t a = 0, am = m_program[i]->args.size(); a < am; a++)
 					os << ' ' << m_program[i]->args[a]->toString();
 				os << '\n';
