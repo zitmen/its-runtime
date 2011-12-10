@@ -89,6 +89,16 @@ class ProgramLoader
 			return &m_program;
 		}
 
+		map<string, StructureSignature *> * getStructures()
+		{
+			return &m_structures;
+		}
+
+		map<string, FunctionSignature *> * getFunctions()
+		{
+			return &m_functions;
+		}
+
 		void printProgram(ostream &os) const
 		{
 			for(map<string, StructureSignature *>::const_iterator it = m_structures.begin(); it != m_structures.end(); ++it)

@@ -1,6 +1,10 @@
 #ifndef _RUN_DATA_TYPE_H_
 #define _RUN_DATA_TYPE_H_
 
+#include <cstdio>
+#include <string>
+using std::string;
+
 class DataType
 {
 	public:
@@ -46,6 +50,29 @@ class DataType
 			if(tmp == "STRING") return STRING;
 			if(tmp == "STRUCTURE") return STRUCTURE;
 			return INVALID;
+		}
+
+		static int getTypeSize(int type)
+		{
+			switch(type)
+			{
+				case INTEGER:
+					return sizeof(int);
+
+				case FILE:
+					return sizeof(::FILE *);
+				
+				case DOUBLE:
+					return sizeof(double);
+
+				case ARRAY:
+				case STRING: 
+				case STRUCTURE:
+					return sizeof(void *);	// stored as a pointer
+
+				default:
+					return 0;
+			}
 		}
 
 		string toString() const

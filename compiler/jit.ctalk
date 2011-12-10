@@ -1,12 +1,7 @@
-struct Test
-{
-	int a;
-	double b;
-	Array<int> c;
-}
-
 void main()
 {
+	double val = sqrt(10.0);
+	println(concat("sqrt(10)=", double2str(val)));
 	for(int x = 0; x < 1000; x++)
 		println(concat(concat(int2str(x), "^2="), int2str(sqr(x))));
 }

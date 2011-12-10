@@ -1,9 +1,12 @@
 #ifndef _RUN_SIGNATURES_H_
 #define _RUN_SIGNATURES_H_
 
+#include <sstream>
 #include <map>
 using std::map;
 using std::pair;
+using std::istringstream;
+using std::ostringstream;
 
 #include "DataType.h"
 
@@ -12,6 +15,13 @@ class StructureSignature
 	public:
 		string name;
 		map<string, DataType *> items;
+
+		~StructureSignature()
+		{
+			for(map<string, DataType *>::const_iterator it = items.begin(); it != items.end(); ++it)
+				delete it->second;
+			items.clear();
+		}
 
 		static StructureSignature * parse(istringstream &is)
 		{	// STRUCTURE structure_name [ DATA_TYPE item_1 ... DATA_TYPE item_n ]
@@ -51,6 +61,16 @@ class FunctionSignature
 		DataType *return_type;
 		map<string, DataType *> arguments;
 		map<string, DataType *> declarations;	// declarations inside of a function
+
+		~FunctionSignature()
+		{
+			for(map<string, DataType *>::iterator it = arguments.begin(); it != arguments.end(); ++it)
+				delete it->second;
+			arguments.clear();
+			for(map<string, DataType *>::iterator it = declarations.begin(); it != declarations.end(); ++it)
+				delete it->second;
+			declarations.clear();
+		}
 
 		static FunctionSignature * parse(istringstream &is)
 		{	// FUNCTION <RETURN_TYPE> function_name [ DATA_TYPE argument_1 ... DATA_TYPE argument_n ] [ DATA_TYPE declared_variable_1 ... DATA_TYPE declared_variable_2 ] @ line_where_function_starts

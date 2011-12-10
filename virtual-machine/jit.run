@@ -1,21 +1,27 @@
-STRUCTURE Test [ DOUBLE b ARRAY<INTEGER> c INTEGER a ]
-FUNCTION <INTEGER> sqr [ INTEGER var1 ] [ INTEGER var6 INTEGER var1 ] @ 15
-FUNCTION <VOID> main [ ] [ STRING var5 INTEGER var3 INTEGER var4 INTEGER var2 INTEGER var0 ] @ 0
+FUNCTION <INTEGER> sqr [ INTEGER var2 ] [ INTEGER var9 INTEGER var2 ] @ 22
+FUNCTION <VOID> main [ ] [ STRING var8 INTEGER var7 INTEGER var5 INTEGER var6 DOUBLE var3 STRING var4 INTEGER var1 DOUBLE var0 ] @ 0
 CODE
-000: LDCI var2 0
-001: ST var0 var2
-002: LDCI var3 1000
-003: LT var4 var0 var3
-004: JZ 14
-005: CALL sqr var0
-006: INVOKE int2str sqr
-007: LDCS var5 "^2="
-008: INVOKE int2str var0
-009: INVOKE concat int2str var5
-010: INVOKE concat concat int2str
-011: INVOKE println concat
-012: INC var0
-013: JMP 2
-014: RET
-015: MUL var6 var1 var1
-016: RETV var6
+000: LDCR var3 10.0
+001: INVOKE sqrt var3
+002: ST var0 sqrt
+003: INVOKE double2str var0
+004: LDCS var4 "sqrt(10)="
+005: INVOKE concat var4 double2str
+006: INVOKE println concat
+007: LDCI var5 0
+008: ST var1 var5
+009: LDCI var6 1000
+010: LT var7 var1 var6
+011: JZ 21
+012: CALL sqr var1
+013: INVOKE int2str sqr
+014: LDCS var8 "^2="
+015: INVOKE int2str var1
+016: INVOKE concat int2str var8
+017: INVOKE concat concat int2str
+018: INVOKE println concat
+019: INC var1
+020: JMP 9
+021: RET
+022: MUL var9 var2 var2
+023: RETV var9

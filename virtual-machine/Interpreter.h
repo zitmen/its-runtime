@@ -1,34 +1,148 @@
 #ifndef _RUN_INTERPRETER_H_
 #define _RUN_INTERPRETER_H_
 
+#include <vector>
+#include <map>
+#include <exception>
+using std::map;
+using std::vector;
+
+#include "Signatures.h"
+#include "Argument.h"
+#include "BuiltInRoutines.h"
+#include "MemoryManager.h"
+#include "InstructionSet.h"
+
 class Interpreter
 {
 	public:
 		class Options { public: static enum { HeapSize, StackSize, GarbageCollector, JITCompiler }; };
 
 	private:
+		MemoryManager *memory;
+		double options[4];
 		vector<Instruction *> *program;
-		void *stack;
-		void *heap;
-		int IC;
+		map<string, StructureSignature *> *structures;
+		map<string, FunctionSignature *> *functions;
+		int IP;	// Instruction Pointer -- points to an instruction after the currently processed one
+		int SP;	// Stack Pointer -- top of the stack
+		bool ZF;	// Zero Flag -- was the result of the previous instruction zero-valued?
+
+	protected:
+		void init()
+		{
+			IP = 0;
+			SP = 0;
+			ZF = false;
+			memory = new MemoryManager(options[Options::StackSize], options[Options::HeapSize]);
+		}
+
+		void _call(const FunctionSignature *fn, const vector<Argument *> &args);
+		void _invoke(const Variable *name, const vector<Argument *> &args);
+		void _jz(const Integer *to);
+		void _jnz(const Integer * to);
+		void _jmp(const Integer * to);
+		void _ret();
+		void _retv(const Variable *var);
+		void _st(const Variable *dest, const Variable *src);
+		void _sta();	// ???
+		void _add(const Variable *dest, const Variable *op1, const Variable *op2);
+		void _sub(const Variable *dest, const Variable *op1, const Variable *op2);
+		void _mul(const Variable *dest, const Variable *op1, const Variable *op2);
+		void _div(const Variable *dest, const Variable *op1, const Variable *op2);
+		void _mod(const Variable *dest, const Variable *op1, const Variable *op2);
+		void _and(const Variable *dest, const Variable *op1, const Variable *op2);
+		void _or(const Variable *dest, const Variable *op1, const Variable *op2);
+		void _xor(const Variable *dest, const Variable *op1, const Variable *op2);
+		void _lsh(const Variable *dest, const Variable *op1, const Variable *op2);
+		void _rsh(const Variable *dest, const Variable *op1, const Variable *op2);
+		void _inc(const Variable *var);
+		void _dec(const Variable *var);
+		void _not(const Variable *dest, const Variable *src);
+		void _neg(const Variable *dest, const Variable *src);
+		void _minus(const Variable *dest, const Variable *src);
+		void _ldci(const Variable *var, const Integer *constant);
+		void _ldcb(const Variable *var, const Boolean *constant);
+		void _ldcr(const Variable *var, const Double *constant);
+		void _ldcs(const Variable *var, const String *constant);
+		void _ldcn(const Variable *var, const Null *constant);
+		void _new(const Variable *var, const Variable *size);
+		void _lt(const Variable *dest, const Variable *op1, const Variable *op2);
+		void _gt(const Variable *dest, const Variable *op1, const Variable *op2);
+		void _lte(const Variable *dest, const Variable *op1, const Variable *op2);
+		void _gte(const Variable *dest, const Variable *op1, const Variable *op2);
+		void _eq(const Variable *dest, const Variable *op1, const Variable *op2);
+		void _neq(const Variable *dest, const Variable *op1, const Variable *op2);
 
 	public:
-		Interpreter(vector<Instruction *> *program)
+		Interpreter(vector<Instruction *> *program, map<string, StructureSignature *> *structures, map<string, FunctionSignature *> *functions)
 		{
 			this->program = program;
-			IC = 0;
-			stack = NULL;
-			heap = NULL;
+			this->structures = structures;
+			this->functions = functions;
+			memory = NULL;
+			options[Options::HeapSize] = 32*1024*1024;	// 32MB
+			options[Options::StackSize] = 32*1024*1024;	// 32MB
+			options[Options::GarbageCollector] = 0.9;	// 90% of heap is full
+			options[Options::JITCompiler] = 10;	// 10 iterations over 1 function
 		}
 
 		void setOption(int option, double val)
 		{
-			//
+			options[option] = val;
 		}
 
 		void run()
 		{
-			//
+			init();
+			Instruction first; first.code = InstructionCode::CALL; first.args.push_back(new Variable("main"));
+			step(&first);
+			while((IP >= 0) && (IP < program->size()))
+				step(program->at(IP++));
+		}
+
+		void step(const Instruction *instr)
+		{
+			switch(instr->code)
+			{
+				case InstructionCode::JZ: _jz((Integer *)instr->args[0]); break;
+				case InstructionCode::JNZ: _jnz((Integer *)instr->args[0]); break;
+				case InstructionCode::JMP: _jmp((Integer *)instr->args[0]); break;
+				case InstructionCode::RET: _ret(); break;
+				case InstructionCode::RETV: _retv((Variable *)instr->args[0]); break;
+				case InstructionCode::ST: _st((Variable *)instr->args[0], (Variable *)instr->args[1]); break;
+				case InstructionCode::STA: _sta(); break;	// ??!!
+				case InstructionCode::ADD: _add((Variable *)instr->args[0], (Variable *)instr->args[1], (Variable *)instr->args[2]); break;
+				case InstructionCode::SUB: _sub((Variable *)instr->args[0], (Variable *)instr->args[1], (Variable *)instr->args[2]); break;
+				case InstructionCode::MUL: _mul((Variable *)instr->args[0], (Variable *)instr->args[1], (Variable *)instr->args[2]); break;
+				case InstructionCode::DIV: _div((Variable *)instr->args[0], (Variable *)instr->args[1], (Variable *)instr->args[2]); break;
+				case InstructionCode::MOD: _mod((Variable *)instr->args[0], (Variable *)instr->args[1], (Variable *)instr->args[2]); break;
+				case InstructionCode::AND: _and((Variable *)instr->args[0], (Variable *)instr->args[1], (Variable *)instr->args[2]); break;
+				case InstructionCode::OR: _or((Variable *)instr->args[0], (Variable *)instr->args[1], (Variable *)instr->args[2]); break;
+				case InstructionCode::XOR: _xor((Variable *)instr->args[0], (Variable *)instr->args[1], (Variable *)instr->args[2]); break;
+				case InstructionCode::LSH: _lsh((Variable *)instr->args[0], (Variable *)instr->args[1], (Variable *)instr->args[2]); break;
+				case InstructionCode::RSH: _rsh((Variable *)instr->args[0], (Variable *)instr->args[1], (Variable *)instr->args[2]); break;
+				case InstructionCode::INC: _inc((Variable *)instr->args[0]); break;
+				case InstructionCode::DEC: _dec((Variable *)instr->args[0]); break;
+				case InstructionCode::NOT: _not((Variable *)instr->args[0], (Variable *)instr->args[1]); break;
+				case InstructionCode::NEG: _neg((Variable *)instr->args[0], (Variable *)instr->args[1]); break;
+				case InstructionCode::MINUS: _minus((Variable *)instr->args[0], (Variable *)instr->args[1]); break;
+				case InstructionCode::CALL: _call(functions->find(((Variable *)instr->args[0])->getName())->second, instr->args); break;
+				case InstructionCode::INVOKE: _invoke((Variable *)instr->args[0], instr->args); break;
+				case InstructionCode::LDCI: _ldci((Variable *)instr->args[0], (Integer *)instr->args[1]); break;
+				case InstructionCode::LDCB: _ldcb((Variable *)instr->args[0], (Boolean *)instr->args[1]); break;
+				case InstructionCode::LDCR: _ldcr((Variable *)instr->args[0], (Double *)instr->args[1]); break;
+				case InstructionCode::LDCS: _ldcs((Variable *)instr->args[0], (String *)instr->args[1]); break;
+				case InstructionCode::LDCN: _ldcn((Variable *)instr->args[0], (Null *)instr->args[1]); break;
+				case InstructionCode::NEW: _new((Variable *)instr->args[0], (Variable *)instr->args[1]); break;
+				case InstructionCode::LT: _lt((Variable *)instr->args[0], (Variable *)instr->args[1], (Variable *)instr->args[2]); break;
+				case InstructionCode::GT: _gt((Variable *)instr->args[0], (Variable *)instr->args[1], (Variable *)instr->args[2]); break;
+				case InstructionCode::LTE: _lte((Variable *)instr->args[0], (Variable *)instr->args[1], (Variable *)instr->args[2]); break;
+				case InstructionCode::GTE: _gte((Variable *)instr->args[0], (Variable *)instr->args[1], (Variable *)instr->args[2]); break;
+				case InstructionCode::EQ: _eq((Variable *)instr->args[0], (Variable *)instr->args[1], (Variable *)instr->args[2]); break;
+				case InstructionCode::NEQ: _neq((Variable *)instr->args[0], (Variable *)instr->args[1], (Variable *)instr->args[2]); break;
+				default: throw new std::exception("Interpreter::step: invalid instruction code!");
+			}
 		}
 };
 

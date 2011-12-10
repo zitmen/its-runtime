@@ -115,8 +115,6 @@ class InstructionCode
 		}
 };
 
-map<string, int> * InstructionCode::convertor = NULL;
-
 class Instruction
 {
 	public:
@@ -147,7 +145,7 @@ class Instruction
 					instr->args.push_back(Integer::parse(is));
 					break;
 
-				// 1 arguments (variable and constant)
+				// 2 arguments (variable and constant)
 				// -- integer
 				case InstructionCode::LDCI:
 					instr->args.push_back(Variable::parse(is));
@@ -189,7 +187,7 @@ class Instruction
 					instr->args.push_back(Variable::parse(is));
 					break;
 
-				// 2 arguments (variables)
+				// 3 arguments (variables)
 				case InstructionCode::ST:
 				case InstructionCode::ADD:
 				case InstructionCode::SUB:
@@ -211,6 +209,7 @@ class Instruction
 				case InstructionCode::GTE:
 				case InstructionCode::EQ:
 				case InstructionCode::NEQ:
+					instr->args.push_back(Variable::parse(is));
 					instr->args.push_back(Variable::parse(is));
 					instr->args.push_back(Variable::parse(is));
 					break;

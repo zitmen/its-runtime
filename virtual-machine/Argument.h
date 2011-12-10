@@ -4,10 +4,13 @@
 #include <sstream>
 #include <ostream>
 #include <string>
+#include <exception>
 using std::istringstream;
 using std::ostringstream;
 using std::string;
 using std::ostream;
+
+#include "DataType.h"
 
 class Argument
 {
@@ -47,8 +50,6 @@ class Integer : public Argument
 		}
 };
 
-ostringstream Integer::os;
-
 class Double : public Argument
 {
 	private:
@@ -80,8 +81,6 @@ class Double : public Argument
 			return os.str();
 		}
 };
-
-ostringstream Double::os;
 
 class Boolean : public Argument
 {
@@ -115,29 +114,106 @@ class Boolean : public Argument
 class String : public Argument
 {
 	private:
-		string m_value;
+		char *m_address;
 
 	public:
-		String(string &val)
+		String()
 		{
-			m_value = val;
+			//
 		}
 
-		string getValue() const
+		String(char *str)
 		{
-			return m_value;
+			m_address = str;
 		}
 
-		static Argument * parse(istringstream &is)
+		const char * getValue() const
+		{
+			return m_address;
+		}
+
+		static Argument * parse(istringstream &is)	// TODO: alokace na halde programu??!!
 		{
 			string val;
 			is >> val;
-			return new String(val.substr(1, val.length() - 2));
+			val = val.substr(1, val.length() - 2);
+			char *str = new char[val.length()+1];
+			return new String(strcpy(str, val.c_str()));
 		}
 
 		virtual string toString() const
 		{
-			return ('"' + m_value + '"');
+			return ('"' + string(m_address) + '"');
+		}
+};
+
+class Array : public Argument
+{
+	private:
+		static ostringstream os;
+		void *m_address;
+
+	public:
+		Array()
+		{
+			m_address = NULL;
+		}
+
+		Array(void *addr)
+		{
+			m_address = addr;
+		}
+
+		/*
+		??? getValue() const
+		{
+			//
+		}
+		*/
+
+		// returns base address of the array
+		void * getAddress() const
+		{
+			return m_address;
+		}
+
+		// returns count of bytes that are needed for the allocation
+		int getAllocSize() const
+		{
+			// [int]length + [int]type + (length*item_size)
+			return ((2*sizeof(int)) + (getLength()*getItemSize()));
+		}
+
+		// returns length of the array
+		int getLength() const
+		{
+			return (*((int *)m_address));
+		}
+
+		// returns type code of the array elements
+		int getType() const
+		{
+			return (*(((int *)m_address)+1));
+		}
+
+		// returns size of item size
+		int getItemSize() const
+		{
+			return DataType::getTypeSize(getType());
+		}
+
+		// returns pointer to an element of the array
+		void * getElementAt(int index)
+		{
+			if(index >= getLength()) throw new std::exception("Array::getElementAt: Array index out of bound!");
+			return (((int *)(((char *)m_address)+(index*getItemSize())))+1);
+		}
+
+		virtual string toString() const
+		{
+			os.str("");
+			os << std::hex << "0x" << m_address;
+			return os.str();
 		}
 };
 
@@ -170,6 +246,31 @@ class Null : public Argument
 		}
 };
 
+class File : public Argument
+{
+	private:
+		static ostringstream os;
+		FILE *m_value;
+
+	public:
+		File(FILE *fp)
+		{
+			m_value = fp;
+		}
+
+		FILE * getValue() const
+		{
+			return m_value;
+		}
+
+		virtual string toString() const
+		{
+			os.str("");
+			os << "FILE[" << m_value << "]";
+			return  os.str();
+		}
+};
+
 class Variable : public Argument
 {
 	private:
@@ -177,6 +278,11 @@ class Variable : public Argument
 		void *m_address;
 
 	public:
+		Variable(const char *name)
+		{
+			m_name = name;
+		}
+
 		Variable(string &name)
 		{
 			m_name = name;
@@ -185,6 +291,11 @@ class Variable : public Argument
 		void * getAddress() const
 		{
 			return m_address;
+		}
+
+		string getName() const
+		{
+			return m_name;
 		}
 
 		string getValue() const
