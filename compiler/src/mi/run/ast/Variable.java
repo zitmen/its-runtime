@@ -143,14 +143,33 @@ public class Variable extends Atom
     @Override
     public Instruction genByteCode()
     {
+        Instruction stream = new Instruction(Code.NOOP);
+        Instruction first = stream.first();
+        String varCompleteName = uniqName;
+        if(members.size() > 0)
+        {
+            varCompleteName += " [ ";
+            for(Expression member : members)
+            {
+                if(member instanceof StringAtom)    // structure element
+                {
+                    varCompleteName += "@" + ((StringAtom)member).value + " ";
+                }
+                else
+                {
+                    stream = stream.last().append(member.genByteCode());
+                    varCompleteName += member.resultVariable + " ";
+                }
+            }
+            varCompleteName += "]";
+        }
         if(value != null)
         {
-            Instruction stream = value.genByteCode();
-            stream.last().append(new LoadStoreInstr(Code.ST, uniqName, value.resultVariable));
-            return stream.first();
+            stream = stream.last().append(value.genByteCode());
+            stream = stream.last().append(new LoadStoreInstr(Code.ST, varCompleteName, value.resultVariable));
         }
-        resultVariable = uniqName;
-        return new Instruction(Code.NOOP);
+        resultVariable = varCompleteName;
+        return first;
     }
     
     @Override

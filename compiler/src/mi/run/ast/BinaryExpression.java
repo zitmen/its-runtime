@@ -3,6 +3,7 @@ package mi.run.ast;
 import mi.run.bytecode.ArithmeticInstr;
 import mi.run.bytecode.Code;
 import mi.run.bytecode.Instruction;
+import mi.run.bytecode.LoadStoreInstr;
 import mi.run.semantic.Functions;
 import mi.run.semantic.TypeCast;
 import mi.run.semantic.Variables;
@@ -50,11 +51,14 @@ public class BinaryExpression extends Expression
         Instruction first = stream.first();
         stream = stream.last().append(leftOperand.genByteCode());
         if(Operator.isAssign(operator))
-            resultVariable = ((Variable)leftOperand).uniqName;
+            resultVariable = ((Variable)leftOperand).resultVariable;
         else
             resultVariable = Variables.addVar(functionName, "tmp", new DataType(leftOperand.exprDataType));
         //
-        stream = stream.last().append(new ArithmeticInstr(Code.getByOperator(operator, false), resultVariable, leftOperand.resultVariable, rightOperand.resultVariable));
+        if(operator == Operator.ASN)
+            stream = stream.last().append(new LoadStoreInstr(Code.ST, resultVariable, rightOperand.resultVariable));
+        else
+            stream = stream.last().append(new ArithmeticInstr(Code.getByOperator(operator, false), resultVariable, leftOperand.resultVariable, rightOperand.resultVariable));
         return first;
     }
 

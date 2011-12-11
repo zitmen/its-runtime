@@ -1,12 +1,26 @@
-void main()
+struct Rectangle
 {
-	double val = sqrt(10.0);
-	println(concat("sqrt(10)=", double2str(val)));
-	for(int x = 0; x < 1000; x++)
-		println(concat(concat(int2str(x), "^2="), int2str(sqr(x))));
+	int a;
+	int b;
 }
 
-int sqr(int x)
+void main()
 {
-	return x*x;
+	Rectangle r = new;
+	r.a = 5;
+	println(int2str(r.a));
 }
+
+
+/*
+void main()
+{
+	Rectangle r = new;
+	println(concat(concat(concat(concat(concat(concat("Rectangle [a=", int2str(r.a)), ",b="), int2str(r.b)),",S="), int2str(getArea(r))),"]"));
+}
+
+int getArea(Rectangle rect)
+{
+	return rect.a*rect.b;
+}
+*/

@@ -3,7 +3,7 @@ package mi.run.bytecode;
 import mi.run.runtime.Interpreter;
 
 public class LoadStoreInstr extends Instruction
-{   //LD,ST,LDA,STA,LDR,STAV
+{   //LD,LDAI,ST,STAI
     public String dest;
     public String src;
     

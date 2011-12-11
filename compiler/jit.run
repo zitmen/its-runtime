@@ -1,35 +1,11 @@
-FUNCTION <INTEGER> sqr [ INTEGER var2 ] [ INTEGER var17 INTEGER var2 ] @ 30
-FUNCTION <VOID> main [ ] [ STRING var5 STRING var6 DOUBLE var3 DOUBLE var4 INTEGER var1 DOUBLE var0 STRING var15 STRING var14 STRING var13 STRING var12 INTEGER var9 INTEGER var8 STRING var16 STRING var7 INTEGER var11 INTEGER var10 ] @ 0
+STRUCTURE Rectangle [ INTEGER b INTEGER a ]
+FUNCTION <VOID> main [ ] [ STRING var3 NEW_EXPR var1 INTEGER var2 STRUCTURE<Rectangle> var0 ] @ 0
 CODE
-000: LDCR var3 10.0
-001: INVOKE sqrt var3
-002: POP var4
-003: ST var0 var4
-004: INVOKE double2str var0
-005: POP var5
-006: LDCS var6 "sqrt(10)="
-007: INVOKE concat var6 var5
-008: POP var7
-009: INVOKE println var7
-010: LDCI var8 0
-011: ST var1 var8
-012: LDCI var9 1000
-013: LT var10 var1 var9
-014: JZ 29
-015: CALL sqr var1
-016: POP var11
-017: INVOKE int2str var11
-018: POP var12
-019: LDCS var13 "^2="
-020: INVOKE int2str var1
-021: POP var14
-022: INVOKE concat var14 var13
-023: POP var15
-024: INVOKE concat var15 var12
-025: POP var16
-026: INVOKE println var16
-027: INC var1
-028: JMP 12
-029: RET
-030: MUL var17 var2 var2
-031: RETV var17
+000: NEW var1
+001: ST var0 var1
+002: LDCI var2 5
+003: ST var0 [ @a ] var2
+004: INVOKE int2str var0 [ @a ]
+005: POP var3
+006: INVOKE println var3
+007: RET

@@ -1,6 +1,5 @@
 package mi.run.ast;
 
-import mi.run.bytecode.Code;
 import mi.run.bytecode.Instruction;
 import mi.run.bytecode.LoadConstInstr;
 import mi.run.semantic.Functions;
@@ -8,9 +7,9 @@ import mi.run.semantic.Variables;
 
 public class StringAtom extends Atom
 {
-    public java.lang.String value;
+    public String value;
     
-    public StringAtom(java.lang.String str)
+    public StringAtom(String str)
     {
         value = str;
     }

@@ -157,6 +157,7 @@ public class Code
             case Operator.OR_ASN: return OR;
             case Operator.XOR:
             case Operator.XOR_ASN: return XOR;
+            case Operator.ASN: return ST;
             //
             case Operator.LTE: return LTE;
             case Operator.LT:  return LT;
