@@ -45,7 +45,8 @@ Variable::getAddress() const
 	//
 	addr = (char *)var->getAddress();
 	delete var;
-	if((addr - offset) == NULL) throw new std::exception("Variable::getAddress: Null pointer exception!");
+	if((addr - offset) == NULL)
+		throw new std::exception("Variable::getAddress: Null pointer exception!");
 	return ((void *)addr);
 }
 

@@ -37,10 +37,10 @@ void Interpreter::_ret()
 	// 4. restore local variables
 	int offset = 0;
 	map<string, Variable *>::iterator it = fn->variables.end();
-	do	// must be done this way, because reverse_iterator didn't work :(
+	do	// had to be done this way, because reverse_iterator didn't work :(
 	{
 		--it;
-		offset += it->second->getItemTypeSize();
+		offset += DataType::getTypeSize(it->second->getType());
 		it->second->setAddress((void *)((char *)(memory->SP) - offset));
 	} while(it != fn->variables.begin());
 }
@@ -220,7 +220,8 @@ void Interpreter::_jmp(const Integer *to)
 void Interpreter::_pop(Variable *dest)
 {	// do not pop!
 	// -- f.e.: call sqrt x; pop tmp1; call sqrt y; pop tmp2; --> variable tmp1 would be overwritten
-	dest->setValue(memory->peekAndGetTopValAddr(dest->getItemType()));
+	//dest->setValue(memory->peekAndGetTopValAddr(dest->getItemType()));
+	dest->setValue(memory->popAndGetTopValAddr(dest->getItemType()));
 	//
 	++IP;
 }

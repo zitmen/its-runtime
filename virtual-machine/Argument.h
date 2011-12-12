@@ -441,14 +441,14 @@ class Variable : public Argument
 			m_base = NULL;
 		}
 
-		DataType * getDataType()
+		DataType * getDataType() const
 		{
 			return ((m_base == NULL) ? m_type : m_base->getDataType());
 		}
 
 		virtual int getType() const
 		{
-			return ((m_base == NULL) ? m_type->type : m_base->getType());
+			return getDataType()->type;
 		}
 
 		DataType * getItemDataType() const;
