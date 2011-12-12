@@ -2,6 +2,8 @@
 
 void Interpreter::_call(FunctionSignature *fn, const vector<Argument *> &args)
 {
+	// 0. push signature to call stack
+	call_stack.push(fn);
 	// 1. push IP
 	memory->push(new Integer(IP + 1));
 	// 2. set new IP
@@ -10,35 +12,56 @@ void Interpreter::_call(FunctionSignature *fn, const vector<Argument *> &args)
 	memory->push(new Reference(memory->SFB));
 	// 4. set new SFB
 	memory->SFB = memory->SP;
-	// 5. setup the stack - 1st come parameters, 2nd declared variables; set SP
-	for(map<string, Variable *>::iterator it = fn->variables.begin(); it != fn->variables.end(); ++it)
-		it->second->setAddress(memory->push(it->second));
-	// 6. set values on the stack -- arguments of the function
+	// 5. get values on the stack -- arguments of the function
+	map<string, Argument *> values;
 	for(size_t i = 1, im = args.size(); i < im; i++)
-		fn->variables[fn->arguments_ordering[i-1]]->setValue((Variable *)(args[i]));
+		values[((Variable *)args[i])->getName()] = ((Variable *)args[i])->getValue();
+	// 6. setup the stack - 1st come parameters, 2nd declared variables; set SP
+    for(map<string, Variable *>::iterator it = fn->variables.begin(); it != fn->variables.end(); ++it)
+		it->second->setAddress(memory->push(it->second));
+	// 7. set values on the stack -- arguments of the function (non-recursive)
+    for(size_t i = 1, im = args.size(); i < im; i++)
+        fn->variables[fn->arguments_ordering[i-1]]->setValue((Variable *)(args[i]));
+	// 8. set values on the stack -- arguments of the function (recursive -- variable names are overlapping)
+	map<string, Argument *>::iterator val_it;
+	for(map<string, Variable *>::iterator it = fn->variables.begin(); it != fn->variables.end(); ++it)
+		if((val_it = values.find(it->first)) != values.end())
+			it->second->setValue(val_it->second);
 }
 
 void Interpreter::_ret()
 {
+	// 0. pop signature from call stack
+	FunctionSignature *fn = call_stack.top(); call_stack.pop();
 	// 1. restore SP to the state before call -- top was at SFB (there is still old SFB and IP - next steps)
 	memory->SP = memory->SFB;
 	// 2. restore SFB of previous stack fram
 	memory->SFB = (*((void **)(memory->popAndGetTopValAddr(DataType::REFERENCE))));
 	// 3. restore IP
 	IP = (*((int *)(memory->popAndGetTopValAddr(DataType::INTEGER))));
+	// 4. restore local variables
+	int offset = 0;
+	map<string, Variable *>::iterator it = fn->variables.end();
+	do	// must be done this way, because reverse_iterator didn't work :(
+	{
+		--it;
+		offset += it->second->getItemTypeSize();
+		it->second->setAddress((void *)((char *)(memory->SP) - offset));
+	} while(it != fn->variables.begin());
 }
 
 void Interpreter::_retv(const Variable *var)
 {
+	Argument *retval = var->getValue();
 	_ret();
-	memory->push(var->getValue());
+	memory->push(retval);
 }
 
 void Interpreter::_invoke(Variable *name, const vector<Argument *> &args)
 {
 	if(name->getName() == "cloneArray")
 	{
-		BuiltInRoutines::cloneArray(memory, (Array *)(((Variable *)args[1])->getValue()));
+		memory->push(BuiltInRoutines::cloneArray(memory, (Array *)(((Variable *)args[1])->getValue())));
 	}
 	else if(name->getName() == "clearArray")
 	{
@@ -515,7 +538,7 @@ void Interpreter::_new(Variable *var, const Variable *size)
 	if(var->getItemType() == DataType::ARRAY)
 	{
 		int length = ((Integer *)size->getValue())->getValue();
-		var->setValue(new Reference(memory->alloc(var->getItemTypeSize() * length)));
+		var->setValue(new Reference(memory->alloc((2 * sizeof(int)) + (var->getItemTypeSize() * length))));
 		// set length and item type
 		Array *arr = (Array *)(var->getValue());
 		arr->setLength(length);

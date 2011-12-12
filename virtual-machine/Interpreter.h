@@ -4,6 +4,8 @@
 #include <vector>
 #include <map>
 #include <exception>
+#include <stack>
+using std::stack;
 using std::map;
 using std::vector;
 
@@ -19,6 +21,7 @@ class Interpreter
 		class Options { public: static enum { HeapSize, StackSize, GarbageCollector, JITCompiler }; };
 
 	private:
+		stack<FunctionSignature *> call_stack;
 		MemoryManager *memory;
 		double options[4];
 		vector<Instruction *> *program;

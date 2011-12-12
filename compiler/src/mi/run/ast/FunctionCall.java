@@ -13,6 +13,7 @@ public class FunctionCall extends Expression
     public ExpressionList parameters;
     private boolean isDefined;  // if it's not then it's a built-in function
     private String callerName;
+    private DataType return_type;
     
     private void removeNulls()
     {
@@ -46,10 +47,20 @@ public class FunctionCall extends Expression
             function = Functions.builtInFunctions.get(functionName);
             if(function == null)
                 throw new Exception("SEMANTIC ERROR: the function '" + functionName + "' does not exist!");
+            //
+            if(functionName.equals("cloneArray"))  // returns Array, but what item type?!
+            {   // returned type is the same as type of the parameter
+                return_type = ((Variable)(parameters.expressions.get(0))).type;
+            }
+            else
+            {
+                return_type = function.type;
+            }
             isDefined = false;
         }
         else
         {
+            return_type = function.type;
             isDefined = true;
         }
         // check arguments count
@@ -85,7 +96,7 @@ public class FunctionCall extends Expression
         }
         else
         {   // others are stored at the stack
-            resultVariable = Variables.addVar(callerName, "tmp", new DataType(this.function.type.type));
+            resultVariable = Variables.addVar(callerName, "tmp", return_type);
             stream = stream.last().append(new CallInstr(Code.POP, resultVariable, new ArrayList<Expression>()));
         }
         return first;

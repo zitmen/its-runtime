@@ -96,6 +96,15 @@ class MemoryManager
 			return retval;
 		}
 
+		void * reserve(const Variable *var)
+		{
+			int bytes = DataType::getTypeSize(var->getType());
+			if(!fitsToStack(bytes)) throw new std::exception("MemoryManager::reserve: variable couldn't fit into the memory - stack overflow!");
+			void *retval = SP;
+			SP = (((char *)SP) + bytes);
+			return retval;
+		}
+
 		Argument * pop(int data_type)
 		{
 			SP = (void *)(((char *)SP) - DataType::getTypeSize(data_type));

@@ -1,75 +1,147 @@
-STRUCTURE Rectangle [ INTEGER b INTEGER a ]
-FUNCTION <INTEGER> getArea [ INTEGER var4 INTEGER var5 ] [ INTEGER var42 INTEGER var5 INTEGER var4 ] @ 69
-FUNCTION <VOID> main [ ] [ STRING var6 INTEGER var3 INTEGER var1 ARRAY<DOUBLE> var2 ARRAY<STRUCTURE<Rectangle>> var0 INTEGER var15 INTEGER var14 STRING var39 INTEGER var13 STRING var38 INTEGER var12 DOUBLE var37 STRING var19 INTEGER var36 INTEGER var9 STRING var18 INTEGER var35 INTEGER var8 INTEGER var17 INTEGER var34 INTEGER var7 STRING var16 INTEGER var33 INTEGER var32 INTEGER var31 STRING var30 INTEGER var11 INTEGER var10 STRING var24 STRING var23 STRING var26 STRING var25 STRING var28 STRING var27 STRING var29 STRING var41 STRING var20 STRING var40 STRING var22 STRING var21 ] @ 0
+STRUCTURE Result [ ARRAY<INTEGER> conf INTEGER cost ]
+STRUCTURE Stuff [ INTEGER weight INTEGER cost ]
+FUNCTION <STRUCTURE<Result>> computeSolution [ INTEGER var21 INTEGER var22 ARRAY<STRUCTURE<Stuff>> var23 ARRAY<INTEGER> var24 ] [ INTEGER var80 INTEGER var79 INTEGER var78 INTEGER var73 INTEGER var72 ARRAY<INTEGER> var31 INTEGER var30 INTEGER var77 INTEGER var76 INTEGER var75 INTEGER var74 ARRAY<INTEGER> var24 ARRAY<STRUCTURE<Stuff>> var23 INTEGER var26 INTEGER var25 STRUCTURE<Result> var28 ARRAY<INTEGER> var27 STRUCTURE<Result> var29 INTEGER var82 INTEGER var81 STRUCTURE<Result> var84 INTEGER var83 INTEGER var85 INTEGER var22 INTEGER var21 ] @ 76
+FUNCTION <INTEGER> weight [ INTEGER var11 ARRAY<STRUCTURE<Stuff>> var12 ARRAY<INTEGER> var13 ] [ INTEGER var15 INTEGER var14 ARRAY<INTEGER> var13 ARRAY<STRUCTURE<Stuff>> var12 INTEGER var64 INTEGER var63 INTEGER var66 INTEGER var65 INTEGER var11 INTEGER var62 ] @ 114
+FUNCTION <INTEGER> cost [ INTEGER var16 ARRAY<STRUCTURE<Stuff>> var17 ARRAY<INTEGER> var18 ] [ INTEGER var68 INTEGER var19 INTEGER var67 ARRAY<INTEGER> var18 ARRAY<STRUCTURE<Stuff>> var17 INTEGER var69 INTEGER var16 INTEGER var71 INTEGER var70 INTEGER var20 ] @ 127
+FUNCTION <INTEGER> main [ ] [ ARRAY<STRUCTURE<Stuff>> var5 ARRAY<INTEGER> var6 INTEGER var3 INTEGER var4 STRING var1 FILE var2 STRING var0 STRING var39 INTEGER var38 STRING var59 STRING var37 STRING var58 FILE var9 FILE var36 INTEGER var57 STRUCTURE<Result> var8 STRING var35 INTEGER var56 INTEGER var7 STRING var34 STRING var55 STRING var33 STRING var54 STRING var32 STRING var53 STRING var52 FILE var51 BOOL var50 INTEGER var10 STRUCTURE<Result> var49 INTEGER var46 STRING var45 INTEGER var48 STRING var47 INTEGER var42 INTEGER var41 INTEGER var44 INTEGER var43 STRING var60 INTEGER var40 INTEGER var61 ] @ 0
 CODE
-000: LDCS var6 "---- Array of rectangles ----"
-001: INVOKE println var6
-002: LDCI var7 10
-003: NEW var0 var7
-004: LDCI var8 0
-005: ST var1 var8
-006: LDCI var9 10
-007: LT var10 var1 var9
-008: JZ 44
-009: LDCI var11 1
-010: NEW var0 [ var1 ] var11
-011: LDCI var12 1
-012: ADD var13 var1 var12
-013: ST var0 [ var1 @a ] var13
-014: LDCI var14 3
-015: ADD var15 var1 var14
-016: ST var0 [ var1 @b ] var15
-017: LDCS var16 "]"
-018: CALL getArea var0 [ var1 @a ] var0 [ var1 @b ]
-019: POP var17
-020: INVOKE int2str var17
-021: POP var18
-022: LDCS var19 ",S="
-023: INVOKE int2str var0 [ var1 @b ]
-024: POP var20
-025: LDCS var21 ",b="
-026: INVOKE int2str var0 [ var1 @a ]
-027: POP var22
-028: LDCS var23 "Rectangle [a="
-029: INVOKE concat var23 var22
-030: POP var24
-031: INVOKE concat var24 var21
-032: POP var25
-033: INVOKE concat var25 var20
-034: POP var26
-035: INVOKE concat var26 var19
-036: POP var27
-037: INVOKE concat var27 var18
-038: POP var28
-039: INVOKE concat var28 var16
-040: POP var29
-041: INVOKE println var29
-042: INC var1
-043: JMP 6
-044: LDCS var30 "---- Array of doubles ----"
-045: INVOKE println var30
-046: LDCI var31 10
-047: NEW var2 var31
-048: LDCI var32 0
-049: ST var3 var32
-050: LDCI var33 10
-051: LT var34 var3 var33
-052: JZ 66
-053: LDCI var35 1
-054: ADD var36 var3 var35
-055: INVOKE int2double var36
-056: POP var37
-057: ST var2 [ var3 ] var37
-058: LDCS var38 " "
-059: INVOKE double2str var2 [ var3 ]
-060: POP var39
-061: INVOKE concat var39 var38
-062: POP var40
-063: INVOKE print var40
-064: INC var3
-065: JMP 50
-066: LDCS var41 "Bye."
-067: INVOKE println var41
-068: RET
-069: MUL var42 var4 var5
-070: RETV var42
+000: LDCS var32 "Input file: "
+001: INVOKE println var32
+002: INVOKE input
+003: POP var33
+004: ST var0 var33
+005: LDCS var34 "Output file: "
+006: INVOKE println var34
+007: INVOKE input
+008: POP var35
+009: ST var1 var35
+010: INVOKE openRFile var0
+011: POP var36
+012: ST var2 var36
+013: INVOKE inputFile var2
+014: POP var37
+015: INVOKE str2int var37
+016: POP var38
+017: ST var3 var38
+018: INVOKE inputFile var2
+019: POP var39
+020: INVOKE str2int var39
+021: POP var40
+022: ST var4 var40
+023: NEW var5 var3
+024: NEW var6 var3
+025: LDCI var41 0
+026: ST var7 var41
+027: LT var42 var7 var3
+028: JZ 45
+029: LDCI var43 0
+030: ST var6 [ var7 ] var43
+031: LDCI var44 1
+032: NEW var5 [ var7 ] var44
+033: INVOKE inputFile var2
+034: POP var45
+035: INVOKE str2int var45
+036: POP var46
+037: ST var5 [ var7 @weight ] var46
+038: INVOKE inputFile var2
+039: POP var47
+040: INVOKE str2int var47
+041: POP var48
+042: ST var5 [ var7 @cost ] var48
+043: INC var7
+044: JMP 27
+045: INVOKE closeFile var2
+046: CALL computeSolution var3 var4 var5 var6
+047: POP var49
+048: ST var8 var49
+049: LDCB var50 FALSE
+050: INVOKE openWFile var1 var50
+051: POP var51
+052: ST var9 var51
+053: INVOKE int2str var8 [ @cost ]
+054: POP var52
+055: LDCS var53 "Total price: "
+056: INVOKE concat var53 var52
+057: POP var54
+058: INVOKE printlnFile var9 var54
+059: LDCS var55 "Items configuration: "
+060: INVOKE printFile var9 var55
+061: LDCI var56 0
+062: ST var10 var56
+063: LT var57 var10 var3
+064: JZ 73
+065: INVOKE int2str var8 [ @conf var10 ]
+066: POP var58
+067: LDCS var59 " "
+068: INVOKE concat var59 var58
+069: POP var60
+070: INVOKE printFile var9 var60
+071: INC var10
+072: JMP 63
+073: INVOKE closeFile var9
+074: LDCI var61 0
+075: RETV var61
+076: LDCI var72 0
+077: ST var25 var72
+078: LDCI var73 0
+079: ST var26 var73
+080: ST var27 var24
+081: LDCI var74 1
+082: NEW var28 var74
+083: CALL weight var21 var23 var24
+084: POP var75
+085: LTE var76 var75 var22
+086: JZ 93
+087: CALL cost var21 var23 var24
+088: POP var77
+089: ST var25 var77
+090: GT var78 var25 var26
+091: JZ 93
+092: ST var26 var25
+093: ST var28 [ @cost ] var26
+094: ST var28 [ @conf ] var27
+095: LDCI var79 0
+096: ST var30 var79
+097: LT var80 var30 var21
+098: JZ 113
+099: ST var31 var24
+100: LDCI var81 0
+101: EQ var82 var24 [ var30 ] var81
+102: JZ 111
+103: LDCI var83 1
+104: ST var31 [ var30 ] var83
+105: CALL computeSolution var21 var22 var23 var31
+106: POP var84
+107: ST var29 var84
+108: GT var85 var29 [ @cost ] var28 [ @cost ]
+109: JZ 111
+110: ST var28 var29
+111: INC var30
+112: JMP 97
+113: RETV var28
+114: LDCI var62 0
+115: ST var14 var62
+116: LDCI var63 0
+117: ST var15 var63
+118: LT var64 var15 var11
+119: JZ 126
+120: LDCI var65 1
+121: EQ var66 var13 [ var15 ] var65
+122: JZ 124
+123: ADD var14 var14 var12 [ var15 @weight ]
+124: INC var15
+125: JMP 118
+126: RETV var14
+127: LDCI var67 0
+128: ST var19 var67
+129: LDCI var68 0
+130: ST var20 var68
+131: LT var69 var20 var16
+132: JZ 139
+133: LDCI var70 1
+134: EQ var71 var18 [ var20 ] var70
+135: JZ 137
+136: ADD var19 var19 var17 [ var20 @cost ]
+137: INC var20
+138: JMP 131
+139: RETV var19
