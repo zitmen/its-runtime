@@ -12,21 +12,16 @@ void Interpreter::_call(FunctionSignature *fn, const vector<Argument *> &args)
 	memory->push(new Reference(memory->SFB));
 	// 4. set new SFB
 	memory->SFB = memory->SP;
-	// 5. get values on the stack -- arguments of the function
-	map<string, Argument *> values;
+	// 5. get arguments values from the stack before variables addresses will be changed
+	vector<Argument *> values;
 	for(size_t i = 1, im = args.size(); i < im; i++)
-		values[((Variable *)args[i])->getName()] = ((Variable *)args[i])->getValue();
+		values.push_back(((Variable *)args[i])->getValue());
 	// 6. setup the stack - 1st come parameters, 2nd declared variables; set SP
     for(map<string, Variable *>::iterator it = fn->variables.begin(); it != fn->variables.end(); ++it)
-		it->second->setAddress(memory->push(it->second));
-	// 7. set values on the stack -- arguments of the function (non-recursive)
-    for(size_t i = 1, im = args.size(); i < im; i++)
-        fn->variables[fn->arguments_ordering[i-1]]->setValue((Variable *)(args[i]));
-	// 8. set values on the stack -- arguments of the function (recursive -- variable names are overlapping)
-	map<string, Argument *>::iterator val_it;
-	for(map<string, Variable *>::iterator it = fn->variables.begin(); it != fn->variables.end(); ++it)
-		if((val_it = values.find(it->first)) != values.end())
-			it->second->setValue(val_it->second);
+		it->second->setAddress(memory->reserve(it->second));
+	// 7. set values of arguments on the stack
+	for(size_t i = 0, im = values.size(); i < im; i++)
+        fn->variables[fn->arguments_ordering[i]]->setValue(values[i]);
 }
 
 void Interpreter::_ret()
