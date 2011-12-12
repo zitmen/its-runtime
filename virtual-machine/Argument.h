@@ -243,6 +243,12 @@ class Array : public Argument
 		// returns type code of the array elements
 		virtual int getType() const
 		{
+			return DataType::ARRAY;
+		}
+
+		// returns type code of the array elements
+		int getItemType() const
+		{
 			return (*(((int *)m_address)+1));
 		}
 
@@ -261,7 +267,7 @@ class Array : public Argument
 		// returns size of item size
 		int getItemSize() const
 		{
-			return DataType::getTypeSize(getType());
+			return DataType::getTypeSize(getItemType());
 		}
 
 		// returns pointer to an element of the array

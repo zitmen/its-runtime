@@ -54,7 +54,7 @@ class DataType
 			string tmp = ((ptr == string::npos) ? strVal : strVal.substr(0, ptr));
 			if(tmp == "VOID") return VOID;
 			if(tmp == "INTEGER") return INTEGER;
-			if(tmp == "BOOLEAN") return BOOLEAN;
+			if(tmp == "BOOL") return BOOLEAN;
 			if(tmp == "DOUBLE") return DOUBLE;
 			if(tmp == "FILE") return FILE;
 			if(tmp == "ARRAY") return ARRAY;
@@ -99,7 +99,7 @@ class DataType
 				case INVALID: str = "INVALID"; break;
 				case VOID: str = "VOID"; break;
 				case INTEGER: str = "INTEGER"; break;
-				case BOOLEAN: str = "BOOLEAN"; break;
+				case BOOLEAN: str = "BOOL"; break;
 				case DOUBLE: str = "DOUBLE"; break;
 				case FILE: str = "FILE"; break;
 				case ARRAY: str = "ARRAY<" + subtype->toString() + ">"; break;

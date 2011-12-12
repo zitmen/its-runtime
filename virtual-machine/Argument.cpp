@@ -18,6 +18,7 @@ Variable::getAddress() const
 		Array *arr = new Array(*((Array **)addr));
 		if(ith >= arr->getLength()) throw new std::exception("Variable::getAddress: array index out of bounds!");
 		offset = (2 * sizeof(int)) + (arr->getItemSize() * ith);
+		type = type->subtype;
 	}
 	else if(m_index[0]->getType() == DataType::STRING)	// Structure
 	{	// it's always String
@@ -25,12 +26,18 @@ Variable::getAddress() const
 		// go through items and all items before the one, that i'm indexing, skip (=add offset for each skipped item)
 		for(size_t m = 0, mm = ssig->items_ordering.size(); m < mm; m++)
 		{
-			if(ssig->items_ordering[m] == ((String *)m_index[0])->getValue()) break;
+			if(ssig->items_ordering[m] == ((String *)m_index[0])->getValue())
+			{
+				type = ssig->items[ssig->items_ordering[m]];
+				break;
+			}
 			offset += DataType::getTypeSize(ssig->items[ssig->items_ordering[m]]->type);
 		}
 	}
+	else
+		throw new std::exception("Variable::getAddress: unknown index type!");
 	//
-	var = new Variable("", type->subtype);
+	var = new Variable("", type);
 	var->setAddress(((char *)(*((void **)addr))) + offset);
 	//
 	for(size_t i = 1, im = m_index.size(); i < im; i++)
