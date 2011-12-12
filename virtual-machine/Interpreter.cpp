@@ -35,14 +35,122 @@ void Interpreter::_retv(const Variable *var)
 }
 
 void Interpreter::_invoke(Variable *name, const vector<Argument *> &args)
-{	// TODO zbytek
-	if(name->getName() == "println")
+{
+	if(name->getName() == "cloneArray")
+	{
+		BuiltInRoutines::cloneArray(memory, (Array *)(((Variable *)args[1])->getValue()));
+	}
+	else if(name->getName() == "clearArray")
+	{
+		BuiltInRoutines::clearArray((Array *)(((Variable *)args[1])->getValue()));
+	}
+	else if(name->getName() == "length")
+	{
+		memory->push(BuiltInRoutines::length((Array *)(((Variable *)args[1])->getValue())));
+	}
+	else if(name->getName() == "openRFile")
+	{
+		memory->push(BuiltInRoutines::openRFile((String *)(((Variable *)args[1])->getValue())));
+	}
+	else if(name->getName() == "openWFile")
+	{
+		memory->push(BuiltInRoutines::openWFile((String *)(((Variable *)args[1])->getValue()), (Boolean *)(((Variable *)args[2])->getValue())));
+	}
+	else if(name->getName() == "closeFile")
+	{
+		BuiltInRoutines::closeFile((File *)(((Variable *)args[1])->getValue()));
+	}
+	else if(name->getName() == "flushFile")
+	{
+		BuiltInRoutines::flushFile((File *)(((Variable *)args[1])->getValue()));
+	}
+	else if(name->getName() == "printlnFile")
+	{
+		BuiltInRoutines::printlnFile((File *)(((Variable *)args[1])->getValue()), (String *)(((Variable *)args[2])->getValue()));
+	}
+	else if(name->getName() == "printFile")
+	{
+		BuiltInRoutines::printFile((File *)(((Variable *)args[1])->getValue()), (String *)(((Variable *)args[2])->getValue()));
+	}
+	else if(name->getName() == "println")
 	{
 		BuiltInRoutines::println((String *)(((Variable *)args[1])->getValue()));
 	}
 	else if(name->getName() == "print")
 	{
 		BuiltInRoutines::print((String *)(((Variable *)args[1])->getValue()));
+	}
+	else if(name->getName() == "inputFile")
+	{
+		memory->push(BuiltInRoutines::inputFile(memory, (File *)(((Variable *)args[1])->getValue())));
+	}
+	else if(name->getName() == "input")
+	{
+		memory->push(BuiltInRoutines::input(memory));
+	}
+	else if(name->getName() == "eof")
+	{
+		memory->push(BuiltInRoutines::eof((File *)(((Variable *)args[1])->getValue())));
+	}
+	else if(name->getName() == "eoi")
+	{
+		memory->push(BuiltInRoutines::eoi());
+	}
+	else if(name->getName() == "pow")
+	{
+		memory->push(BuiltInRoutines::pow((Double *)(((Variable *)args[1])->getValue()), (Double *)(((Variable *)args[2])->getValue())));
+	}
+	else if(name->getName() == "sqrt")
+	{
+		memory->push(BuiltInRoutines::sqrt((Double *)(((Variable *)args[1])->getValue())));
+	}
+	else if(name->getName() == "log")
+	{
+		memory->push(BuiltInRoutines::log((Double *)(((Variable *)args[1])->getValue())));
+	}
+	else if(name->getName() == "rand")
+	{
+		memory->push(BuiltInRoutines::rand((Integer *)(((Variable *)args[1])->getValue())));
+	}
+	else if(name->getName() == "indexOf")
+	{
+		memory->push(BuiltInRoutines::indexOf((String *)(((Variable *)args[1])->getValue()), (String *)(((Variable *)args[2])->getValue())));
+	}
+	else if(name->getName() == "lastIndexOf")
+	{
+		memory->push(BuiltInRoutines::lastIndexOf((String *)(((Variable *)args[1])->getValue()), (String *)(((Variable *)args[2])->getValue())));
+	}
+	else if(name->getName() == "substring")
+	{
+		memory->push(BuiltInRoutines::substring(memory, (String *)(((Variable *)args[1])->getValue()), (Integer *)(((Variable *)args[2])->getValue()), (Integer *)(((Variable *)args[3])->getValue())));
+	}
+	else if(name->getName() == "toLower")
+	{
+		memory->push(BuiltInRoutines::toLower(memory, (String *)(((Variable *)args[1])->getValue())));
+	}
+	else if(name->getName() == "toUpper")
+	{
+		memory->push(BuiltInRoutines::toUpper(memory, (String *)(((Variable *)args[1])->getValue())));
+	}
+	else if(name->getName() == "trim")
+	{
+		memory->push(BuiltInRoutines::trim(memory, (String *)(((Variable *)args[1])->getValue())));
+	}
+	else if(name->getName() == "startsWith")
+	{
+		memory->push(BuiltInRoutines::startsWith((String *)(((Variable *)args[1])->getValue()), (String *)(((Variable *)args[2])->getValue())));
+	}
+	else if(name->getName() == "endsWith")
+	{
+		memory->push(BuiltInRoutines::endsWith((String *)(((Variable *)args[1])->getValue()), (String *)(((Variable *)args[2])->getValue())));
+	}
+	else if(name->getName() == "concat")
+	{
+		memory->push(BuiltInRoutines::concat(memory, (String *)(((Variable *)args[1])->getValue()), (String *)(((Variable *)args[2])->getValue())));
+	}
+	else if(name->getName() == "strlen")
+	{
+		memory->push(BuiltInRoutines::strlen((String *)(((Variable *)args[1])->getValue())));
 	}
 	else if(name->getName() == "int2str")
 	{
@@ -52,17 +160,21 @@ void Interpreter::_invoke(Variable *name, const vector<Argument *> &args)
 	{
 		memory->push(BuiltInRoutines::double2str(memory, (Double *)(((Variable *)args[1])->getValue())));
 	}
+	else if(name->getName() == "str2int")
+	{
+		memory->push(BuiltInRoutines::str2int((String *)(((Variable *)args[1])->getValue())));
+	}
+	else if(name->getName() == "double2int")
+	{
+		memory->push(BuiltInRoutines::double2int((Double *)(((Variable *)args[1])->getValue())));
+	}
+	else if(name->getName() == "str2double")
+	{
+		memory->push(BuiltInRoutines::str2double((String *)(((Variable *)args[1])->getValue())));
+	}
 	else if(name->getName() == "int2double")
 	{
 		memory->push(BuiltInRoutines::int2double((Integer *)(((Variable *)args[1])->getValue())));
-	}
-	else if(name->getName() == "concat")
-	{
-		memory->push(BuiltInRoutines::concat(memory, (String *)(((Variable *)args[1])->getValue()), (String *)(((Variable *)args[2])->getValue())));
-	}
-	else if(name->getName() == "sqrt")
-	{
-		memory->push(BuiltInRoutines::sqrt((Double *)(((Variable *)args[1])->getValue())));
 	}
 	else
 		throw new std::exception(("Interpreter::_invoke: routine '" + name->getName() + "' was not found!").c_str());
