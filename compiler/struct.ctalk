@@ -1,0 +1,18 @@
+struct Rectangle
+{
+	int a;
+	int b;
+}
+
+void main()
+{
+	Rectangle r = new;
+	r.a = 3;
+	r.b = 5;
+	println(concat(concat(concat(concat(concat(concat("Rectangle [a=", int2str(r.a)), ",b="), int2str(r.b)),",S="), int2str(getArea(r))),"]"));
+}
+
+int getArea(Rectangle rect)
+{
+	return rect.a*rect.b;
+}

@@ -1,0 +1,38 @@
+STRUCTURE Rectangle [ INTEGER b INTEGER a ]
+FUNCTION <INTEGER> getArea [ STRUCTURE<Rectangle> var1 ] [ INTEGER var19 STRUCTURE<Rectangle> var1 ] @ 32
+FUNCTION <VOID> main [ ] [ STRING var5 INTEGER var6 INTEGER var3 INTEGER var4 INTEGER var2 STRUCTURE<Rectangle> var0 STRING var15 STRING var14 STRING var13 STRING var12 STRING var18 STRING var9 STRING var17 STRING var8 STRING var16 STRING var7 STRING var11 STRING var10 ] @ 0
+CODE
+000: LDCI var2 1
+001: NEW var0 var2
+002: LDCI var3 3
+003: ST var0 [ @a ] var3
+004: LDCI var4 5
+005: ST var0 [ @b ] var4
+006: LDCS var5 "]"
+007: CALL getArea var0
+008: POP var6
+009: INVOKE int2str var6
+010: POP var7
+011: LDCS var8 ",S="
+012: INVOKE int2str var0 [ @b ]
+013: POP var9
+014: LDCS var10 ",b="
+015: INVOKE int2str var0 [ @a ]
+016: POP var11
+017: LDCS var12 "Rectangle [a="
+018: INVOKE concat var12 var11
+019: POP var13
+020: INVOKE concat var13 var10
+021: POP var14
+022: INVOKE concat var14 var9
+023: POP var15
+024: INVOKE concat var15 var8
+025: POP var16
+026: INVOKE concat var16 var7
+027: POP var17
+028: INVOKE concat var17 var5
+029: POP var18
+030: INVOKE println var18
+031: RET
+032: MUL var19 var1 [ @a ] var1 [ @b ]
+033: RETV var19

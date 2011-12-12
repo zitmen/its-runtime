@@ -17,6 +17,7 @@ class StructureSignature
 {
 	public:
 		string name;
+		vector<string> items_ordering;	// arguments int the order from the first to the last
 		map<string, DataType *> items;
 
 		~StructureSignature()
@@ -40,6 +41,7 @@ class StructureSignature
 				type = DataType::parse(token);
 				is >> token;	// name
 				st->items[token] = type;
+				st->items_ordering.push_back(token);
 			}
 			return st;
 		}

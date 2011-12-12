@@ -40,6 +40,10 @@ void Interpreter::_invoke(Variable *name, const vector<Argument *> &args)
 	{
 		BuiltInRoutines::println((String *)(((Variable *)args[1])->getValue()));
 	}
+	else if(name->getName() == "print")
+	{
+		BuiltInRoutines::print((String *)(((Variable *)args[1])->getValue()));
+	}
 	else if(name->getName() == "int2str")
 	{
 		memory->push(BuiltInRoutines::int2str(memory, (Integer *)(((Variable *)args[1])->getValue())));
@@ -47,6 +51,10 @@ void Interpreter::_invoke(Variable *name, const vector<Argument *> &args)
 	else if(name->getName() == "double2str")
 	{
 		memory->push(BuiltInRoutines::double2str(memory, (Double *)(((Variable *)args[1])->getValue())));
+	}
+	else if(name->getName() == "int2double")
+	{
+		memory->push(BuiltInRoutines::int2double((Integer *)(((Variable *)args[1])->getValue())));
 	}
 	else if(name->getName() == "concat")
 	{
@@ -82,7 +90,7 @@ void Interpreter::_jmp(const Integer *to)
 void Interpreter::_pop(Variable *dest)
 {	// do not pop!
 	// -- f.e.: call sqrt x; pop tmp1; call sqrt y; pop tmp2; --> variable tmp1 would be overwritten
-	dest->setAddress(memory->peekAndGetTopValAddr(dest->getType()));
+	dest->setValue(memory->peekAndGetTopValAddr(dest->getItemType()));
 	//
 	++IP;
 }
@@ -94,19 +102,14 @@ void Interpreter::_st(Variable *dest, Variable *src)
 	++IP;
 }
 
-void Interpreter::_sta()
-{
-	// TODO
-}
-
 void Interpreter::_add(Variable *dest, const Variable *op1, const Variable *op2)
 {
-	if(op1->getType() == DataType::INTEGER)
+	if(op1->getItemType() == DataType::INTEGER)
 	{
 		dest->setValue(new Integer(((Integer *)(op1->getValue()))->getValue() + ((Integer *)(op2->getValue()))->getValue()));
 		ZF = (((Integer *)(dest->getValue()))->getValue() == 0);
 	}
-	else if(op1->getType() == DataType::DOUBLE)
+	else if(op1->getItemType() == DataType::DOUBLE)
 	{
 		dest->setValue(new Double(((Double *)(op1->getValue()))->getValue() + ((Double *)(op2->getValue()))->getValue()));
 		ZF = (((Double *)(dest->getValue()))->getValue() == 0.0);
@@ -119,12 +122,12 @@ void Interpreter::_add(Variable *dest, const Variable *op1, const Variable *op2)
 
 void Interpreter::_sub(Variable *dest, const Variable *op1, const Variable *op2)
 {
-	if(op1->getType() == DataType::INTEGER)
+	if(op1->getItemType() == DataType::INTEGER)
 	{
 		dest->setValue(new Integer(((Integer *)(op1->getValue()))->getValue() - ((Integer *)(op2->getValue()))->getValue()));
 		ZF = (((Integer *)(dest->getValue()))->getValue() == 0);
 	}
-	else if(op1->getType() == DataType::DOUBLE)
+	else if(op1->getItemType() == DataType::DOUBLE)
 	{
 		dest->setValue(new Double(((Double *)(op1->getValue()))->getValue() - ((Double *)(op2->getValue()))->getValue()));
 		ZF = (((Double *)(dest->getValue()))->getValue() == 0.0);
@@ -137,12 +140,12 @@ void Interpreter::_sub(Variable *dest, const Variable *op1, const Variable *op2)
 
 void Interpreter::_mul(Variable *dest, const Variable *op1, const Variable *op2)
 {
-	if(op1->getType() == DataType::INTEGER)
+	if(op1->getItemType() == DataType::INTEGER)
 	{
 		dest->setValue(new Integer(((Integer *)(op1->getValue()))->getValue() * ((Integer *)(op2->getValue()))->getValue()));
 		ZF = (((Integer *)(dest->getValue()))->getValue() == 0);
 	}
-	else if(op1->getType() == DataType::DOUBLE)
+	else if(op1->getItemType() == DataType::DOUBLE)
 	{
 		dest->setValue(new Double(((Double *)(op1->getValue()))->getValue() * ((Double *)(op2->getValue()))->getValue()));
 		ZF = (((Double *)(dest->getValue()))->getValue() == 0.0);
@@ -155,13 +158,13 @@ void Interpreter::_mul(Variable *dest, const Variable *op1, const Variable *op2)
 
 void Interpreter::_div(Variable *dest, const Variable *op1, const Variable *op2)
 {
-	if(op1->getType() == DataType::INTEGER)
+	if(op1->getItemType() == DataType::INTEGER)
 	{
 		if(((Integer *)(op2->getValue()))->getValue() == 0) throw new std::exception("Interpreter::_div: division be zero!");
 		dest->setValue(new Integer(((Integer *)(op1->getValue()))->getValue() / ((Integer *)(op2->getValue()))->getValue()));
 		ZF = (((Integer *)(dest->getValue()))->getValue() == 0);
 	}
-	else if(op1->getType() == DataType::DOUBLE)
+	else if(op1->getItemType() == DataType::DOUBLE)
 	{
 		dest->setValue(new Double(((Double *)(op1->getValue()))->getValue() / ((Double *)(op2->getValue()))->getValue()));
 		ZF = (((Double *)(dest->getValue()))->getValue() == 0.0);
@@ -174,7 +177,7 @@ void Interpreter::_div(Variable *dest, const Variable *op1, const Variable *op2)
 
 void Interpreter::_mod(Variable *dest, const Variable *op1, const Variable *op2)
 {
-	if(op1->getType() == DataType::INTEGER)
+	if(op1->getItemType() == DataType::INTEGER)
 	{
 		if(((Integer *)(op2->getValue()))->getValue() == 0) throw new std::exception("Interpreter::_mod: division be zero!");
 		dest->setValue(new Integer(((Integer *)(op1->getValue()))->getValue() % ((Integer *)(op2->getValue()))->getValue()));
@@ -188,12 +191,12 @@ void Interpreter::_mod(Variable *dest, const Variable *op1, const Variable *op2)
 
 void Interpreter::_and(Variable *dest, const Variable *op1, const Variable *op2)
 {
-	if(op1->getType() == DataType::INTEGER)
+	if(op1->getItemType() == DataType::INTEGER)
 	{
 		dest->setValue(new Integer(((Integer *)(op1->getValue()))->getValue() & ((Integer *)(op2->getValue()))->getValue()));
 		ZF = (((Integer *)(dest->getValue()))->getValue() == 0);
 	}
-	else if(op1->getType() == DataType::BOOLEAN)
+	else if(op1->getItemType() == DataType::BOOLEAN)
 	{
 		dest->setValue(new Boolean(((Boolean *)(op1->getValue()))->getValue() & ((Boolean *)(op2->getValue()))->getValue()));
 		ZF = (((Boolean *)(dest->getValue()))->getValue() == false);
@@ -206,12 +209,12 @@ void Interpreter::_and(Variable *dest, const Variable *op1, const Variable *op2)
 
 void Interpreter::_or(Variable *dest, const Variable *op1, const Variable *op2)
 {
-	if(op1->getType() == DataType::INTEGER)
+	if(op1->getItemType() == DataType::INTEGER)
 	{
 		dest->setValue(new Integer(((Integer *)(op1->getValue()))->getValue() | ((Integer *)(op2->getValue()))->getValue()));
 		ZF = (((Integer *)(dest->getValue()))->getValue() == 0);
 	}
-	else if(op1->getType() == DataType::BOOLEAN)
+	else if(op1->getItemType() == DataType::BOOLEAN)
 	{
 		dest->setValue(new Boolean(((Boolean *)(op1->getValue()))->getValue() | ((Boolean *)(op2->getValue()))->getValue()));
 		ZF = (((Boolean *)(dest->getValue()))->getValue() == false);
@@ -224,12 +227,12 @@ void Interpreter::_or(Variable *dest, const Variable *op1, const Variable *op2)
 
 void Interpreter::_xor(Variable *dest, const Variable *op1, const Variable *op2)
 {
-	if(op1->getType() == DataType::INTEGER)
+	if(op1->getItemType() == DataType::INTEGER)
 	{
 		dest->setValue(new Integer(((Integer *)(op1->getValue()))->getValue() ^ ((Integer *)(op2->getValue()))->getValue()));
 		ZF = (((Integer *)(dest->getValue()))->getValue() == 0);
 	}
-	else if(op1->getType() == DataType::BOOLEAN)
+	else if(op1->getItemType() == DataType::BOOLEAN)
 	{
 		dest->setValue(new Boolean(((Boolean *)(op1->getValue()))->getValue() ^ ((Boolean *)(op2->getValue()))->getValue()));
 		ZF = (((Boolean *)(dest->getValue()))->getValue() == false);
@@ -242,12 +245,12 @@ void Interpreter::_xor(Variable *dest, const Variable *op1, const Variable *op2)
 
 void Interpreter::_lsh(Variable *dest, const Variable *op1, const Variable *op2)
 {
-	if(op1->getType() == DataType::INTEGER)
+	if(op1->getItemType() == DataType::INTEGER)
 	{
 		dest->setValue(new Integer(((Integer *)(op1->getValue()))->getValue() << ((Integer *)(op2->getValue()))->getValue()));
 		ZF = (((Integer *)(dest->getValue()))->getValue() == 0);
 	}
-	else if(op1->getType() == DataType::BOOLEAN)
+	else if(op1->getItemType() == DataType::BOOLEAN)
 	{
 		dest->setValue(new Boolean(((Boolean *)(op1->getValue()))->getValue() << ((Boolean *)(op2->getValue()))->getValue()));
 		ZF = (((Boolean *)(dest->getValue()))->getValue() == false);
@@ -260,12 +263,12 @@ void Interpreter::_lsh(Variable *dest, const Variable *op1, const Variable *op2)
 
 void Interpreter::_rsh(Variable *dest, const Variable *op1, const Variable *op2)
 {
-	if(op1->getType() == DataType::INTEGER)
+	if(op1->getItemType() == DataType::INTEGER)
 	{
 		dest->setValue(new Integer(((Integer *)(op1->getValue()))->getValue() >> ((Integer *)(op2->getValue()))->getValue()));
 		ZF = (((Integer *)(dest->getValue()))->getValue() == 0);
 	}
-	else if(op1->getType() == DataType::BOOLEAN)
+	else if(op1->getItemType() == DataType::BOOLEAN)
 	{
 		dest->setValue(new Boolean(((Boolean *)(op1->getValue()))->getValue() >> ((Boolean *)(op2->getValue()))->getValue()));
 		ZF = (((Boolean *)(dest->getValue()))->getValue() == false);
@@ -278,7 +281,7 @@ void Interpreter::_rsh(Variable *dest, const Variable *op1, const Variable *op2)
 
 void Interpreter::_inc(Variable *var)
 {
-	if(var->getType() == DataType::INTEGER)
+	if(var->getItemType() == DataType::INTEGER)
 	{
 		var->setValue(new Integer(((Integer *)var->getValue())->getValue() + 1));
 		ZF = (((Integer *)((Variable *)var)->getValue())->getValue() == 0);
@@ -291,7 +294,7 @@ void Interpreter::_inc(Variable *var)
 
 void Interpreter::_dec(Variable *var)
 {
-	if(var->getType() == DataType::INTEGER)
+	if(var->getItemType() == DataType::INTEGER)
 	{
 		var->setValue(new Integer(((Integer *)var->getValue())->getValue() - 1));
 		ZF = (((Integer *)((Variable *)var)->getValue())->getValue() == 0);
@@ -304,7 +307,7 @@ void Interpreter::_dec(Variable *var)
 
 void Interpreter::_not(Variable *dest, const Variable *src)
 {
-	if(src->getType() == DataType::BOOLEAN)
+	if(src->getItemType() == DataType::BOOLEAN)
 	{
 		dest->setValue(new Boolean(!(((Boolean *)(src->getValue()))->getValue())));
 		ZF = (((Boolean *)(dest->getValue()))->getValue() == false);
@@ -317,12 +320,12 @@ void Interpreter::_not(Variable *dest, const Variable *src)
 
 void Interpreter::_neg(Variable *dest, const Variable *src)
 {
-	if(src->getType() == DataType::INTEGER)
+	if(src->getItemType() == DataType::INTEGER)
 	{
 		dest->setValue(new Integer(~(((Integer *)(src->getValue()))->getValue())));
 		ZF = (((Integer *)(dest->getValue()))->getValue() == 0);
 	}
-	else if(src->getType() == DataType::BOOLEAN)
+	else if(src->getItemType() == DataType::BOOLEAN)
 	{
 		dest->setValue(new Boolean(~(((Boolean *)(src->getValue()))->getValue())));
 		ZF = (((Boolean *)(dest->getValue()))->getValue() == false);
@@ -335,12 +338,12 @@ void Interpreter::_neg(Variable *dest, const Variable *src)
 
 void Interpreter::_minus(Variable *dest, const Variable *src)
 {
-	if(src->getType() == DataType::INTEGER)
+	if(src->getItemType() == DataType::INTEGER)
 	{
 		dest->setValue(new Integer(-(((Integer *)(src->getValue()))->getValue())));
 		ZF = (((Integer *)(dest->getValue()))->getValue() == 0);
 	}
-	else if(src->getType() == DataType::DOUBLE)
+	else if(src->getItemType() == DataType::DOUBLE)
 	{
 		dest->setValue(new Double(-(((Double *)(src->getValue()))->getValue())));
 		ZF = (((Double *)(dest->getValue()))->getValue() == 0.0);
@@ -397,14 +400,28 @@ void Interpreter::_ldcn(Variable *var, Reference *constant)
 
 void Interpreter::_new(Variable *var, const Variable *size)
 {
-	//TODO
+	if(var->getItemType() == DataType::ARRAY)
+	{
+		int length = ((Integer *)size->getValue())->getValue();
+		var->setValue(new Reference(memory->alloc(var->getItemTypeSize() * length)));
+		// set length and item type
+		Array *arr = (Array *)(var->getValue());
+		arr->setLength(length);
+		arr->setType(var->getItemDataType()->subtype->type);
+	}
+	else	// structure
+	{
+		var->setValue(new Reference(memory->alloc(var->getItemTypeSize())));
+	}
+	//
+	++IP;
 }
 
 void Interpreter::_lt(Variable *dest, const Variable *op1, const Variable *op2)
 {
-	if(op1->getType() == DataType::INTEGER)
+	if(op1->getItemType() == DataType::INTEGER)
 		dest->setValue(new Boolean(((Integer *)(op1->getValue()))->getValue() < ((Integer *)(op2->getValue()))->getValue()));
-	else if(op1->getType() == DataType::DOUBLE)
+	else if(op1->getItemType() == DataType::DOUBLE)
 		dest->setValue(new Boolean(((Double *)(op1->getValue()))->getValue() < ((Double *)(op2->getValue()))->getValue()));
 	else
 		throw new std::exception("Interpreter::_lt: invalid data type!");
@@ -415,9 +432,9 @@ void Interpreter::_lt(Variable *dest, const Variable *op1, const Variable *op2)
 
 void Interpreter::_gt(Variable *dest, const Variable *op1, const Variable *op2)
 {
-	if(op1->getType() == DataType::INTEGER)
+	if(op1->getItemType() == DataType::INTEGER)
 		dest->setValue(new Boolean(((Integer *)(op1->getValue()))->getValue() > ((Integer *)(op2->getValue()))->getValue()));
-	else if(op1->getType() == DataType::DOUBLE)
+	else if(op1->getItemType() == DataType::DOUBLE)
 		dest->setValue(new Boolean(((Double *)(op1->getValue()))->getValue() > ((Double *)(op2->getValue()))->getValue()));
 	else
 		throw new std::exception("Interpreter::_gt: invalid data type!");
@@ -428,9 +445,9 @@ void Interpreter::_gt(Variable *dest, const Variable *op1, const Variable *op2)
 
 void Interpreter::_lte(Variable *dest, const Variable *op1, const Variable *op2)
 {
-	if(op1->getType() == DataType::INTEGER)
+	if(op1->getItemType() == DataType::INTEGER)
 		dest->setValue(new Boolean(((Integer *)(op1->getValue()))->getValue() <= ((Integer *)(op2->getValue()))->getValue()));
-	else if(op1->getType() == DataType::DOUBLE)
+	else if(op1->getItemType() == DataType::DOUBLE)
 		dest->setValue(new Boolean(((Double *)(op1->getValue()))->getValue() <= ((Double *)(op2->getValue()))->getValue()));
 	else
 		throw new std::exception("Interpreter::_lte: invalid data type!");
@@ -441,9 +458,9 @@ void Interpreter::_lte(Variable *dest, const Variable *op1, const Variable *op2)
 
 void Interpreter::_gte(Variable *dest, const Variable *op1, const Variable *op2)
 {
-	if(op1->getType() == DataType::INTEGER)
+	if(op1->getItemType() == DataType::INTEGER)
 		dest->setValue(new Boolean(((Integer *)(op1->getValue()))->getValue() >= ((Integer *)(op2->getValue()))->getValue()));
-	else if(op1->getType() == DataType::DOUBLE)
+	else if(op1->getItemType() == DataType::DOUBLE)
 		dest->setValue(new Boolean(((Double *)(op1->getValue()))->getValue() >= ((Double *)(op2->getValue()))->getValue()));
 	else
 		throw new std::exception("Interpreter::_gte: invalid data type!");
@@ -454,11 +471,11 @@ void Interpreter::_gte(Variable *dest, const Variable *op1, const Variable *op2)
 
 void Interpreter::_eq(Variable *dest, const Variable *op1, const Variable *op2)
 {
-	if(op1->getType() == DataType::INTEGER)
+	if(op1->getItemType() == DataType::INTEGER)
 		dest->setValue(new Boolean(((Integer *)(op1->getValue()))->getValue() == ((Integer *)(op2->getValue()))->getValue()));
-	else if(op1->getType() == DataType::DOUBLE)
+	else if(op1->getItemType() == DataType::DOUBLE)
 		dest->setValue(new Boolean(((Double *)(op1->getValue()))->getValue() == ((Double *)(op2->getValue()))->getValue()));
-	else if(op1->getType() == DataType::BOOLEAN)
+	else if(op1->getItemType() == DataType::BOOLEAN)
 		dest->setValue(new Boolean(((Boolean *)(op1->getValue()))->getValue() == ((Boolean *)(op2->getValue()))->getValue()));
 	else
 		throw new std::exception("Interpreter::_eq: invalid data type!");
@@ -469,11 +486,11 @@ void Interpreter::_eq(Variable *dest, const Variable *op1, const Variable *op2)
 
 void Interpreter::_neq(Variable *dest, const Variable *op1, const Variable *op2)
 {
-	if(op1->getType() == DataType::INTEGER)
+	if(op1->getItemType() == DataType::INTEGER)
 		dest->setValue(new Boolean(((Integer *)(op1->getValue()))->getValue() != ((Integer *)(op2->getValue()))->getValue()));
-	else if(op1->getType() == DataType::DOUBLE)
+	else if(op1->getItemType() == DataType::DOUBLE)
 		dest->setValue(new Boolean(((Double *)(op1->getValue()))->getValue() != ((Double *)(op2->getValue()))->getValue()));
-	else if(op1->getType() == DataType::BOOLEAN)
+	else if(op1->getItemType() == DataType::BOOLEAN)
 		dest->setValue(new Boolean(((Boolean *)(op1->getValue()))->getValue() != ((Boolean *)(op2->getValue()))->getValue()));
 	else
 		throw new std::exception("Interpreter::_neq: invalid data type!");

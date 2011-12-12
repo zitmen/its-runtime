@@ -1,0 +1,22 @@
+struct Rectangle
+{
+	int a;
+	int b;
+}
+
+void main()
+{
+	Array<Rectangle> arr_r = new[10];
+	for(int i = 0; i < 10; i++)
+	{
+		arr_r[i];
+		arr_r[i].a = i+1;
+		arr_r[i].b = i+3;
+		println(concat(concat(concat(concat(concat(concat("Rectangle [a=", int2str(arr_r[i].a)), ",b="), int2str(arr_r[i].b)),",S="), int2str(getArea(arr_r[i]))),"]"));
+	}
+}
+
+int getArea(Rectangle rect)
+{
+	return rect.a*rect.b;
+}

@@ -11,11 +11,13 @@ class DataType
 		static enum { INVALID, VOID, INTEGER, BOOLEAN, DOUBLE, FILE, ARRAY, STRING, STRUCTURE, REFERENCE };
 
 		int type;
+		string name;
 		DataType *subtype;
 
-		DataType(int type = INVALID, DataType *subtype = NULL)
+		DataType(int type = INVALID, string name = "", DataType *subtype = NULL)
 		{
 			this->type = type;
+			this->name = name;
 			this->subtype = subtype;
 		}
 
@@ -23,6 +25,8 @@ class DataType
 		{
 			delete subtype;
 		}
+
+		int getSize() const;
 
 		static DataType * parse(const string &token)
 		{
@@ -33,7 +37,13 @@ class DataType
 			else
 			{
 				type->type = getTypeCode(token.substr(0, ptr));
-				type->subtype = parse(token.substr(ptr + 1));
+				if(type->type == DataType::STRUCTURE)
+				{
+					size_t endptr = token.find_first_of('>', ptr);
+					type->name = token.substr(ptr + 1, endptr - ptr - 1);
+				}
+				else	// Array
+					type->subtype = parse(token.substr(ptr + 1));
 			}
 			return type;
 		}
@@ -94,7 +104,7 @@ class DataType
 				case FILE: str = "FILE"; break;
 				case ARRAY: str = "ARRAY<" + subtype->toString() + ">"; break;
 				case STRING: str = "STRING"; break;
-				case STRUCTURE: str = "STRUCTURE<" + subtype->toString() + ">"; break;
+				case STRUCTURE: str = "STRUCTURE<" + name + ">"; break;
 				case REFERENCE: str = "REFERENCE"; break;
 			}
 			return str;

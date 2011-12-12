@@ -1,6 +1,7 @@
 #include "InstructionSet.h"
 #include "Argument.h"
 #include "BuiltInRoutines.h"
+#include "Interpreter.h"
 
 map<string, int> * InstructionCode::convertor = NULL;
 
@@ -14,3 +15,6 @@ ostringstream Reference::os;
 bool BuiltInRoutines::m_first_rand = true;
 time_t BuiltInRoutines::m_rand_seed = time(NULL);
 map<string, DataType *> BuiltInRoutines::routinesList;
+
+map<string, StructureSignature *> *Interpreter::structures = NULL;
+map<string, FunctionSignature *> *Interpreter::functions = NULL;

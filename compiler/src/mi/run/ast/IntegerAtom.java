@@ -1,6 +1,5 @@
 package mi.run.ast;
 
-import mi.run.bytecode.Code;
 import mi.run.bytecode.Instruction;
 import mi.run.bytecode.LoadConstInstr;
 import mi.run.semantic.Functions;

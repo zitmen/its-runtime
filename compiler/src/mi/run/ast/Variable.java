@@ -163,12 +163,13 @@ public class Variable extends Atom
             }
             varCompleteName += "]";
         }
+        resultVariable = varCompleteName;
         if(value != null)
         {
             stream = stream.last().append(value.genByteCode());
-            stream = stream.last().append(new LoadStoreInstr(Code.ST, varCompleteName, value.resultVariable));
+            if(!(value instanceof NewExpression))
+                stream = stream.last().append(new LoadStoreInstr(Code.ST, resultVariable, value.resultVariable));
         }
-        resultVariable = varCompleteName;
         return first;
     }
     

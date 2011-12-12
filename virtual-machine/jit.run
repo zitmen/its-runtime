@@ -1,11 +1,75 @@
 STRUCTURE Rectangle [ INTEGER b INTEGER a ]
-FUNCTION <VOID> main [ ] [ STRING var3 NEW_EXPR var1 INTEGER var2 STRUCTURE<Rectangle> var0 ] @ 0
+FUNCTION <INTEGER> getArea [ INTEGER var4 INTEGER var5 ] [ INTEGER var42 INTEGER var5 INTEGER var4 ] @ 69
+FUNCTION <VOID> main [ ] [ STRING var6 INTEGER var3 INTEGER var1 ARRAY<DOUBLE> var2 ARRAY<STRUCTURE<Rectangle>> var0 INTEGER var15 INTEGER var14 STRING var39 INTEGER var13 STRING var38 INTEGER var12 DOUBLE var37 STRING var19 INTEGER var36 INTEGER var9 STRING var18 INTEGER var35 INTEGER var8 INTEGER var17 INTEGER var34 INTEGER var7 STRING var16 INTEGER var33 INTEGER var32 INTEGER var31 STRING var30 INTEGER var11 INTEGER var10 STRING var24 STRING var23 STRING var26 STRING var25 STRING var28 STRING var27 STRING var29 STRING var41 STRING var20 STRING var40 STRING var22 STRING var21 ] @ 0
 CODE
-000: NEW var1
-001: ST var0 var1
-002: LDCI var2 5
-003: ST var0 [ @a ] var2
-004: INVOKE int2str var0 [ @a ]
-005: POP var3
-006: INVOKE println var3
-007: RET
+000: LDCS var6 "---- Array of rectangles ----"
+001: INVOKE println var6
+002: LDCI var7 10
+003: NEW var0 var7
+004: LDCI var8 0
+005: ST var1 var8
+006: LDCI var9 10
+007: LT var10 var1 var9
+008: JZ 44
+009: LDCI var11 1
+010: NEW var0 [ var1 ] var11
+011: LDCI var12 1
+012: ADD var13 var1 var12
+013: ST var0 [ var1 @a ] var13
+014: LDCI var14 3
+015: ADD var15 var1 var14
+016: ST var0 [ var1 @b ] var15
+017: LDCS var16 "]"
+018: CALL getArea var0 [ var1 @a ] var0 [ var1 @b ]
+019: POP var17
+020: INVOKE int2str var17
+021: POP var18
+022: LDCS var19 ",S="
+023: INVOKE int2str var0 [ var1 @b ]
+024: POP var20
+025: LDCS var21 ",b="
+026: INVOKE int2str var0 [ var1 @a ]
+027: POP var22
+028: LDCS var23 "Rectangle [a="
+029: INVOKE concat var23 var22
+030: POP var24
+031: INVOKE concat var24 var21
+032: POP var25
+033: INVOKE concat var25 var20
+034: POP var26
+035: INVOKE concat var26 var19
+036: POP var27
+037: INVOKE concat var27 var18
+038: POP var28
+039: INVOKE concat var28 var16
+040: POP var29
+041: INVOKE println var29
+042: INC var1
+043: JMP 6
+044: LDCS var30 "---- Array of doubles ----"
+045: INVOKE println var30
+046: LDCI var31 10
+047: NEW var2 var31
+048: LDCI var32 0
+049: ST var3 var32
+050: LDCI var33 10
+051: LT var34 var3 var33
+052: JZ 66
+053: LDCI var35 1
+054: ADD var36 var3 var35
+055: INVOKE int2double var36
+056: POP var37
+057: ST var2 [ var3 ] var37
+058: LDCS var38 " "
+059: INVOKE double2str var2 [ var3 ]
+060: POP var39
+061: INVOKE concat var39 var38
+062: POP var40
+063: INVOKE print var40
+064: INC var3
+065: JMP 50
+066: LDCS var41 "Bye."
+067: INVOKE println var41
+068: RET
+069: MUL var42 var4 var5
+070: RETV var42

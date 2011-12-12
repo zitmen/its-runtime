@@ -5,12 +5,18 @@
 #include <ostream>
 #include <string>
 #include <exception>
+#include <vector>
+#include <map>
 using std::istringstream;
 using std::ostringstream;
 using std::string;
 using std::ostream;
+using std::vector;
+using std::map;
 
 #include "DataType.h"
+
+class StructureSignature;
 
 class Argument
 {
@@ -186,8 +192,8 @@ class String : public Argument
 		static String * parse(istringstream &is)
 		{	// allocation of the string will be done in LDCS instruction
 			string val;
-			is >> val;
-			val = val.substr(1, val.length() - 2);
+			while(is.get() != '\"');
+			getline(is, val, '\"');
 			char *str = new char[val.length()+1];
 			return new String(strcpy(str, val.c_str()));
 		}
@@ -240,6 +246,18 @@ class Array : public Argument
 			return (*(((int *)m_address)+1));
 		}
 
+		// sets length of the array
+		void setLength(int length) const
+		{
+			(*((int *)m_address)) = length;
+		}
+
+		// sets type code of the array elements
+		void setType(int type)
+		{
+			(*(((int *)m_address)+1)) = type;
+		}
+
 		// returns size of item size
 		int getItemSize() const
 		{
@@ -266,11 +284,17 @@ class Structure : public Argument
 	private:
 		static ostringstream os;
 		void *m_address;
+		StructureSignature *m_struct_sig;
 
 	public:
 		Structure(void *addr = NULL)
 		{
 			m_address = addr;
+		}
+
+		void setSignature(StructureSignature *sig)
+		{
+			m_struct_sig = sig;
 		}
 
 		// returns base address of the array
@@ -398,6 +422,8 @@ class Variable : public Argument
 		DataType *m_type;
 		void *m_address;
 		bool m_retval;
+		vector<Argument *> m_index;
+		Variable *m_base;
 
 	public:
 		Variable(const char *name, DataType *type = NULL, bool retval = false)	// retval specifies if it is return value of a function or not
@@ -406,17 +432,24 @@ class Variable : public Argument
 			m_type = type;
 			m_address = NULL;
 			m_retval = retval;
+			m_base = NULL;
+		}
+
+		DataType * getDataType()
+		{
+			return ((m_base == NULL) ? m_type : m_base->getDataType());
 		}
 
 		virtual int getType() const
 		{
-			return m_type->type;
+			return ((m_base == NULL) ? m_type->type : m_base->getType());
 		}
 
-		void * getAddress() const
-		{
-			return m_address;
-		}
+		DataType * getItemDataType() const;
+		int getItemType() const;
+		int getItemTypeSize() const;
+
+		void * getAddress() const;
 
 		void setAddress(void *addr)
 		{
@@ -428,25 +461,41 @@ class Variable : public Argument
 			return m_name;
 		}
 
+		void setValue(void *val_ptr)
+		{
+			switch(getItemType())
+			{
+				case DataType::ARRAY:      setValue(new Array(*((void **)val_ptr))); break;
+				case DataType::STRUCTURE:  setValue(new Structure(*((void **)val_ptr))); break;
+				case DataType::REFERENCE:  setValue(new Reference(*((void **)val_ptr))); break;
+				case DataType::STRING:     setValue(new String(*((char **)val_ptr))); break;
+				case DataType::INTEGER:    setValue(new Integer(*((int *)val_ptr))); break;
+				case DataType::DOUBLE:     setValue(new Double(*((double *)val_ptr))); break;
+				case DataType::BOOLEAN:    setValue(new Boolean(*((bool *)val_ptr))); break;
+				case DataType::FILE:       setValue(new File(*((FILE **)val_ptr))); break;
+				default: throw new std::exception("Argument::setValue: unsupported argument type!");
+			}
+		}
+
 		void setValue(Argument *val)
 		{
 			switch(val->getType())
 			{
-				case DataType::ARRAY:      (*((void **)m_address)) = ((Array *)val)->getAddress(); break;
-				case DataType::STRUCTURE:  (*((void **)m_address)) = ((Structure *)val)->getAddress(); break;
-				case DataType::REFERENCE:  (*((void **)m_address)) = ((Reference *)val)->getValue(); break;
-				case DataType::STRING:     (*((void **)m_address)) = (void *)((String *)val)->getValue(); break;
-				case DataType::INTEGER:    (*((int *)m_address)) = ((Integer *)val)->getValue(); break;
-				case DataType::DOUBLE:     (*((double *)m_address)) = ((Double *)val)->getValue(); break;
-				case DataType::BOOLEAN:    (*((bool *)m_address)) = ((Boolean *)val)->getValue(); break;
-				case DataType::FILE:       (*((FILE **)m_address)) = ((File *)val)->getValue(); break;
+				case DataType::ARRAY:      (*((void **)getAddress())) = ((Array *)val)->getAddress(); break;
+				case DataType::STRUCTURE:  (*((void **)getAddress())) = ((Structure *)val)->getAddress(); break;
+				case DataType::REFERENCE:  (*((void **)getAddress())) = ((Reference *)val)->getValue(); break;
+				case DataType::STRING:     (*((void **)getAddress())) = (void *)((String *)val)->getValue(); break;
+				case DataType::INTEGER:    (*((int *)getAddress())) = ((Integer *)val)->getValue(); break;
+				case DataType::DOUBLE:     (*((double *)getAddress())) = ((Double *)val)->getValue(); break;
+				case DataType::BOOLEAN:    (*((bool *)getAddress())) = ((Boolean *)val)->getValue(); break;
+				case DataType::FILE:       (*((FILE **)getAddress())) = ((File *)val)->getValue(); break;
 				default: throw new std::exception("Argument::setValue: unsupported argument type!");
 			}
 		}
 
 		void setValue(Variable *var)
 		{
-			switch(var->getType())
+			switch(var->getItemType())
 			{
 				case DataType::ARRAY:
 				case DataType::STRUCTURE:
@@ -466,7 +515,7 @@ class Variable : public Argument
 
 		Argument * getValue() const
 		{
-			switch(getType())
+			switch(getItemType())
 			{
 				case DataType::INTEGER: return new Integer(getAddress()); break;
 				case DataType::DOUBLE: return new Double(getAddress()); break;
@@ -475,21 +524,73 @@ class Variable : public Argument
 				case DataType::FILE: return new File((FILE *)(*((FILE **)(getAddress())))); break;
 				case DataType::STRING: return new String((char *)(*((char **)(getAddress())))); break;
 				case DataType::ARRAY: return new Array((void *)(*((void **)(getAddress())))); break;
-				//case DataType::STRUCTURE: return new Structure((void *)(*((void **)(getAddress())))); break;
+                case DataType::STRUCTURE: return new Structure((void *)(*((void **)(getAddress())))); break;
 				default: throw new std::exception("Variable::getValue: invalid type!");
 			}
 		}
 
-		static Variable * parse(istringstream &is)
+		static Variable * parse(istringstream &is, map<string, Variable *> *variables = NULL)
 		{
 			string name;
 			is >> name;
-			return new Variable(name.c_str());
+			Variable *var = new Variable(name.c_str()), *tmp;
+			char c;
+			while(!isalnum(is.peek()))
+			{	// f.e.: var0 [ @a var1 ] => var0 is struct, var0.a is array, var.a[var1] is variable that we lookin' for
+				c = is.get();
+				if(is.eof()) break;
+				if(isspace(c)) continue;
+				if(c == '[')
+				{
+					while(1)
+					{
+						is >> name;
+						if(name == "]") break;
+						if(name[0] == '@')
+						{	// struct element
+							name = name.substr(1);
+							char *strval = new char[name.length()+1];
+							var->m_index.push_back(new String(strcpy(strval, name.c_str())));
+						}
+						else
+						{	// array element
+							if(variables == NULL) throw new std::exception("Variable::parse: unknown index!");
+							tmp = new Variable(name.c_str(), new DataType(DataType::INTEGER));
+							tmp->m_base = variables->find(tmp->m_name)->second;
+							var->m_index.push_back(tmp);
+						}
+					}
+				}
+				else
+				{	// some other character, that is not part of variable token
+					is.putback(c);
+					break;
+				}
+			}
+			if(variables != NULL) var->m_base = variables->find(var->m_name)->second;
+			return var;
 		}
 
 		virtual string toString() const
 		{
-			return m_name;
+			string str = m_name;
+			if(m_index.size() > 0)
+			{
+				str += " [ ";
+				for(size_t i = 0, im = m_index.size(); i < im; i++)
+				{
+					if(m_index[i]->getType() == DataType::INTEGER)
+						str += ((Variable *)m_index[i])->getName() + ' ';
+					else
+					{
+						str += '@';
+						str += ((String *)m_index[i])->getValue();
+						str += ' ';
+					}
+				}
+				str += ']';
+			}
+			return str;
 		}
 };
 

@@ -11,7 +11,7 @@ public class NewInstr extends Instruction
     {
         super(Code.NEW);
         this.countVar = countVar;
-         this.dest = dest;
+        this.dest = dest;
     }
 
     @Override

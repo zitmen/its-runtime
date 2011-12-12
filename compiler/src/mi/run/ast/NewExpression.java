@@ -11,12 +11,15 @@ public class NewExpression extends Atom
     
     public NewExpression()
     {
-        this.count = null;
+        this.count = new IntegerAtom(1);
     }
     
     public NewExpression(Expression count)
     {
-        this.count = count;
+        if(count != null)
+            this.count = count;
+        else
+            this.count = new IntegerAtom(1);
     }
     
     @Override
@@ -44,16 +47,17 @@ public class NewExpression extends Atom
     public Instruction genByteCode()
     {
         Instruction stream, first;
-        if(count != null)
+        stream = count.genByteCode();
+        first = stream.first();
+        //
+        if(parent instanceof BinaryExpression)
         {
-            stream = count.genByteCode();
-            first = stream.first();
-            stream = stream.last().append(new NewInstr(resultVariable = Variables.addVar(functionName, "tmp", new DataType(DataType.NEW_EXPR)), count.resultVariable));
+            stream = stream.last().append(((BinaryExpression)parent).leftOperand.genByteCode());
+            stream = stream.last().append(new NewInstr(((BinaryExpression)parent).leftOperand.resultVariable, count.resultVariable));
         }
-        else
+        else    // Variable
         {
-            stream = new NewInstr(resultVariable = Variables.addVar(functionName, "tmp", new DataType(DataType.NEW_EXPR)), null);
-            first = stream.first();
+            stream = stream.last().append(new NewInstr(((Variable)parent).resultVariable, count.resultVariable));
         }
         //
         return first;
@@ -62,6 +66,16 @@ public class NewExpression extends Atom
     @Override
     public void semanticCheck() throws Exception
     {
+        if(parent instanceof BinaryExpression)
+        {
+            if(((BinaryExpression)parent).operator != Operator.ASN)
+                throw new Exception("SEMANTIC ERROR: NEW expression must always be right operator of a assign expression!");
+        }
+        else if(!(parent instanceof Variable))
+        {
+            throw new Exception("SEMANTIC ERROR: NEW expression must always be right operator of a assign expression!");
+        }
+        //
         functionName = Functions.actualFunction;
         //
         if(count != null)

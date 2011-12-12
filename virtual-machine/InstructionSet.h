@@ -28,7 +28,6 @@ class InstructionCode
 			RETV,	// RETurn Value
 			POP,	// POP from the stack
 			ST,		// STore
-			STA,	// STore Array - stores array's or structure's items by indices(Integer) or member names(String)
 			ADD,	// ADD
 			SUB,	// SUBtract
 			MUL,	// MULtiply
@@ -64,7 +63,7 @@ class InstructionCode
 		{
 			static string convertor[] =
 			{
-				"INVALID", "JZ", "JNZ", "JMP", "RET", "RETV", "POP", "ST", "STA", "ADD", "SUB", "MUL", "DIV", "MOD", "AND",
+				"INVALID", "JZ", "JNZ", "JMP", "RET", "RETV", "POP", "ST", "ADD", "SUB", "MUL", "DIV", "MOD", "AND",
 				"OR", "XOR", "LSH", "RSH", "INC", "DEC", "NOT", "NEG", "MINUS", "CALL", "INVOKE", "LDCI", "LDCB",
 				"LDCR", "LDCS", "LDCN", "NEW", "LT", "GT", "LTE", "GTE", "EQ", "NEQ"
 			};
@@ -83,7 +82,6 @@ class InstructionCode
 				convertor->insert(std::pair<string, int>("RETV", RETV));
 				convertor->insert(std::pair<string, int>("POP", POP));
 				convertor->insert(std::pair<string, int>("ST", ST));
-				convertor->insert(std::pair<string, int>("STA", STA));
 				convertor->insert(std::pair<string, int>("ADD", ADD));
 				convertor->insert(std::pair<string, int>("SUB", SUB));
 				convertor->insert(std::pair<string, int>("MUL", MUL));
@@ -151,31 +149,31 @@ class Instruction
 				// 2 arguments (variable and constant)
 				// -- integer
 				case InstructionCode::LDCI:
-					instr->args.push_back(variables[Variable::parse(is)->getName()]);
+					instr->args.push_back(Variable::parse(is, &variables));
 					instr->args.push_back(Integer::parse(is));
 					break;
 
 				// -- boolean
 				case InstructionCode::LDCB:
-					instr->args.push_back(variables[Variable::parse(is)->getName()]);
+					instr->args.push_back(Variable::parse(is, &variables));
 					instr->args.push_back(Boolean::parse(is));
 					break;
 
 				// -- double
 				case InstructionCode::LDCR:
-					instr->args.push_back(variables[Variable::parse(is)->getName()]);
+					instr->args.push_back(Variable::parse(is, &variables));
 					instr->args.push_back(Double::parse(is));
 					break;
 
 				// -- string
 				case InstructionCode::LDCS:
-					instr->args.push_back(variables[Variable::parse(is)->getName()]);
+					instr->args.push_back(Variable::parse(is, &variables));
 					instr->args.push_back(String::parse(is));
 					break;
 
 				// -- null
 				case InstructionCode::LDCN:
-					instr->args.push_back(variables[Variable::parse(is)->getName()]);
+					instr->args.push_back(Variable::parse(is, &variables));
 					instr->args.push_back(Reference::parse(is));
 					break;
 
@@ -188,13 +186,14 @@ class Instruction
 				case InstructionCode::INC:
 				case InstructionCode::DEC:
 				case InstructionCode::POP:
-					instr->args.push_back(variables[Variable::parse(is)->getName()]);
+					instr->args.push_back(Variable::parse(is, &variables));
 					break;
 
 				// 2 arguments (variables)
+				case InstructionCode::NEW:
 				case InstructionCode::ST:
-					instr->args.push_back(variables[Variable::parse(is)->getName()]);
-					instr->args.push_back(variables[Variable::parse(is)->getName()]);
+					instr->args.push_back(Variable::parse(is, &variables));
+					instr->args.push_back(Variable::parse(is, &variables));
 					break;
 
 				// 3 arguments (variables)
@@ -211,20 +210,18 @@ class Instruction
 				case InstructionCode::NOT:
 				case InstructionCode::NEG:
 				case InstructionCode::MINUS:
-				case InstructionCode::NEW:
 				case InstructionCode::LT:
 				case InstructionCode::GT:
 				case InstructionCode::LTE:
 				case InstructionCode::GTE:
 				case InstructionCode::EQ:
 				case InstructionCode::NEQ:
-					instr->args.push_back(variables[Variable::parse(is)->getName()]);
-					instr->args.push_back(variables[Variable::parse(is)->getName()]);
-					instr->args.push_back(variables[Variable::parse(is)->getName()]);
+					instr->args.push_back(Variable::parse(is, &variables));
+					instr->args.push_back(Variable::parse(is, &variables));
+					instr->args.push_back(Variable::parse(is, &variables));
 					break;
 
 				// Unknown count of arguments (all variables)
-				case InstructionCode::STA:
 				case InstructionCode::CALL:
 				case InstructionCode::INVOKE:
 				{
@@ -233,8 +230,7 @@ class Instruction
 					while(1)
 					{	// arguments
 						if(!is.good()) break;
-						arg = variables[Variable::parse(is)->getName()];
-						instr->args.push_back(arg);
+						instr->args.push_back(Variable::parse(is, &variables));
 					}
 					break;
 				}

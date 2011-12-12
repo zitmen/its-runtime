@@ -22,8 +22,8 @@ class Interpreter
 		MemoryManager *memory;
 		double options[4];
 		vector<Instruction *> *program;
-		map<string, StructureSignature *> *structures;
-		map<string, FunctionSignature *> *functions;
+		static map<string, StructureSignature *> *structures;
+		static map<string, FunctionSignature *> *functions;
 		int IP;	// Instruction Pointer -- points to an instruction after the currently processed one
 		bool ZF;	// Zero Flag -- was the result of the previous arithmetic/bit/logic instruction zero?
 
@@ -44,7 +44,6 @@ class Interpreter
 		void _retv(const Variable *var);
 		void _pop(Variable *dest);
 		void _st(Variable *dest, Variable *src);
-		void _sta();	// ???
 		void _add(Variable *dest, const Variable *op1, const Variable *op2);
 		void _sub(Variable *dest, const Variable *op1, const Variable *op2);
 		void _mul(Variable *dest, const Variable *op1, const Variable *op2);
@@ -74,6 +73,18 @@ class Interpreter
 		void _neq(Variable *dest, const Variable *op1, const Variable *op2);
 
 	public:
+		static map<string, StructureSignature *> * getStructureSignatures()
+		{
+			if(structures == NULL) throw new std::exception("Interpreter::getStrustureSignatures: can't call this yet! First initialize interpreter.");
+			return structures;
+		}
+
+		static map<string, FunctionSignature *> * getFunctionSignatures()
+		{
+			if(functions == NULL) throw new std::exception("Interpreter::getFunctionSignatures: can't call this yet! First initialize interpreter.");
+			return functions;
+		}
+
 		Interpreter(vector<Instruction *> *program, map<string, StructureSignature *> *structures, map<string, FunctionSignature *> *functions)
 		{
 			this->program = program;
@@ -112,7 +123,6 @@ class Interpreter
 				case InstructionCode::RETV: _retv((Variable *)instr->args[0]); break;
 				case InstructionCode::POP: _pop((Variable *)instr->args[0]); break;
 				case InstructionCode::ST: _st((Variable *)instr->args[0], (Variable *)instr->args[1]); break;
-				case InstructionCode::STA: _sta(); break;	// ??!!
 				case InstructionCode::ADD: _add((Variable *)instr->args[0], (Variable *)instr->args[1], (Variable *)instr->args[2]); break;
 				case InstructionCode::SUB: _sub((Variable *)instr->args[0], (Variable *)instr->args[1], (Variable *)instr->args[2]); break;
 				case InstructionCode::MUL: _mul((Variable *)instr->args[0], (Variable *)instr->args[1], (Variable *)instr->args[2]); break;

@@ -47,6 +47,9 @@ public class BinaryExpression extends Expression
     @Override
     public Instruction genByteCode()
     {
+        if(rightOperand instanceof NewExpression)
+            return rightOperand.genByteCode();
+        //
         Instruction stream = rightOperand.genByteCode();
         Instruction first = stream.first();
         stream = stream.last().append(leftOperand.genByteCode());

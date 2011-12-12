@@ -29,6 +29,9 @@ class MemoryManager
 			{
 				SB = SP = stack = new char[stack_size = stackSize];
 				HB = HP = heap  = new char[heap_size = heapSize];
+				//
+				memset(SB, 0, stack_size);
+				memset(HB, 0, heap_size);
 			}
 			catch(const std::bad_alloc &e)
 			{
