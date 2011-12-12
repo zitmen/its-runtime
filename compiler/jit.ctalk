@@ -77,9 +77,9 @@ Result computeSolution(int n, int M, Array<Stuff> stuff, Array<int> conf)
 	Result _retval;
 	for(int i = 0; i < n; i++)
 	{
-		Array<int> _conf = conf;//cloneArray(conf);
 		if(conf[i] == 0)
 		{
+			Array<int> _conf = cloneArray(conf);
 			_conf[i] = 1;
 			_retval = computeSolution(n, M, stuff, _conf);
 			if(_retval.cost > retval.cost)

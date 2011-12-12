@@ -64,7 +64,7 @@ class BuiltInRoutines
 		static Array * cloneArray(MemoryManager *mem, const Array *arr)
 		{
 			Array *new_arr = new Array(mem->alloc(arr->getAllocSize()));
-			memcpy(new_arr->getAddress(), arr->getAddress(), new_arr->getAllocSize());
+			memcpy(new_arr->getAddress(), arr->getAddress(), arr->getAllocSize());
 			return new_arr;
 		}
     

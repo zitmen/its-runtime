@@ -1,0 +1,24 @@
+FUNCTION <INTEGER> fact [ INTEGER var0 ] [ INTEGER var12 INTEGER var9 INTEGER var8 INTEGER var7 INTEGER var6 INTEGER var11 INTEGER var10 INTEGER var0 ] @ 10
+FUNCTION <VOID> main [ ] [ STRING var5 STRING var3 STRING var4 INTEGER var1 INTEGER var2 ] @ 0
+CODE
+000: LDCI var1 3
+001: CALL fact var1
+002: POP var2
+003: INVOKE int2str var2
+004: POP var3
+005: LDCS var4 "3!="
+006: INVOKE concat var4 var3
+007: POP var5
+008: INVOKE println var5
+009: RET
+010: LDCI var6 1
+011: LTE var7 var0 var6
+012: JZ 15
+013: LDCI var8 1
+014: RETV var8
+015: LDCI var9 1
+016: SUB var10 var0 var9
+017: CALL fact var10
+018: POP var11
+019: MUL var12 var0 var11
+020: RETV var12

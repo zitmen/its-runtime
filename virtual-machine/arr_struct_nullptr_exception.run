@@ -1,0 +1,47 @@
+STRUCTURE Rectangle [ INTEGER b INTEGER a ]
+FUNCTION <INTEGER> getArea [ STRUCTURE<Rectangle> var2 ] [ INTEGER var25 STRUCTURE<Rectangle> var2 ] @ 41
+FUNCTION <VOID> main [ ] [ INTEGER var5 INTEGER var6 INTEGER var3 INTEGER var4 INTEGER var1 ARRAY<STRUCTURE<Rectangle>> var0 STRING var24 STRING var15 STRING var23 STRING var14 STRING var13 INTEGER var12 STRING var19 STRING var18 INTEGER var9 STRING var17 INTEGER var8 STRING var16 INTEGER var7 STRING var20 STRING var11 INTEGER var10 STRING var22 STRING var21 ] @ 0
+CODE
+000: LDCI var3 10
+001: NEW var0 var3
+002: LDCI var4 0
+003: ST var1 var4
+004: LDCI var5 10
+005: LT var6 var1 var5
+006: JZ 40
+007: LDCI var7 1
+008: ADD var8 var1 var7
+009: ST var0 [ var1 @a ] var8
+010: LDCI var9 3
+011: ADD var10 var1 var9
+012: ST var0 [ var1 @b ] var10
+013: LDCS var11 "]"
+014: CALL getArea var0 [ var1 ]
+015: POP var12
+016: INVOKE int2str var12
+017: POP var13
+018: LDCS var14 ",S="
+019: INVOKE int2str var0 [ var1 @b ]
+020: POP var15
+021: LDCS var16 ",b="
+022: INVOKE int2str var0 [ var1 @a ]
+023: POP var17
+024: LDCS var18 "Rectangle [a="
+025: INVOKE concat var18 var17
+026: POP var19
+027: INVOKE concat var19 var16
+028: POP var20
+029: INVOKE concat var20 var15
+030: POP var21
+031: INVOKE concat var21 var14
+032: POP var22
+033: INVOKE concat var22 var13
+034: POP var23
+035: INVOKE concat var23 var11
+036: POP var24
+037: INVOKE println var24
+038: INC var1
+039: JMP 4
+040: RET
+041: MUL var25 var2 [ @a ] var2 [ @b ]
+042: RETV var25

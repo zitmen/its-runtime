@@ -218,9 +218,7 @@ void Interpreter::_jmp(const Integer *to)
 }
 
 void Interpreter::_pop(Variable *dest)
-{	// do not pop!
-	// -- f.e.: call sqrt x; pop tmp1; call sqrt y; pop tmp2; --> variable tmp1 would be overwritten
-	//dest->setValue(memory->peekAndGetTopValAddr(dest->getItemType()));
+{
 	dest->setValue(memory->popAndGetTopValAddr(dest->getItemType()));
 	//
 	++IP;
