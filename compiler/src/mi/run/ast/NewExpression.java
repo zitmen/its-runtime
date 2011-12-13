@@ -3,7 +3,6 @@ package mi.run.ast;
 import mi.run.bytecode.Instruction;
 import mi.run.bytecode.NewInstr;
 import mi.run.semantic.Functions;
-import mi.run.semantic.Variables;
 
 public class NewExpression extends Atom
 {
@@ -33,7 +32,7 @@ public class NewExpression extends Atom
     {
         if(count != null)
         {
-            count.optimize();
+            count = (Expression)count.optimize();
             //
             // check for a non-positive value
             if(count instanceof IntegerAtom)

@@ -5,6 +5,7 @@
 #include <cstring>
 
 #include "DataType.h"
+#include "GarbageCollector.h"
 
 class MemoryManager
 {
@@ -13,6 +14,35 @@ class MemoryManager
 		int heap_size;
 		void *stack;
 		void *heap;
+		double start_gc;
+
+	protected:
+		GarbageCollector *gc;
+
+		void cleanHeap(int alloc_bytes)
+		{
+			if(start_gc == 0.0)	return;	// GC is off
+			//
+			if(start_gc < (double(int(HP) - int(HB) + alloc_bytes) / double(heap_size)))	// is memory full?
+				gc->cleanUp(&heap, &HB, &HP, heap_size);
+		}
+
+		void addHeapRef(const Argument *arg, DataType *type, void **ref)
+		{
+			switch(arg->getType())
+			{
+				case DataType::ARRAY:
+				case DataType::STRING:
+				case DataType::STRUCTURE:
+				case DataType::REFERENCE:
+					if(type != NULL)	// references with type==NULL are only temporarory anyway (f.e.: retvals - it doesn't need to be in ref.list)
+						gc->addReference(ref, type);
+					break;
+
+				default:	// nothing to do
+					break;
+			}
+		}
 
 	public:
 		void *SFB;	// StackFrame Base - top of the stack before the last CALL
@@ -21,8 +51,9 @@ class MemoryManager
 		void *HB;	// Heap Base
 		void *HP;	// Heap Pointer - forst non-allocated place on the heap
 
-		MemoryManager(int stackSize, int heapSize)
+		MemoryManager(int stackSize, int heapSize, double startGC)
 		{
+			gc = NULL;
 			stack = heap = NULL;
 			SFB = SB = SP = HB = HP = NULL;
 			try
@@ -32,6 +63,9 @@ class MemoryManager
 				//
 				memset(SB, 0, stack_size);
 				memset(HB, 0, heap_size);
+				//
+				start_gc = startGC;
+				gc = new GarbageCollector;
 			}
 			catch(const std::bad_alloc &e)
 			{
@@ -44,6 +78,7 @@ class MemoryManager
 		{
 			if(stack != NULL) delete [] stack;
 			if(heap != NULL) delete [] heap;
+			if(gc != NULL) delete gc;
 		}
 
 		bool fitsToHeap(int bytes)
@@ -58,13 +93,17 @@ class MemoryManager
 
 		void * alloc(int bytes)
 		{
-			if(!fitsToHeap(bytes)) throw new std::exception("MemoryManager::alloc: allocated object couldn't fit into the memory - heap overflow!");
-			void *retval = HP;
-			HP = (((char *)HP) + bytes);
+			cleanHeap(bytes);	// start GC if necessary
+			//
+			// first 4B (int) of the block specifies how long it is
+			if(!fitsToHeap(bytes + sizeof(int))) throw new std::exception("MemoryManager::alloc: allocated object couldn't fit into the memory - heap overflow!");
+			(*((int *)HP)) = bytes + sizeof(int);
+			void *retval = (void *)(((char *)HP) + sizeof(int));
+			HP = (((char *)HP) + bytes + sizeof(int));
 			return retval;
 		}
 
-		void * push(const Argument *arg)
+		void * push(const Argument *arg, DataType *type = NULL)
 		{
 			int bytes = DataType::getTypeSize(arg->getType());
 			if(!fitsToStack(bytes)) throw new std::exception("MemoryManager::push: pushed variable couldn't fit into the memory - stack overflow!");
@@ -80,6 +119,7 @@ class MemoryManager
 				case DataType::FILE:      (*((FILE **)SP))  = ((File *)arg)->getValue(); break;
 				default: throw new std::exception("MemoryManager::push: unsupported argument type!");
 			}
+			addHeapRef(arg, type, (void **)SP);	// for GC
 			void *retval = SP;
 			SP = (((char *)SP) + bytes);
 			return retval;
@@ -87,10 +127,11 @@ class MemoryManager
 
 		void * push(const Variable *var)
 		{
-			if(var->getAddress() != NULL) return push(var->getValue());
+			if(var->getAddress() != NULL) return push(var->getValue(), var->getDataType());
 			//
 			int bytes = DataType::getTypeSize(var->getType());
 			if(!fitsToStack(bytes)) throw new std::exception("MemoryManager::push: pushed variable couldn't fit into the memory - stack overflow!");
+			addHeapRef(var, var->getDataType(), (void **)SP);	// for GC
 			void *retval = SP;
 			SP = (((char *)SP) + bytes);
 			return retval;
@@ -100,6 +141,7 @@ class MemoryManager
 		{
 			int bytes = DataType::getTypeSize(var->getType());
 			if(!fitsToStack(bytes)) throw new std::exception("MemoryManager::reserve: variable couldn't fit into the memory - stack overflow!");
+			addHeapRef(var, var->getDataType(), (void **)SP);	// for GC
 			void *retval = SP;
 			SP = (((char *)SP) + bytes);
 			return retval;

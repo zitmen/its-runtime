@@ -35,7 +35,7 @@ class Interpreter
 		{
 			IP = 0;
 			ZF = false;
-			memory = new MemoryManager(options[Options::StackSize], options[Options::HeapSize]);
+			memory = new MemoryManager(options[Options::StackSize], options[Options::HeapSize], options[Options::GarbageCollector]);
 		}
 
 		void _call(FunctionSignature *fn, const vector<Argument *> &args);

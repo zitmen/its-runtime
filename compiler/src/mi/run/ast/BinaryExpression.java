@@ -39,7 +39,9 @@ public class BinaryExpression extends Expression
            ((rightOperand instanceof StringAtom ) || (rightOperand instanceof RealAtom) ||
            (rightOperand instanceof IntegerAtom) || (rightOperand instanceof BooleanAtom) || (rightOperand instanceof NullAtom)))
         {
-            return TypeCast.builtInArithmetic(operator, (Atom)leftOperand, (Atom)rightOperand);  // replace this by pre-computed node
+            Atom atom = TypeCast.builtInArithmetic(operator, (Atom)leftOperand, (Atom)rightOperand);  // replace this by pre-computed node
+            atom.functionName = functionName;
+            return atom;
         }
         return this;
     }
