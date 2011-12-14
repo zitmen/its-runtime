@@ -1,20 +1,12 @@
 #include "JITCompiler.h"
 #include "Interpreter.h"
 
-void divByZeroEx()
-{
-	throw new std::exception("Runtime exception: Division by zero!");
-}
-
-void modByZeroEx()
-{
-	throw new std::exception("Runtime exception: Modulo by zero!");
-}
-
-void * heapAlloc(int size)
-{
-	return Interpreter::memory->alloc(size);
-}
+// Help
+// ------------------------------------------------------------
+// mov eax, 12345678h --> B8 78 56 34 12
+// mov ebx, 12345678h --> BB 78 56 34 12
+// mov ecx, 12345678h --> B9 78 56 34 12
+// mov edx, 12345678h --> BA 78 56 34 12
 
 /*
 		typedef int (*func)(int, int);
@@ -59,6 +51,36 @@ void * heapAlloc(int size)
 00471BF1 5D                   pop         ebp  
 00471BF2 C3                   ret  
 */
+
+void divByZeroEx()
+{
+	throw new std::exception("Runtime exception: Division by zero!");
+}
+
+void modByZeroEx()
+{
+	throw new std::exception("Runtime exception: Modulo by zero!");
+}
+
+void * heapAlloc(int size)
+{
+	return Interpreter::memory->alloc(size);
+}
+
+int JITCompiler::gen_prolog(char *code)
+{
+	// i don't need it, at least for now
+	return 0;
+}
+
+int JITCompiler::gen_epilog(char *code)
+{
+	// i don't need it, at least for now; just `ret`
+	const int code_len = 1;
+	const char *precompiled = "\xC3";	//ret
+	memcpy(code, precompiled, code_len);
+	return code_len;
+}
 
 void JITCompiler::gen_call(FunctionSignature *fn, const vector<Argument *> &args)
 {
@@ -366,11 +388,51 @@ void JITCompiler::gen_ldzf_double(Variable *dest)
 	gen_ldzf_int(dest);
 }
 
-void JITCompiler::gen_add(Variable *dest, const Variable *op1, const Variable *op2)
+int JITCompiler::gen_add(char *code, Variable *dest, const Variable *op1, const Variable *op2)
 {
 	void *x = op1->getAddress(), *y = op2->getAddress(), *z = dest->getAddress(), *zf = &ZF;
 	if(op1->getItemType() == DataType::INTEGER)
 	{
+		const int code_len = 23;
+		const char *precompiled = "\xB8????"	//mov eax, address(x)
+								  "\x8B\x00"	//mov eax, [eax]
+								  "\xBB????"	//mov ebx, address(y)
+								  "\x8B\x1B"	//mov ebx, [ebx]
+								  "\x03\xD8"	//add ebx, eax
+								  "\xB8????"	//mov eax, address(z)
+								  "\x89\x18";	//mov [eax], ebx
+		memcpy(code, precompiled, code_len);
+		(*((void **)(code+1))) = x;
+		(*((void **)(code+8))) = y;
+		(*((void **)(code+17))) = z;
+		return code_len;
+/*
+		"\x8B\x45\xD4"	//mov eax, x
+		"\x8B\x00"		//mov eax, [eax]
+		"\x8B\x5D\xC8"	//mov ebx, y
+		"\x8B\x1B"		//mov ebx, [ebx]
+		"\x03\xD8"		//add ebx, eax
+		"\x8B\x45\xBC"	//mov eax, z
+		"\x89\x18"		//mov [eax], ebx
+*/
+/*
+   378: 			; z = x + y
+   379: 			mov eax, x
+0043EE89 8B 45 D4             mov         eax,dword ptr [ebp-2Ch]  
+   380: 			mov eax, [eax]
+0043EE8C 8B 00                mov         eax,dword ptr [eax]  
+   381: 			mov ebx, y
+0043EE8E 8B 5D C8             mov         ebx,dword ptr [ebp-38h]  
+   382: 			mov ebx, [ebx]
+0043EE91 8B 1B                mov         ebx,dword ptr [ebx]  
+   383: 			add ebx, eax
+0043EE93 03 D8                add         ebx,eax  
+   384: 			mov eax, z
+0043EE95 8B 45 BC             mov         eax,dword ptr [ebp-44h]  
+   385: 			mov [eax], ebx
+0043EE98 89 18                mov         dword ptr [eax],ebx  
+*/
+/*
 		__asm
 		{
 			; z = x + y
@@ -382,9 +444,29 @@ void JITCompiler::gen_add(Variable *dest, const Variable *op1, const Variable *o
 			mov eax, z
 			mov [eax], ebx
 		}
+*/
 	}
 	else if(op1->getItemType() == DataType::DOUBLE)
 	{
+		return 0;
+/*
+   392: 			; z = x + y
+   393: 			mov eax, x
+0043EEAC 8B 45 D4             mov         eax,dword ptr [ebp-2Ch]  
+   394: 			fld qword ptr [eax]
+0043EEAF DD 00                fld         qword ptr [eax]  
+   395: 			mov eax, y
+0043EEB1 8B 45 C8             mov         eax,dword ptr [ebp-38h]  
+   396: 			fld qword ptr [eax]
+0043EEB4 DD 00                fld         qword ptr [eax]  
+   397: 			fadd
+0043EEB6 DE C1                faddp       st(1),st  
+   398: 			mov eax, z
+0043EEB8 8B 45 BC             mov         eax,dword ptr [ebp-44h]  
+   399: 			fstp qword ptr [eax]
+0043EEBB DD 18                fstp        qword ptr [eax]  
+*/
+/*
 		__asm
 		{
 			; z = x + y
@@ -396,6 +478,7 @@ void JITCompiler::gen_add(Variable *dest, const Variable *op1, const Variable *o
 			mov eax, z
 			fstp qword ptr [eax]
 		}
+*/
 	}
 	else
 		throw new std::exception("JITCompiler::gen_add: invalid data type!");

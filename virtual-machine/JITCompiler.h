@@ -31,6 +31,8 @@ class JITCompiler
 
 	//protected:
 	public:
+		int gen_prolog(char *code);
+		int gen_epilog(char *code);
 		void gen_call(FunctionSignature *fn, const vector<Argument *> &args);
 		void gen_invoke(Variable *name, const vector<Argument *> &args);
 		void gen_jz(const Integer *to);
@@ -42,7 +44,7 @@ class JITCompiler
 		void gen_st(Variable *dest, Variable *src);
 		void gen_ldzf_int(Variable *dest);
 		void gen_ldzf_double(Variable *dest);
-		void gen_add(Variable *dest, const Variable *op1, const Variable *op2);
+		int gen_add(char *code, Variable *dest, const Variable *op1, const Variable *op2);
 		void gen_sub(Variable *dest, const Variable *op1, const Variable *op2);
 		void gen_mul(Variable *dest, const Variable *op1, const Variable *op2);
 		void gen_div(Variable *dest, const Variable *op1, const Variable *op2);

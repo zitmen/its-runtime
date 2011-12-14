@@ -4,15 +4,8 @@
 
 #include "ProgramLoader.h"
 #include "Interpreter.h"
-
-double dbl()
-{
-	double x = 5.0, y = 3.0, z;
-	z = x / y;
-	printf("z=%f\n", z);
-	return z;
-}
 #include "JITCompiler.h"
+
 int main()
 {
 	try
@@ -22,9 +15,10 @@ int main()
 		Variable x1("x", new DataType(DataType::INTEGER)); x1.setAddress(&ix);
 		Variable y1("y", new DataType(DataType::INTEGER)); y1.setAddress(&iy);
 		Variable z1("z", new DataType(DataType::INTEGER)); z1.setAddress(&iz);
-		jit.gen_st(&z1, &x1);
-		printf("iz=%d\n", iz);
+		//jit.gen_st(&z1, &x1);
+		//printf("iz=%d\n", iz);
 		//
+/*
 		double dx = 4.0, dy = 3.0, dz;
 		Variable x2("x", new DataType(DataType::DOUBLE)); x2.setAddress(&dx);
 		Variable y2("y", new DataType(DataType::DOUBLE)); y2.setAddress(&dy);
@@ -38,7 +32,21 @@ int main()
 		Variable z3("z", new DataType(DataType::BOOLEAN)); z3.setAddress(&bz);
 		jit.gen_st(&z3, &x3);
 		printf("bz=%d\n", bz);
+*/
 		//
+		//jit.gen_st(&z1, &x1);
+		typedef void (*compiled_program)(void);
+		char *compiled = new char[4096];	// 4kB
+		int length = 0;
+		length += jit.gen_prolog(compiled+length);
+		length += jit.gen_add(compiled+length, &z1, &x1, &y1);
+		length += jit.gen_epilog(compiled+length);
+		//
+		compiled_program exec = (compiled_program)compiled;
+		exec();
+		printf("iz=%d\n", iz);
+		//
+		delete [] compiled;
 		//
 /*
 		Interpreter interpreter(NULL, NULL, NULL);
