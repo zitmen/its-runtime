@@ -1,5 +1,7 @@
 #include "Interpreter.h"
 
+MemoryManager * Interpreter::memory = NULL;
+
 void Interpreter::_call(FunctionSignature *fn, const vector<Argument *> &args)
 {
 	// 0. push signature to call stack

@@ -1,4 +1,5 @@
 #include "JITCompiler.h"
+#include "Interpreter.h"
 
 void divByZeroEx()
 {
@@ -8,6 +9,11 @@ void divByZeroEx()
 void modByZeroEx()
 {
 	throw new std::exception("Runtime exception: Modulo by zero!");
+}
+
+void * heapAlloc(int size)
+{
+	return Interpreter::memory->alloc(size);
 }
 
 /*
@@ -294,10 +300,40 @@ void JITCompiler::gen_pop(Variable *dest)
 
 void JITCompiler::gen_st(Variable *dest, Variable *src)
 {
-	// TODO
-	dest->setValue(src);
-	//
-	++IP;
+	void *x = dest->getAddress(), *y = src->getAddress();
+	if(src->getItemType() == DataType::DOUBLE)	// 8B, FPU
+	{
+		__asm
+		{
+			; x = y
+			mov eax, y
+			fld qword ptr [eax]
+			mov ebx, x
+			fstp qword ptr [ebx]
+		}
+	}
+	else if(src->getItemType() == DataType::BOOLEAN)	// 1B, ALU
+	{
+		__asm
+		{
+			; x = y
+			mov eax, y
+			mov al, byte ptr [eax]
+			mov ebx, x
+			mov byte ptr [ebx], al
+		}
+	}
+	else	// INTEGER, REFERENCE, ARRAY, STRUCTURE, STRING -- 4B, ALU
+	{
+		__asm
+		{
+			; x = y
+			mov eax, y
+			mov eax, [eax]
+			mov ebx, x
+			mov [ebx], eax
+		}
+	}
 }
 
 void JITCompiler::gen_ldzf_int(Variable *dest)
@@ -797,17 +833,33 @@ void JITCompiler::gen_ldcr(Variable *var, Double *constant)
 
 void JITCompiler::gen_ldcs(Variable *var, String *constant)
 {
-	// TODO
-	// -- asi bude nejlepsi press call eax zavolat metodu, ktera dostane parametrem pocet bajtu a vrati ukazatel na zacatek bloku
-	//
-	//
-	// string is now allocated on system heap, because it was parse before the interpreter was running
-	// --> it must be reallocated into MemoryManager's heap
-	int len = strlen(constant->getValue());
-	char *str = (char *)memory->alloc(sizeof(char) * (len + 1));
-	strcpy(str, constant->getValue());
-	constant->setValue(str);
-	var->setValue(constant);
+	void *p_strlen = strlen, *p_heapAlloc = heapAlloc, *p_strcpy = strcpy;
+	void *x = var->getAddress();
+	char *s = constant->getValue();
+	__asm
+	{
+		; ptr = heapAlloc(strlen(s))
+		; strcpy(ptr, s);
+		; x = ptr;
+		mov eax, s
+		push eax
+		mov eax, p_strlen
+		call eax
+		add esp, 4	; pop function argument
+		add eax, 2
+		push eax
+		mov eax, p_heapAlloc
+		call eax
+		add esp, 4	; pop function argument
+		mov ebx, s
+		push ebx	; constant string value
+		push eax	; allocated space ptr
+		mov eax, p_strcpy
+		call eax
+		add esp, 8	; pop function arguments (2*4B)
+		mov ebx, x
+		mov [ebx], eax	; string copied into the newly allocated memory block
+	}
 }
 
 void JITCompiler::gen_ldcn(Variable *var, Reference *constant)
@@ -816,101 +868,357 @@ void JITCompiler::gen_ldcn(Variable *var, Reference *constant)
 }
 
 void JITCompiler::gen_new(Variable *var, const Variable *size)
-{
-	// TODO
+{	// TODO: not tested yet!
+	int item_size = var->getItemTypeSize();
+	void *p_heapAlloc = heapAlloc;
+	void *x = var->getAddress();
+	//
 	if(var->getItemType() == DataType::ARRAY)
 	{
-		int length = ((Integer *)size->getValue())->getValue();
-		var->setValue(new Reference(memory->alloc((2 * sizeof(int)) + (var->getItemTypeSize() * length))));
-		// set length and item type
-		Array *arr = (Array *)(var->getValue());
-		arr->setLength(length);
-		arr->setType(var->getItemDataType()->subtype->type);
+		void *len = size->getAddress();
+		int item_type = var->getItemDataType()->subtype->type;
+		__asm
+		{
+			; x = heapAlloc(item_size * length + 8)
+			mov eax, item_size
+			mov ecx, len
+			mov ecx, [ecx]
+			mul ecx
+			add eax, 8
+			push eax
+			mov eax, p_heapAlloc
+			call eax
+			mov ebx, x
+			mov [ebx], eax
+			; x->length = len
+			; x->item_type = item_type
+			mov [eax], ecx
+			mov ebx, item_type
+			mov [eax + 4], ebx
+		}
 	}
 	else	// structure
 	{
-		var->setValue(new Reference(memory->alloc(var->getItemTypeSize())));
+		int item_size = var->getItemTypeSize();
+		void *p_heapAlloc = heapAlloc;
+		void *x = var->getAddress();
+		__asm
+		{
+			; ptr = heapAlloc(sizeof(x))
+			; x = ptr
+			mov eax, item_size
+			push eax
+			mov eax, p_heapAlloc
+			call eax
+			add esi, 4	; pop function argument
+			mov ebx, x
+			mov [ebx], eax	; save ptr into x
+		}
 	}
 }
 
 void JITCompiler::gen_lt(Variable *dest, const Variable *op1, const Variable *op2)
 {
-	// TODO
+	void *x = op1->getAddress(), *y = op2->getAddress(), *z = dest->getAddress(), *zf = &ZF;
 	if(op1->getItemType() == DataType::INTEGER)
-		dest->setValue(new Boolean(((Integer *)(op1->getValue()))->getValue() < ((Integer *)(op2->getValue()))->getValue()));
+	{
+		__asm
+		{
+			; z = x < y
+			mov ebx, y
+			mov ebx, [ebx]
+			mov eax, x
+			mov eax, [eax]
+			cmp eax, ebx
+			jl _lt
+			mov al, 0
+			jmp _cont
+_lt:		mov al, 1
+_cont:		mov ebx, z
+			mov byte ptr [ebx], al
+		}
+	}
 	else if(op1->getItemType() == DataType::DOUBLE)
-		dest->setValue(new Boolean(((Double *)(op1->getValue()))->getValue() < ((Double *)(op2->getValue()))->getValue()));
+	{
+		__asm
+		{
+			; z = x < y
+			mov eax, y
+			fld qword ptr [eax]
+			mov eax, x
+			fld qword ptr [eax]
+			fcompp
+			fnstsw ax	; copy flags to AX
+			and ax, 256	; gen C0 flag (8th bit; C0 = compare less than - carry flag)
+			jnz _less
+			mov al, 0
+			jmp _continue
+_less:		mov al, 1
+_continue:	mov ebx, z
+			mov byte ptr [ebx], al
+		}
+	}
 	else
 		throw new std::exception("JITCompiler::gen_lt: invalid data type!");
-	//
-	ZF = (((Boolean *)(dest->getValue()))->getValue() == false);
 }
 
 void JITCompiler::gen_gt(Variable *dest, const Variable *op1, const Variable *op2)
 {
-	// TODO
+	void *x = op1->getAddress(), *y = op2->getAddress(), *z = dest->getAddress(), *zf = &ZF;
 	if(op1->getItemType() == DataType::INTEGER)
-		dest->setValue(new Boolean(((Integer *)(op1->getValue()))->getValue() > ((Integer *)(op2->getValue()))->getValue()));
+	{
+		__asm
+		{
+			; z = x > y
+			mov ebx, y
+			mov ebx, [ebx]
+			mov eax, x
+			mov eax, [eax]
+			cmp eax, ebx
+			jg _gt
+			mov al, 0
+			jmp _cont
+_gt:		mov al, 1
+_cont:		mov ebx, z
+			mov byte ptr [ebx], al
+		}
+	}
 	else if(op1->getItemType() == DataType::DOUBLE)
-		dest->setValue(new Boolean(((Double *)(op1->getValue()))->getValue() > ((Double *)(op2->getValue()))->getValue()));
+	{
+		__asm
+		{
+			; z = x > y
+			mov eax, y
+			fld qword ptr [eax]
+			mov eax, x
+			fld qword ptr [eax]
+			fcompp
+			fnstsw ax	; copy flags to AX
+			and ax, 0x4100	; gen C0 and C3 flags (8th bit - C0 = compare less than - carry flag; 14th bit - C3 = compare equal - zero flag)
+			jz _greater
+			mov al, 0
+			jmp _continue
+_greater:	mov al, 1
+_continue:	mov ebx, z
+			mov byte ptr [ebx], al
+		}
+	}
 	else
 		throw new std::exception("JITCompiler::gen_gt: invalid data type!");
-	//
-	ZF = (((Boolean *)(dest->getValue()))->getValue() == false);
 }
 
 void JITCompiler::gen_lte(Variable *dest, const Variable *op1, const Variable *op2)
 {
-	// TODO
+	void *x = op1->getAddress(), *y = op2->getAddress(), *z = dest->getAddress(), *zf = &ZF;
 	if(op1->getItemType() == DataType::INTEGER)
-		dest->setValue(new Boolean(((Integer *)(op1->getValue()))->getValue() <= ((Integer *)(op2->getValue()))->getValue()));
+	{
+		__asm
+		{
+			; z = x <= y
+			mov ebx, y
+			mov ebx, [ebx]
+			mov eax, x
+			mov eax, [eax]
+			cmp eax, ebx
+			jle _lte
+			mov al, 0
+			jmp _cont
+_lte:		mov al, 1
+_cont:		mov ebx, z
+			mov byte ptr [ebx], al
+		}
+	}
 	else if(op1->getItemType() == DataType::DOUBLE)
-		dest->setValue(new Boolean(((Double *)(op1->getValue()))->getValue() <= ((Double *)(op2->getValue()))->getValue()));
+	{
+		__asm
+		{
+			; z = x <= y
+			mov eax, y
+			fld qword ptr [eax]
+			mov eax, x
+			fld qword ptr [eax]
+			fcompp
+			fnstsw ax	; copy flags to AX
+			and ax, 0x4100	; gen C0 and C3 flags (8th bit - C0 = compare less than - carry flag; 14th bit - C3 = compare equal - zero flag)
+			jnz _less_eq
+			mov al, 0
+			jmp _continue
+_less_eq:	mov al, 1
+_continue:	mov ebx, z
+			mov byte ptr [ebx], al
+		}
+	}
 	else
 		throw new std::exception("JITCompiler::gen_lte: invalid data type!");
-	//
-	ZF = (((Boolean *)(dest->getValue()))->getValue() == false);
 }
 
 void JITCompiler::gen_gte(Variable *dest, const Variable *op1, const Variable *op2)
 {
-	// TODO
+	void *x = op1->getAddress(), *y = op2->getAddress(), *z = dest->getAddress(), *zf = &ZF;
 	if(op1->getItemType() == DataType::INTEGER)
-		dest->setValue(new Boolean(((Integer *)(op1->getValue()))->getValue() >= ((Integer *)(op2->getValue()))->getValue()));
+	{
+		__asm
+		{
+			; z = x >= y
+			mov ebx, y
+			mov ebx, [ebx]
+			mov eax, x
+			mov eax, [eax]
+			cmp eax, ebx
+			jge _gte
+			mov al, 0
+			jmp _cont
+_gte:		mov al, 1
+_cont:		mov ebx, z
+			mov byte ptr [ebx], al
+		}
+	}
 	else if(op1->getItemType() == DataType::DOUBLE)
-		dest->setValue(new Boolean(((Double *)(op1->getValue()))->getValue() >= ((Double *)(op2->getValue()))->getValue()));
+	{
+		__asm
+		{
+			; z = x >= y
+			mov eax, y
+			fld qword ptr [eax]
+			mov eax, x
+			fld qword ptr [eax]
+			fcompp
+			fnstsw ax	; copy flags to AX
+			and ax, 256	; gen C0 and C3 flags (8th bit - C0 = compare less than - carry flag)
+			jz _great_eq
+			mov al, 0
+			jmp _continue
+_great_eq:	mov al, 1
+_continue:	mov ebx, z
+			mov byte ptr [ebx], al
+		}
+	}
 	else
 		throw new std::exception("JITCompiler::gen_gte: invalid data type!");
-	//
-	ZF = (((Boolean *)(dest->getValue()))->getValue() == false);
 }
 
 void JITCompiler::gen_eq(Variable *dest, const Variable *op1, const Variable *op2)
 {
-	// TODO
-	if(op1->getItemType() == DataType::INTEGER)
-		dest->setValue(new Boolean(((Integer *)(op1->getValue()))->getValue() == ((Integer *)(op2->getValue()))->getValue()));
+	void *x = op1->getAddress(), *y = op2->getAddress(), *z = dest->getAddress(), *zf = &ZF;
+	if(op1->getItemType() == DataType::BOOLEAN)
+	{
+		__asm
+		{
+			; z = x == y
+			mov ebx, y
+			mov bl, byte ptr [ebx]
+			mov eax, x
+			mov al, byte ptr [eax]
+			cmp al, bl
+			je _eq_b
+			mov al, 0
+			jmp _cont_b
+_eq_b:		mov al, 1
+_cont_b:	mov ebx, z
+			mov byte ptr [ebx], al
+		}
+	}
+	else if(op1->getItemType() == DataType::INTEGER)
+	{
+		__asm
+		{
+			; z = x == y
+			mov ebx, y
+			mov ebx, [ebx]
+			mov eax, x
+			mov eax, [eax]
+			cmp eax, ebx
+			je _eq_i
+			mov al, 0
+			jmp _cont_i
+_eq_i:		mov al, 1
+_cont_i:	mov ebx, z
+			mov byte ptr [ebx], al
+		}
+	}
 	else if(op1->getItemType() == DataType::DOUBLE)
-		dest->setValue(new Boolean(((Double *)(op1->getValue()))->getValue() == ((Double *)(op2->getValue()))->getValue()));
-	else if(op1->getItemType() == DataType::BOOLEAN)
-		dest->setValue(new Boolean(((Boolean *)(op1->getValue()))->getValue() == ((Boolean *)(op2->getValue()))->getValue()));
+	{
+		__asm
+		{
+			; z = x == y
+			mov eax, y
+			fld qword ptr [eax]
+			mov eax, x
+			fld qword ptr [eax]
+			fcompp
+			fnstsw ax	; copy flags to AX
+			and ax, 0x4000	; gen C3 flag (14th bit - C3 = compare equal - zero flag)
+			jnz _eq_d
+			mov al, 0
+			jmp _cont_d
+_eq_d:		mov al, 1
+_cont_d:	mov ebx, z
+			mov byte ptr [ebx], al
+		}
+	}
 	else
 		throw new std::exception("JITCompiler::gen_eq: invalid data type!");
-	//
-	ZF = (((Boolean *)(dest->getValue()))->getValue() == false);
 }
 
 void JITCompiler::gen_neq(Variable *dest, const Variable *op1, const Variable *op2)
 {
-	// TODO
-	if(op1->getItemType() == DataType::INTEGER)
-		dest->setValue(new Boolean(((Integer *)(op1->getValue()))->getValue() != ((Integer *)(op2->getValue()))->getValue()));
+	void *x = op1->getAddress(), *y = op2->getAddress(), *z = dest->getAddress(), *zf = &ZF;
+	if(op1->getItemType() == DataType::BOOLEAN)
+	{
+		__asm
+		{
+			; z = x != y
+			mov ebx, y
+			mov bl, byte ptr [ebx]
+			mov eax, x
+			mov al, byte ptr [eax]
+			cmp al, bl
+			jne _neq_b
+			mov al, 0
+			jmp _cont_b
+_neq_b:		mov al, 1
+_cont_b:	mov ebx, z
+			mov byte ptr [ebx], al
+		}
+	}
+	else if(op1->getItemType() == DataType::INTEGER)
+	{
+		__asm
+		{
+			; z = x != y
+			mov ebx, y
+			mov ebx, [ebx]
+			mov eax, x
+			mov eax, [eax]
+			cmp eax, ebx
+			jne _neq_i
+			mov al, 0
+			jmp _cont_i
+_neq_i:		mov al, 1
+_cont_i:	mov ebx, z
+			mov byte ptr [ebx], al
+		}
+	}
 	else if(op1->getItemType() == DataType::DOUBLE)
-		dest->setValue(new Boolean(((Double *)(op1->getValue()))->getValue() != ((Double *)(op2->getValue()))->getValue()));
-	else if(op1->getItemType() == DataType::BOOLEAN)
-		dest->setValue(new Boolean(((Boolean *)(op1->getValue()))->getValue() != ((Boolean *)(op2->getValue()))->getValue()));
+	{
+		__asm
+		{
+			; z = x != y
+			mov eax, y
+			fld qword ptr [eax]
+			mov eax, x
+			fld qword ptr [eax]
+			fcompp
+			fnstsw ax	; copy flags to AX
+			and ax, 0x4000	; gen C3 flag (14th bit - C3 = compare equal - zero flag)
+			jz _neq_d
+			mov al, 0
+			jmp _cont_d
+_neq_d:		mov al, 1
+_cont_d:	mov ebx, z
+			mov byte ptr [ebx], al
+		}
+	}
 	else
 		throw new std::exception("JITCompiler::gen_neq: invalid data type!");
-	//
-	ZF = (((Boolean *)(dest->getValue()))->getValue() == false);
 }

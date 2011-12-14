@@ -22,7 +22,6 @@ class Interpreter
 
 	private:
 		stack<FunctionSignature *> call_stack;
-		MemoryManager *memory;
 		double options[4];
 		vector<Instruction *> *program;
 		static map<string, StructureSignature *> *structures;
@@ -31,13 +30,6 @@ class Interpreter
 		bool ZF;	// Zero Flag -- was the result of the previous arithmetic/bit/logic instruction zero?
 
 	protected:
-		void init()
-		{
-			IP = 0;
-			ZF = false;
-			memory = new MemoryManager(options[Options::StackSize], options[Options::HeapSize], options[Options::GarbageCollector]);
-		}
-
 		void _call(FunctionSignature *fn, const vector<Argument *> &args);
 		void _invoke(Variable *name, const vector<Argument *> &args);
 		void _jz(const Integer *to);
@@ -76,6 +68,8 @@ class Interpreter
 		void _neq(Variable *dest, const Variable *op1, const Variable *op2);
 
 	public:
+		static MemoryManager *memory;
+
 		static map<string, StructureSignature *> * getStructureSignatures()
 		{
 			if(structures == NULL) throw new std::exception("Interpreter::getStrustureSignatures: can't call this yet! First initialize interpreter.");
@@ -103,6 +97,13 @@ class Interpreter
 		void setOption(int option, double val)
 		{
 			options[option] = val;
+		}
+
+		void init()
+		{
+			IP = 0;
+			ZF = false;
+			memory = new MemoryManager(options[Options::StackSize], options[Options::HeapSize], options[Options::GarbageCollector]);
 		}
 
 		void run()

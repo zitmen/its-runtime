@@ -18,26 +18,37 @@ int main()
 	try
 	{
 		JITCompiler jit;
-		int ix = 5, iy = 3, iz;
+		int ix = 4, iy = 3, iz;
 		Variable x1("x", new DataType(DataType::INTEGER)); x1.setAddress(&ix);
 		Variable y1("y", new DataType(DataType::INTEGER)); y1.setAddress(&iy);
 		Variable z1("z", new DataType(DataType::INTEGER)); z1.setAddress(&iz);
-		jit.gen_ldci(&z1, new Integer(15));
+		jit.gen_st(&z1, &x1);
 		printf("iz=%d\n", iz);
 		//
-		double dx = 5.0, dy = 2.0, dz;
+		double dx = 4.0, dy = 3.0, dz;
 		Variable x2("x", new DataType(DataType::DOUBLE)); x2.setAddress(&dx);
 		Variable y2("y", new DataType(DataType::DOUBLE)); y2.setAddress(&dy);
 		Variable z2("z", new DataType(DataType::DOUBLE)); z2.setAddress(&dz);
-		jit.gen_ldcr(&z2, new Double(3.1415));
+		jit.gen_st(&z2, &x2);
 		printf("dz=%f\n", dz);
 		//
-		bool bx = false, by = true, bz;
+		bool bx = true, by, bz;
 		Variable x3("x", new DataType(DataType::BOOLEAN)); x3.setAddress(&bx);
 		Variable y3("y", new DataType(DataType::BOOLEAN)); y3.setAddress(&by);
 		Variable z3("z", new DataType(DataType::BOOLEAN)); z3.setAddress(&bz);
-		jit.gen_ldcb(&z3, new Boolean(false));
+		jit.gen_st(&z3, &x3);
 		printf("bz=%d\n", bz);
+		//
+		//
+/*
+		Interpreter interpreter(NULL, NULL, NULL);
+		interpreter.init();
+		//
+		char *str;
+		Variable z4("z", new DataType(DataType::STRING)); z4.setAddress(&str);
+		jit.gen_ldcs(&z4, new String("Ahoj, tady Pepa!"));
+		printf("str=%s\n", str);
+*/
 	}
 	catch(std::exception *e)
 	{
