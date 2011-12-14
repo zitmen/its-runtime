@@ -18,33 +18,32 @@ int main()
 		//jit.gen_st(&z1, &x1);
 		//printf("iz=%d\n", iz);
 		//
-/*
-		double dx = 4.0, dy = 3.0, dz;
+		double dx = 4.0, dy = 5.0, dz;
 		Variable x2("x", new DataType(DataType::DOUBLE)); x2.setAddress(&dx);
 		Variable y2("y", new DataType(DataType::DOUBLE)); y2.setAddress(&dy);
 		Variable z2("z", new DataType(DataType::DOUBLE)); z2.setAddress(&dz);
-		jit.gen_st(&z2, &x2);
-		printf("dz=%f\n", dz);
+		//jit.gen_st(&z2, &x2);
+		//printf("dz=%f\n", dz);
 		//
 		bool bx = true, by, bz;
 		Variable x3("x", new DataType(DataType::BOOLEAN)); x3.setAddress(&bx);
 		Variable y3("y", new DataType(DataType::BOOLEAN)); y3.setAddress(&by);
 		Variable z3("z", new DataType(DataType::BOOLEAN)); z3.setAddress(&bz);
-		jit.gen_st(&z3, &x3);
-		printf("bz=%d\n", bz);
-*/
+		//jit.gen_st(&z3, &x3);
+		//printf("bz=%d\n", bz);
 		//
 		//jit.gen_st(&z1, &x1);
 		typedef void (*compiled_program)(void);
 		char *compiled = new char[4096];	// 4kB
 		int length = 0;
 		length += jit.gen_prolog(compiled+length);
-		length += jit.gen_add(compiled+length, &z1, &x1, &y1);
+		length += jit.gen_sub(compiled+length, &z1, &x1, &y1);
 		length += jit.gen_epilog(compiled+length);
 		//
 		compiled_program exec = (compiled_program)compiled;
 		exec();
 		printf("iz=%d\n", iz);
+		//printf("dz=%f\n", dz);
 		//
 		delete [] compiled;
 		//

@@ -82,7 +82,7 @@ int JITCompiler::gen_epilog(char *code)
 	return code_len;
 }
 
-void JITCompiler::gen_call(FunctionSignature *fn, const vector<Argument *> &args)
+int JITCompiler::gen_call(char *code, FunctionSignature *fn, const vector<Argument *> &args)
 {
 	// TODO
 	//
@@ -106,9 +106,11 @@ void JITCompiler::gen_call(FunctionSignature *fn, const vector<Argument *> &args
 	// 7. set values of arguments on the stack
 	for(size_t i = 0, im = values.size(); i < im; i++)
         fn->variables[fn->arguments_ordering[i]]->setValue(values[i]);
+	//
+	return 0;
 }
 
-void JITCompiler::gen_ret()
+int JITCompiler::gen_ret(char *code)
 {
 	// TODO
 	//
@@ -129,17 +131,21 @@ void JITCompiler::gen_ret()
 		offset += DataType::getTypeSize(it->second->getType());
 		it->second->setAddress((void *)((char *)(memory->SP) - offset));
 	} while(it != fn->variables.begin());
+	//
+	return 0;
 }
 
-void JITCompiler::gen_retv(const Variable *var)
+int JITCompiler::gen_retv(char *code, const Variable *var)
 {
 	// TODO
 	Argument *retval = var->getValue();
-	gen_ret();
+	gen_ret(code);
 	memory->push(retval);
+	//
+	return 0;
 }
 
-void JITCompiler::gen_invoke(Variable *name, const vector<Argument *> &args)
+int JITCompiler::gen_invoke(char *code, Variable *name, const vector<Argument *> &args)
 {
 	// TODO
 	if(name->getName() == "cloneArray")
@@ -285,42 +291,48 @@ void JITCompiler::gen_invoke(Variable *name, const vector<Argument *> &args)
 	else
 		throw new std::exception(("JITCompiler::gen_invoke: routine '" + name->getName() + "' was not found!").c_str());
 	//
-	++IP;
+	return 0;
 }
 
 // Hint: asi podobne, jako pri generovani bytecodu
 //	-- ukladat si adresy v retezu instrukci, kde ktera zacina a pak jen projit,
 //     najit jumpy a nahradit adresy
 //  -- to ma cenu resit az budu mit opravdovy generovani
-void JITCompiler::gen_jz(const Integer *to)
+int JITCompiler::gen_jz(char *code, const Integer *to)
 {
 	// TODO - jak prepocitat ten offset?? (const Integer to*)
 	if(ZF) IP = to->getValue();
 	else ++IP;
+	//
+	return 0;
 }
 
-void JITCompiler::gen_jnz(const Integer *to)
+int JITCompiler::gen_jnz(char *code, const Integer *to)
 {
 	// TODO - jak prepocitat ten offset?? (const Integer to*)
 	if(!ZF) IP = to->getValue();
 	else ++IP;
+	//
+	return 0;
 }
 
-void JITCompiler::gen_jmp(const Integer *to)
+int JITCompiler::gen_jmp(char *code, const Integer *to)
 {
 	// TODO - jak prepocitat ten offset?? (const Integer to*)
 	IP = to->getValue();
+	//
+	return 0;
 }
 
-void JITCompiler::gen_pop(Variable *dest)
+int JITCompiler::gen_pop(char *code, Variable *dest)
 {
 	// TODO
 	dest->setValue(memory->popAndGetTopValAddr(dest->getItemType()));
 	//
-	++IP;
+	return 0;
 }
 
-void JITCompiler::gen_st(Variable *dest, Variable *src)
+int JITCompiler::gen_st(char *code, Variable *dest, Variable *src)
 {
 	void *x = dest->getAddress(), *y = src->getAddress();
 	if(src->getItemType() == DataType::DOUBLE)	// 8B, FPU
@@ -356,9 +368,11 @@ void JITCompiler::gen_st(Variable *dest, Variable *src)
 			mov [ebx], eax
 		}
 	}
+	//
+	return 0;
 }
 
-void JITCompiler::gen_ldzf_int(Variable *dest)
+int JITCompiler::gen_ldzf_int(char *code, Variable *dest)
 {
 	void *zf = dest->getAddress();
 	__asm
@@ -372,10 +386,13 @@ void JITCompiler::gen_ldzf_int(Variable *dest)
 		mov eax, zf
 		mov [eax], ebx
 	}
+	//
+	return 0;
 }
 
-void JITCompiler::gen_ldzf_double(Variable *dest)
+int JITCompiler::gen_ldzf_double(char *code, Variable *dest)
 {
+	const int code_length = 0;
 	void *zf = dest->getAddress();
 	__asm
 	{
@@ -385,141 +402,86 @@ void JITCompiler::gen_ldzf_double(Variable *dest)
 		sahf            ; copy the condition bits in the CPU's flag register
 	}
 	//	then use the ZF detection for integers
-	gen_ldzf_int(dest);
+	return gen_ldzf_int(code+code_length, dest);
 }
 
 int JITCompiler::gen_add(char *code, Variable *dest, const Variable *op1, const Variable *op2)
 {
-	void *x = op1->getAddress(), *y = op2->getAddress(), *z = dest->getAddress(), *zf = &ZF;
 	if(op1->getItemType() == DataType::INTEGER)
 	{
 		const int code_len = 23;
-		const char *precompiled = "\xB8????"	//mov eax, address(x)
+		const char *precompiled = "\xB8????"	//mov eax, address(op1)
 								  "\x8B\x00"	//mov eax, [eax]
-								  "\xBB????"	//mov ebx, address(y)
+								  "\xBB????"	//mov ebx, address(op2)
 								  "\x8B\x1B"	//mov ebx, [ebx]
 								  "\x03\xD8"	//add ebx, eax
-								  "\xB8????"	//mov eax, address(z)
+								  "\xB8????"	//mov eax, address(dest)
 								  "\x89\x18";	//mov [eax], ebx
 		memcpy(code, precompiled, code_len);
-		(*((void **)(code+1))) = x;
-		(*((void **)(code+8))) = y;
-		(*((void **)(code+17))) = z;
+		(*((void **)(code+1))) = op1->getAddress();
+		(*((void **)(code+8))) = op2->getAddress();
+		(*((void **)(code+17))) = dest->getAddress();
 		return code_len;
-/*
-		"\x8B\x45\xD4"	//mov eax, x
-		"\x8B\x00"		//mov eax, [eax]
-		"\x8B\x5D\xC8"	//mov ebx, y
-		"\x8B\x1B"		//mov ebx, [ebx]
-		"\x03\xD8"		//add ebx, eax
-		"\x8B\x45\xBC"	//mov eax, z
-		"\x89\x18"		//mov [eax], ebx
-*/
-/*
-   378: 			; z = x + y
-   379: 			mov eax, x
-0043EE89 8B 45 D4             mov         eax,dword ptr [ebp-2Ch]  
-   380: 			mov eax, [eax]
-0043EE8C 8B 00                mov         eax,dword ptr [eax]  
-   381: 			mov ebx, y
-0043EE8E 8B 5D C8             mov         ebx,dword ptr [ebp-38h]  
-   382: 			mov ebx, [ebx]
-0043EE91 8B 1B                mov         ebx,dword ptr [ebx]  
-   383: 			add ebx, eax
-0043EE93 03 D8                add         ebx,eax  
-   384: 			mov eax, z
-0043EE95 8B 45 BC             mov         eax,dword ptr [ebp-44h]  
-   385: 			mov [eax], ebx
-0043EE98 89 18                mov         dword ptr [eax],ebx  
-*/
-/*
-		__asm
-		{
-			; z = x + y
-			mov eax, x
-			mov eax, [eax]
-			mov ebx, y
-			mov ebx, [ebx]
-			add ebx, eax
-			mov eax, z
-			mov [eax], ebx
-		}
-*/
 	}
 	else if(op1->getItemType() == DataType::DOUBLE)
 	{
-		return 0;
-/*
-   392: 			; z = x + y
-   393: 			mov eax, x
-0043EEAC 8B 45 D4             mov         eax,dword ptr [ebp-2Ch]  
-   394: 			fld qword ptr [eax]
-0043EEAF DD 00                fld         qword ptr [eax]  
-   395: 			mov eax, y
-0043EEB1 8B 45 C8             mov         eax,dword ptr [ebp-38h]  
-   396: 			fld qword ptr [eax]
-0043EEB4 DD 00                fld         qword ptr [eax]  
-   397: 			fadd
-0043EEB6 DE C1                faddp       st(1),st  
-   398: 			mov eax, z
-0043EEB8 8B 45 BC             mov         eax,dword ptr [ebp-44h]  
-   399: 			fstp qword ptr [eax]
-0043EEBB DD 18                fstp        qword ptr [eax]  
-*/
-/*
-		__asm
-		{
-			; z = x + y
-			mov eax, x
-			fld qword ptr [eax]
-			mov eax, y
-			fld qword ptr [eax]
-			fadd
-			mov eax, z
-			fstp qword ptr [eax]
-		}
-*/
+		const int code_len = 23;
+		const char *precompiled = "\xB8????"	//mov eax, address(op1)
+								  "\xDD\x00"	//fld qword ptr [eax]
+								  "\xB8????"	//mov eax, address(op2)
+								  "\xDD\x00"	//fld qword ptr [eax]
+								  "\xDE\xC1"	//faddp st(1),st
+								  "\xB8????"	//mov eax, address(dest)
+								  "\xDD\x18";	//fstp qword ptr [eax]
+		memcpy(code, precompiled, code_len);
+		(*((void **)(code+1))) = op1->getAddress();
+		(*((void **)(code+8))) = op2->getAddress();
+		(*((void **)(code+17))) = dest->getAddress();
+		return code_len;
 	}
 	else
 		throw new std::exception("JITCompiler::gen_add: invalid data type!");
 }
 
-void JITCompiler::gen_sub(Variable *dest, const Variable *op1, const Variable *op2)
+int JITCompiler::gen_sub(char *code, Variable *dest, const Variable *op1, const Variable *op2)
 {
-	void *x = op1->getAddress(), *y = op2->getAddress(), *z = dest->getAddress(), *zf = &ZF;
 	if(op1->getItemType() == DataType::INTEGER)
 	{
-		__asm
-		{
-			; z = x - y
-			mov eax, x
-			mov eax, [eax]
-			mov ebx, y
-			mov ebx, [ebx]
-			sub eax, ebx
-			mov ebx, z
-			mov [ebx], eax
-		}
+		const int code_len = 23;
+		const char *precompiled = "\xB8????"	//mov eax, address(op1)
+								  "\x8B\x00"	//mov eax, [eax]
+								  "\xBB????"	//mov ebx, address(op2)
+								  "\x8B\x1B"	//mov ebx, [ebx]
+								  "\x2B\xC3"	//sub eax, ebx
+								  "\xBB????"	//mov ebx, address(dest)
+								  "\x89\x03";	//mov [ebx], eax
+		memcpy(code, precompiled, code_len);
+		(*((void **)(code+1))) = op1->getAddress();
+		(*((void **)(code+8))) = op2->getAddress();
+		(*((void **)(code+17))) = dest->getAddress();
+		return code_len;
 	}
 	else if(op1->getItemType() == DataType::DOUBLE)
 	{
-		__asm
-		{
-			; z = x - y
-			mov eax, x
-			fld qword ptr [eax]
-			mov eax, y
-			fld qword ptr [eax]
-			fsub
-			mov eax, z
-			fstp qword ptr [eax]
-		}
+		const int code_len = 23;
+		const char *precompiled = "\xB8????"	//mov eax, address(op1)
+								  "\xDD\x00"	//fld qword ptr [eax]
+								  "\xB8????"	//mov eax, address(op2)
+								  "\xDD\x00"	//fld qword ptr [eax]
+								  "\xDE\xE9"	//fsubp st(1),st
+								  "\xB8????"	//mov eax, address(dest)
+								  "\xDD\x18";	//fstp qword ptr [eax]
+		memcpy(code, precompiled, code_len);
+		(*((void **)(code+1))) = op1->getAddress();
+		(*((void **)(code+8))) = op2->getAddress();
+		(*((void **)(code+17))) = dest->getAddress();
+		return code_len;
 	}
 	else
 		throw new std::exception("JITCompiler::gen_sub: invalid data type!");
 }
 
-void JITCompiler::gen_mul(Variable *dest, const Variable *op1, const Variable *op2)
+int JITCompiler::gen_mul(char *code, Variable *dest, const Variable *op1, const Variable *op2)
 {
 	void *x = op1->getAddress(), *y = op2->getAddress(), *z = dest->getAddress(), *zf = &ZF;
 	if(op1->getItemType() == DataType::INTEGER)
@@ -552,9 +514,11 @@ void JITCompiler::gen_mul(Variable *dest, const Variable *op1, const Variable *o
 	}
 	else
 		throw new std::exception("JITCompiler::gen_mul: invalid data type!");
+	//
+	return 0;
 }
 
-void JITCompiler::gen_div(Variable *dest, const Variable *op1, const Variable *op2)
+int JITCompiler::gen_div(char *code, Variable *dest, const Variable *op1, const Variable *op2)
 {
 	void *error = divByZeroEx;
 	void *x = op1->getAddress(), *y = op2->getAddress(), *z = dest->getAddress(), *zf = &ZF;
@@ -592,9 +556,11 @@ _valid:		mov eax, x
 	}
 	else
 		throw new std::exception("JITCompiler::gen_div: invalid data type!");
+	//
+	return 0;
 }
 
-void JITCompiler::gen_mod(Variable *dest, const Variable *op1, const Variable *op2)
+int JITCompiler::gen_mod(char *code, Variable *dest, const Variable *op1, const Variable *op2)
 {
 	void *error = modByZeroEx;
 	void *x = op1->getAddress(), *y = op2->getAddress(), *z = dest->getAddress(), *zf = &ZF;
@@ -618,9 +584,11 @@ _valid:		mov eax, x
 	}
 	else
 		throw new std::exception("JITCompiler::gen_mod: invalid data type!");
+	//
+	return 0;
 }
 
-void JITCompiler::gen_and(Variable *dest, const Variable *op1, const Variable *op2)
+int JITCompiler::gen_and(char *code, Variable *dest, const Variable *op1, const Variable *op2)
 {
 	void *x = op1->getAddress(), *y = op2->getAddress(), *z = dest->getAddress(), *zf = &ZF;
 	if((op1->getItemType() == DataType::INTEGER))
@@ -653,9 +621,11 @@ void JITCompiler::gen_and(Variable *dest, const Variable *op1, const Variable *o
 	}
 	else
 		throw new std::exception("JITCompiler::gen_and: invalid data type!");
+	//
+	return 0;
 }
 
-void JITCompiler::gen_or(Variable *dest, const Variable *op1, const Variable *op2)
+int JITCompiler::gen_or(char *code, Variable *dest, const Variable *op1, const Variable *op2)
 {
 	void *x = op1->getAddress(), *y = op2->getAddress(), *z = dest->getAddress(), *zf = &ZF;
 	if((op1->getItemType() == DataType::INTEGER))
@@ -688,9 +658,11 @@ void JITCompiler::gen_or(Variable *dest, const Variable *op1, const Variable *op
 	}
 	else
 		throw new std::exception("JITCompiler::gen_or: invalid data type!");
+	//
+	return 0;
 }
 
-void JITCompiler::gen_xor(Variable *dest, const Variable *op1, const Variable *op2)
+int JITCompiler::gen_xor(char *code, Variable *dest, const Variable *op1, const Variable *op2)
 {
 	void *x = op1->getAddress(), *y = op2->getAddress(), *z = dest->getAddress(), *zf = &ZF;
 	if((op1->getItemType() == DataType::INTEGER))
@@ -723,9 +695,11 @@ void JITCompiler::gen_xor(Variable *dest, const Variable *op1, const Variable *o
 	}
 	else
 		throw new std::exception("JITCompiler::gen_xor: invalid data type!");
+	//
+	return 0;
 }
 
-void JITCompiler::gen_lsh(Variable *dest, const Variable *op1, const Variable *op2)
+int JITCompiler::gen_lsh(char *code, Variable *dest, const Variable *op1, const Variable *op2)
 {
 	void *x = op1->getAddress(), *y = op2->getAddress(), *z = dest->getAddress(), *zf = &ZF;
 	if((op1->getItemType() == DataType::INTEGER))
@@ -744,9 +718,11 @@ void JITCompiler::gen_lsh(Variable *dest, const Variable *op1, const Variable *o
 	}
 	else
 		throw new std::exception("JITCompiler::gen_lsh: invalid data type!");
+	//
+	return 0;
 }
 
-void JITCompiler::gen_rsh(Variable *dest, const Variable *op1, const Variable *op2)
+int JITCompiler::gen_rsh(char *code, Variable *dest, const Variable *op1, const Variable *op2)
 {
 	void *x = op1->getAddress(), *y = op2->getAddress(), *z = dest->getAddress(), *zf = &ZF;
 	if((op1->getItemType() == DataType::INTEGER))
@@ -765,9 +741,11 @@ void JITCompiler::gen_rsh(Variable *dest, const Variable *op1, const Variable *o
 	}
 	else
 		throw new std::exception("JITCompiler::gen_rsh: invalid data type!");
+	//
+	return 0;
 }
 
-void JITCompiler::gen_inc(Variable *var)
+int JITCompiler::gen_inc(char *code, Variable *var)
 {
 	void *x = var->getAddress(), *zf = &ZF;
 	if((var->getItemType() == DataType::INTEGER))
@@ -783,9 +761,11 @@ void JITCompiler::gen_inc(Variable *var)
 	}
 	else
 		throw new std::exception("JITCompiler::gen_inc: invalid data type!");
+	//
+	return 0;
 }
 
-void JITCompiler::gen_dec(Variable *var)
+int JITCompiler::gen_dec(char *code, Variable *var)
 {
 	void *x = var->getAddress(), *zf = &ZF;
 	if((var->getItemType() == DataType::INTEGER))
@@ -801,9 +781,11 @@ void JITCompiler::gen_dec(Variable *var)
 	}
 	else
 		throw new std::exception("JITCompiler::gen_dec: invalid data type!");
+	//
+	return 0;
 }
 
-void JITCompiler::gen_not(Variable *dest, const Variable *src)
+int JITCompiler::gen_not(char *code, Variable *dest, const Variable *src)
 {
 	void *x = src->getAddress(), *y = dest->getAddress(), *zf = &ZF;
 	if(src->getItemType() == DataType::BOOLEAN)
@@ -821,9 +803,11 @@ void JITCompiler::gen_not(Variable *dest, const Variable *src)
 	}
 	else
 		throw new std::exception("JITCompiler::gen_not: invalid data type!");
+	//
+	return 0;
 }
 
-void JITCompiler::gen_neg(Variable *dest, const Variable *src)
+int JITCompiler::gen_neg(char *code, Variable *dest, const Variable *src)
 {
 	void *x = src->getAddress(), *y = dest->getAddress(), *zf = &ZF;
 	if(src->getItemType() == DataType::INTEGER)
@@ -837,14 +821,16 @@ void JITCompiler::gen_neg(Variable *dest, const Variable *src)
 			mov ebx, y
 			mov [ebx], eax
 		}
+		//
+		return 0;
 	}
 	else if(src->getItemType() == DataType::BOOLEAN)
-		gen_not(dest, src);
+		return gen_not(code, dest, src);
 	else
 		throw new std::exception("JITCompiler::gen_neg: invalid data type!");
 }
 
-void JITCompiler::gen_minus(Variable *dest, const Variable *src)
+int JITCompiler::gen_minus(char *code, Variable *dest, const Variable *src)
 {
 	void *x = src->getAddress(), *y = dest->getAddress(), *zf = &ZF;
 	if(src->getItemType() == DataType::INTEGER)
@@ -873,9 +859,11 @@ void JITCompiler::gen_minus(Variable *dest, const Variable *src)
 	}
 	else
 		throw new std::exception("JITCompiler::gen_minus: invalid data type!");
+	//
+	return 0;
 }
 
-void JITCompiler::gen_ldci(Variable *var, Integer *constant)
+int JITCompiler::gen_ldci(char *code, Variable *var, Integer *constant)
 {
 	void *x = var->getAddress();
 	int i = constant->getValue();
@@ -886,9 +874,11 @@ void JITCompiler::gen_ldci(Variable *var, Integer *constant)
 		mov ebx, i
 		mov [eax], ebx
 	}
+	//
+	return 0;
 }
 
-void JITCompiler::gen_ldcb(Variable *var, Boolean *constant)
+int JITCompiler::gen_ldcb(char *code, Variable *var, Boolean *constant)
 {
 	void *x = var->getAddress();
 	bool b = constant->getValue();
@@ -899,9 +889,11 @@ void JITCompiler::gen_ldcb(Variable *var, Boolean *constant)
 		mov bl, b
 		mov byte ptr [eax], bl
 	}
+	//
+	return 0;
 }
 
-void JITCompiler::gen_ldcr(Variable *var, Double *constant)
+int JITCompiler::gen_ldcr(char *code, Variable *var, Double *constant)
 {
 	void *x = var->getAddress();
 	double d = constant->getValue();
@@ -912,9 +904,11 @@ void JITCompiler::gen_ldcr(Variable *var, Double *constant)
 		fld qword ptr [d]
 		fstp qword ptr [eax]
 	}
+	//
+	return 0;
 }
 
-void JITCompiler::gen_ldcs(Variable *var, String *constant)
+int JITCompiler::gen_ldcs(char *code, Variable *var, String *constant)
 {
 	void *p_strlen = strlen, *p_heapAlloc = heapAlloc, *p_strcpy = strcpy;
 	void *x = var->getAddress();
@@ -943,14 +937,16 @@ void JITCompiler::gen_ldcs(Variable *var, String *constant)
 		mov ebx, x
 		mov [ebx], eax	; string copied into the newly allocated memory block
 	}
+	//
+	return 0;
 }
 
-void JITCompiler::gen_ldcn(Variable *var, Reference *constant)
+int JITCompiler::gen_ldcn(char *code, Variable *var, Reference *constant)
 {
-	gen_ldci(var, new Integer(0));
+	return gen_ldci(code, var, new Integer(0));
 }
 
-void JITCompiler::gen_new(Variable *var, const Variable *size)
+int JITCompiler::gen_new(char *code, Variable *var, const Variable *size)
 {	// TODO: not tested yet!
 	int item_size = var->getItemTypeSize();
 	void *p_heapAlloc = heapAlloc;
@@ -998,9 +994,11 @@ void JITCompiler::gen_new(Variable *var, const Variable *size)
 			mov [ebx], eax	; save ptr into x
 		}
 	}
+	//
+	return 0;
 }
 
-void JITCompiler::gen_lt(Variable *dest, const Variable *op1, const Variable *op2)
+int JITCompiler::gen_lt(char *code, Variable *dest, const Variable *op1, const Variable *op2)
 {
 	void *x = op1->getAddress(), *y = op2->getAddress(), *z = dest->getAddress(), *zf = &ZF;
 	if(op1->getItemType() == DataType::INTEGER)
@@ -1043,9 +1041,11 @@ _continue:	mov ebx, z
 	}
 	else
 		throw new std::exception("JITCompiler::gen_lt: invalid data type!");
+	//
+	return 0;
 }
 
-void JITCompiler::gen_gt(Variable *dest, const Variable *op1, const Variable *op2)
+int JITCompiler::gen_gt(char *code, Variable *dest, const Variable *op1, const Variable *op2)
 {
 	void *x = op1->getAddress(), *y = op2->getAddress(), *z = dest->getAddress(), *zf = &ZF;
 	if(op1->getItemType() == DataType::INTEGER)
@@ -1088,9 +1088,11 @@ _continue:	mov ebx, z
 	}
 	else
 		throw new std::exception("JITCompiler::gen_gt: invalid data type!");
+	//
+	return 0;
 }
 
-void JITCompiler::gen_lte(Variable *dest, const Variable *op1, const Variable *op2)
+int JITCompiler::gen_lte(char *code, Variable *dest, const Variable *op1, const Variable *op2)
 {
 	void *x = op1->getAddress(), *y = op2->getAddress(), *z = dest->getAddress(), *zf = &ZF;
 	if(op1->getItemType() == DataType::INTEGER)
@@ -1133,9 +1135,11 @@ _continue:	mov ebx, z
 	}
 	else
 		throw new std::exception("JITCompiler::gen_lte: invalid data type!");
+	//
+	return 0;
 }
 
-void JITCompiler::gen_gte(Variable *dest, const Variable *op1, const Variable *op2)
+int JITCompiler::gen_gte(char *code, Variable *dest, const Variable *op1, const Variable *op2)
 {
 	void *x = op1->getAddress(), *y = op2->getAddress(), *z = dest->getAddress(), *zf = &ZF;
 	if(op1->getItemType() == DataType::INTEGER)
@@ -1178,9 +1182,11 @@ _continue:	mov ebx, z
 	}
 	else
 		throw new std::exception("JITCompiler::gen_gte: invalid data type!");
+	//
+	return 0;
 }
 
-void JITCompiler::gen_eq(Variable *dest, const Variable *op1, const Variable *op2)
+int JITCompiler::gen_eq(char *code, Variable *dest, const Variable *op1, const Variable *op2)
 {
 	void *x = op1->getAddress(), *y = op2->getAddress(), *z = dest->getAddress(), *zf = &ZF;
 	if(op1->getItemType() == DataType::BOOLEAN)
@@ -1241,9 +1247,11 @@ _cont_d:	mov ebx, z
 	}
 	else
 		throw new std::exception("JITCompiler::gen_eq: invalid data type!");
+	//
+	return 0;
 }
 
-void JITCompiler::gen_neq(Variable *dest, const Variable *op1, const Variable *op2)
+int JITCompiler::gen_neq(char *code, Variable *dest, const Variable *op1, const Variable *op2)
 {
 	void *x = op1->getAddress(), *y = op2->getAddress(), *z = dest->getAddress(), *zf = &ZF;
 	if(op1->getItemType() == DataType::BOOLEAN)
@@ -1304,4 +1312,6 @@ _cont_d:	mov ebx, z
 	}
 	else
 		throw new std::exception("JITCompiler::gen_neq: invalid data type!");
+	//
+	return 0;
 }
