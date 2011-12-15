@@ -23,6 +23,12 @@ class JITCompiler
 		map<string, FunctionSignature *> *functions;
 		map<string, char *> compiled_functions;
 
+		bool *pZF;	// pointer to Zero Flag inside of the parent interpreter; it's automatically set by compiled code at instructions neg,lt,gt,lte,gte,eq,neq
+
+		// temporary help structures for code generating -- any content is valid only during a compilation time of a single function
+		map<char, char> hlp_addresses;	// addresses used for jumps -> first=address inside of a bytecode, second=address inside of a compiled code
+		vector<char *> hlp_jump_loc;	// address insode of a compiled code, where are stored addresses of jump to bytecode --> those needs to be transformed to compiled code addresses during a compilation
+
 		static bool functionsComparator(FunctionSignature *a, FunctionSignature *b)
 		{
 			return (a->pointer < b->pointer);
@@ -70,20 +76,29 @@ class JITCompiler
 		int gen_eq(char *code, Variable *dest, const Variable *op1, const Variable *op2);
 		int gen_neq(char *code, Variable *dest, const Variable *op1, const Variable *op2);
 
+		bool isConditionalJump(Instruction *instr)
+		{
+			return ((instr->code == InstructionCode::JZ) || (instr->code == InstructionCode::JNZ));
+		}
+
 	public:
-		JITCompiler(vector<Instruction *> *program, map<string, FunctionSignature *> *functions)
+		JITCompiler(vector<Instruction *> *program, map<string, FunctionSignature *> *functions, bool *ZF)
 		{
 			this->program = program;
 			this->functions = functions;
+			pZF = ZF;
 			//
 			// get length of functions
-			vector<FunctionSignature *> fns;
-			for(map<string, FunctionSignature *>::iterator it = functions->begin(); it != functions->end(); ++it)
-				fns.push_back(it->second);
-			std::sort(fns.begin(), fns.end(), JITCompiler::functionsComparator);
-			for(size_t i = 0, im = fns.size() - 1; i < im; i++)
-				fns[i]->length = fns[i+1]->pointer - fns[i]->pointer;
-			fns[fns.size()-1]->length = program->size() - fns[fns.size()-1]->pointer;
+			if(functions)
+			{
+				vector<FunctionSignature *> fns;
+				for(map<string, FunctionSignature *>::iterator it = functions->begin(); it != functions->end(); ++it)
+					fns.push_back(it->second);
+				std::sort(fns.begin(), fns.end(), JITCompiler::functionsComparator);
+				for(size_t i = 0, im = fns.size() - 1; i < im; i++)
+					fns[i]->length = fns[i+1]->pointer - fns[i]->pointer;
+				fns[fns.size()-1]->length = program->size() - fns[fns.size()-1]->pointer;
+			}
 		}
 
 		~JITCompiler()
@@ -142,11 +157,14 @@ class JITCompiler
 			int capacity = 4096, limit = 4000;	// 4kiB, 4kB
 			char *code = new char[capacity];
 			int length = 0;
+			hlp_addresses.clear();
+			hlp_jump_loc.clear();
 			//
 			length += gen_prolog(code+length);
 			//
 			for(int i = functions->find(fnName)->second->pointer, im = i + functions->find(fnName)->second->length; i < im; i++)
 			{
+				hlp_addresses[(char)i] = (char)length;
 				length += compileInstruction(program->at(i), code+length);
 				if(length > limit)
 				{	// realloc
@@ -158,6 +176,14 @@ class JITCompiler
 				}
 			}
 			length += gen_epilog(code+length);
+			//
+			// go through the compiled code and replace all jump addresses
+			char *jmp_address;
+			for(size_t i = 0, im = hlp_jump_loc.size(); i < im; i++)
+			{
+				jmp_address = code + hlp_addresses[(*((char *)(hlp_jump_loc[i])))];
+				(*((char *)(hlp_jump_loc[i]))) = char(jmp_address - hlp_jump_loc[i] - 1);	// 1B offset! (1-complement)
+			}
 			//
 			compiled_functions.insert(pair<string, char *>(fnName, code));
 		}

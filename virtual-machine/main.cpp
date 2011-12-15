@@ -11,7 +11,8 @@ int main()
 /*
 	try
 	{
-		JITCompiler jit;
+		bool ZF;
+		JITCompiler jit(NULL, NULL, &ZF);
 		int ix = 255, iy = 3, iz;
 		Variable x1("x", new DataType(DataType::INTEGER)); x1.setAddress(&ix);
 		Variable y1("y", new DataType(DataType::INTEGER)); y1.setAddress(&iy);
@@ -37,6 +38,7 @@ int main()
 		char *compiled = new char[4096];	// 4kB
 		int length = 0;
 		length += jit.gen_prolog(compiled+length);
+		length += jit.gen_jmp(compiled+length, new Integer(10));
 		//length += jit.gen_st(compiled+length, &z1, &x1);
 		//length += jit.gen_st(compiled+length, &z2, &x2);
 		//length += jit.gen_st(compiled+length, &z3, &x3);
@@ -81,14 +83,14 @@ int main()
 */
 	try
 	{
-		ProgramLoader loader("sqr.run");
+		ProgramLoader loader("jit.run");
 		std::cout << ":: Program ::\n======================\n";
 		loader.printProgram(std::cout);
 		Interpreter interpreter(loader.getProgram(), loader.getStructures(), loader.getFunctions());
 		interpreter.setOption(Interpreter::Options::HeapSize, 32*1024*1024);	// 32MB
 		interpreter.setOption(Interpreter::Options::StackSize, 32*1024*1024);	// 32MB
 		interpreter.setOption(Interpreter::Options::GarbageCollector, 0.9);	// start GC if 90% of heap is full (set 0% for no GC)
-		interpreter.setOption(Interpreter::Options::JITCompiler, 10);	// compile any function that has been executed at least 10 times (set negative value for no JIT Compiler)
+		interpreter.setOption(Interpreter::Options::JITCompiler, 2);	// compile any function that has been executed at least 10 times (set negative value for no JIT Compiler)
 		std::cout << ":: Execution ::\n======================" << std::endl;
 		interpreter.run();
 	}
