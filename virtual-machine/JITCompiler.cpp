@@ -713,42 +713,32 @@ int JITCompiler::gen_rsh(char *code, Variable *dest, const Variable *op1, const 
 
 int JITCompiler::gen_inc(char *code, Variable *var)
 {
-	void *x = var->getAddress(), *zf = &ZF;
-	if((var->getItemType() == DataType::INTEGER))
+	if(var->getItemType() == DataType::INTEGER)
 	{
-		__asm
-		{
-			; x++
-			mov ebx, x
-			mov eax, [ebx]
-			inc eax
-			mov [ebx], eax
-		}
+		const int code_len = 7;
+		const char *precompiled = "\xB8????"	//mov eax, address(var)
+								  "\xFF\x00";	//inc dword ptr [eax]
+		memcpy(code, precompiled, code_len);
+		(*((void **)(code+1))) = var->getAddress();
+		return code_len;
 	}
 	else
 		throw new std::exception("JITCompiler::gen_inc: invalid data type!");
-	//
-	return 0;
 }
 
 int JITCompiler::gen_dec(char *code, Variable *var)
 {
-	void *x = var->getAddress(), *zf = &ZF;
-	if((var->getItemType() == DataType::INTEGER))
+	if(var->getItemType() == DataType::INTEGER)
 	{
-		__asm
-		{
-			; x--
-			mov ebx, x
-			mov eax, [ebx]
-			dec eax
-			mov [ebx], eax
-		}
+		const int code_len = 7;
+		const char *precompiled = "\xB8????"	//mov eax, address(var)
+								  "\xFF\x08";	//dec dword ptr [eax]
+		memcpy(code, precompiled, code_len);
+		(*((void **)(code+1))) = var->getAddress();
+		return code_len;
 	}
 	else
 		throw new std::exception("JITCompiler::gen_dec: invalid data type!");
-	//
-	return 0;
 }
 
 int JITCompiler::gen_not(char *code, Variable *dest, const Variable *src)

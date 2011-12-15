@@ -37,13 +37,16 @@ int main()
 		char *compiled = new char[4096];	// 4kB
 		int length = 0;
 		length += jit.gen_prolog(compiled+length);
-		length += jit.gen_rsh(compiled+length, &z1, &x1, &y1);
+		length += jit.gen_inc(compiled+length, &x1);
+		length += jit.gen_dec(compiled+length, &y1);
 		//length += jit.gen_xor(compiled+length, &z3, &x3, &y3);
 		length += jit.gen_epilog(compiled+length);
 		//
 		compiled_program exec = (compiled_program)compiled;
 		exec();
-		printf("iz=%d\n", iz);
+		//printf("iz=%d\n", iz);
+		printf("ix=%d\n", ix);
+		printf("iy=%d\n", iy);
 		//printf("dz=%f\n", dz);
 		//printf("bz=%d\n", bz);
 		//
