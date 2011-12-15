@@ -118,20 +118,57 @@ int JITCompiler::gen_retv(char *code, const Variable *var)
 
 int JITCompiler::gen_pop(char *code, Variable *dest)
 {
-	const int code_len = 25;
-	const char *precompiled = "\xB8????"		//mov eax, value(var->item_type)
-							  "\x50"			//push eax
-							  "\xB8????"		//mov eax, address(popAndGetTopValAddr)
-							  "\xFF\xD0"		//call eax
-							  "\x83\xC4\x04"	//add esi, 4	; pop function argument
-							  "\x8B\x00"		//mov eax, [eax]
-							  "\xBB????"		//mov ebx, address(dest)
-							  "\x89\x03";		//mov [ebx], eax	; save into dest
-	memcpy(code, precompiled, code_len);
-	(*((int *)(code+1))) = dest->getItemType();
-	(*((void **)(code+7))) = popAndGetTopValAddr;
-	(*((void **)(code+19))) = dest->getAddress();
-	return code_len;
+	if(dest->getItemType() == DataType::BOOLEAN)
+	{
+		const int code_len = 25;
+		const char *precompiled = "\xB8????"		//mov eax, value(var->item_type)
+								  "\x50"			//push eax
+								  "\xB8????"		//mov eax, address(popAndGetTopValAddr)
+								  "\xFF\xD0"		//call eax
+								  "\x83\xC4\x04"	//add esi, 4	; pop function argument
+								  "\x8A\x00"		//mov al, byte ptr [eax]
+								  "\xBB????"		//mov ebx, address(dest)
+								  "\x88\x03";		//mov byte ptr [ebx], al	; save into dest
+		memcpy(code, precompiled, code_len);
+		(*((int *)(code+1))) = dest->getItemType();
+		(*((void **)(code+7))) = popAndGetTopValAddr;
+		(*((void **)(code+19))) = dest->getAddress();
+		return code_len;
+	}
+	else if(dest->getItemType() == DataType::DOUBLE)
+	{
+		const int code_len = 25;
+		const char *precompiled = "\xB8????"		//mov eax, value(var->item_type)
+								  "\x50"			//push eax
+								  "\xB8????"		//mov eax, address(popAndGetTopValAddr)
+								  "\xFF\xD0"		//call eax
+								  "\x83\xC4\x04"	//add esi, 4	; pop function argument
+								  "\xDD\x00"		//fld qword ptr[eax]
+								  "\xB8????"		//mov eax, address(dest)
+								  "\xDD\x18";		//fstp qword ptr [eax]	; save into dest
+		memcpy(code, precompiled, code_len);
+		(*((int *)(code+1))) = dest->getItemType();
+		(*((void **)(code+7))) = popAndGetTopValAddr;
+		(*((void **)(code+19))) = dest->getAddress();
+		return code_len;
+	}
+	else	// 4B -- INTEGER, REFERENCE, ARRAY, STRUCTURE
+	{
+		const int code_len = 25;
+		const char *precompiled = "\xB8????"		//mov eax, value(var->item_type)
+								  "\x50"			//push eax
+								  "\xB8????"		//mov eax, address(popAndGetTopValAddr)
+								  "\xFF\xD0"		//call eax
+								  "\x83\xC4\x04"	//add esi, 4	; pop function argument
+								  "\x8B\x00"		//mov eax, [eax]
+								  "\xBB????"		//mov ebx, address(dest)
+								  "\x89\x03";		//mov [ebx], eax	; save into dest
+		memcpy(code, precompiled, code_len);
+		(*((int *)(code+1))) = dest->getItemType();
+		(*((void **)(code+7))) = popAndGetTopValAddr;
+		(*((void **)(code+19))) = dest->getAddress();
+		return code_len;
+	}
 }
 
 int JITCompiler::gen_invoke(char *code, Variable *name, const vector<Argument *> &args)
@@ -248,7 +285,22 @@ int JITCompiler::gen_invoke(char *code, Variable *name, const vector<Argument *>
 	}
 	else if(name->getName() == "log")
 	{
-		memory->push(BuiltInRoutines::log((Double *)(((Variable *)args[1])->getValue())));
+		const int code_len = 30;
+		const char *precompiled = "\xB8????"			//mov eax, args[1] (Double *)
+								  "\x50"				//push eax
+								  "\xB8????"			//mov eax, address(BuiltInRoutines::log)
+								  "\xFF\xD0"			//call eax
+								  "\xBB\x00\x00\x00\x00"//mov ebx, 0	; type = NULL
+								  "\x53"				//push ebx
+								  "\x50"				//push eax		; val = return value from rand (Argument *)
+								  "\xB8????"			//mov eax, address(pushVal)
+								  "\xFF\xD0"			//call eax		; pushVal(val, type);
+								  "\x83\xC4\x0C";		//add esp, 12	; pop functions arguments from both rand and pushVal
+		memcpy(code, precompiled, code_len);
+		(*((void **)(code+1))) = ((Variable *)(args[1]))->getValue();
+		(*((void **)(code+7))) = BuiltInRoutines::log;
+		(*((void **)(code+21))) = pushVal;
+		return code_len;
 	}
 	else if(name->getName() == "rand")
 	{

@@ -27,7 +27,7 @@ int main()
 		Variable y3("y", new DataType(DataType::BOOLEAN)); y3.setAddress(&by);
 		Variable z3("z", new DataType(DataType::BOOLEAN)); z3.setAddress(&bz);
 		//
-		char *str = "rand";
+		char *str = "log";
 		//Variable z4("str", new DataType(DataType::STRING)); z4.setAddress(&str);
 		//
 		Interpreter interpreter(NULL, NULL, NULL);
@@ -35,15 +35,15 @@ int main()
 		BuiltInRoutines::init();
 		//
 		Variable size("size", new DataType(DataType::INTEGER));// size.setValue(new Integer(10));
-		Variable routineName("rand", new DataType(DataType::STRING)); routineName.setAddress(&str);
-		vector<Argument *> arguments; arguments.push_back(&routineName); arguments.push_back(&x1);
+		Variable routineName("log", new DataType(DataType::STRING)); routineName.setAddress(&str);
+		vector<Argument *> arguments; arguments.push_back(&routineName); arguments.push_back(&x2);
 		//
 		typedef void (*compiled_program)(void);
 		char *compiled = new char[4096];	// 4kB
 		int length = 0;
 		length += jit.gen_prolog(compiled+length);
 		length += jit.gen_invoke(compiled+length, &routineName,  arguments);
-		length += jit.gen_pop(compiled+length, &z1);
+		length += jit.gen_pop(compiled+length, &z2);
 		//length += jit.gen_new(compiled+length, new Variable("x", new DataType(DataType::ARRAY)), &size);
 		//length += jit.gen_jmp(compiled+length, new Integer(10));
 		//length += jit.gen_st(compiled+length, &z1, &x1);
@@ -63,10 +63,11 @@ int main()
 		//
 		compiled_program exec = (compiled_program)compiled;
 		exec();
-		printf("iz=%d\n", iz);
+		//printf("iz=%d\n", iz);
 		//printf("ix=%d\n", ix);
 		//printf("iy=%d\n", iy);
-		//printf("dz=%f\n", dz);
+		printf("dz=%f\n", dz);
+		//printf("dz=%f\n", ((Double *)(z2.getValue()))->getValue());
 		//printf("bx=%d\n", bx);
 		//printf("by=%d\n", by);
 		//printf("bz=%d\n", bz);
