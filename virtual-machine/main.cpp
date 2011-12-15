@@ -42,7 +42,9 @@ int main()
 		char *compiled = new char[4096];	// 4kB
 		int length = 0;
 		length += jit.gen_prolog(compiled+length);
-		length += jit.gen_ldcs(compiled+length, &z4, new String("Byl jsem tu, Fantomas."));
+		length += jit.gen_neq(compiled+length, &x3, &x1, &y1);
+		length += jit.gen_neq(compiled+length, &y3, &x2, &y2);
+		//length += jit.gen_neq(compiled+length, &z3, &x3, &y3);
 		//length += jit.gen_inc(compiled+length, &x1);
 		//length += jit.gen_dec(compiled+length, &y1);
 		//length += jit.gen_xor(compiled+length, &z3, &x3, &y3);
@@ -54,8 +56,10 @@ int main()
 		//printf("ix=%d\n", ix);
 		//printf("iy=%d\n", iy);
 		//printf("dz=%f\n", dz);
+		printf("bx=%d\n", bx);
+		printf("by=%d\n", by);
 		//printf("bz=%d\n", bz);
-		printf("str=%s\n", str);
+		//printf("str=%s\n", str);
 		//
 		delete [] compiled;
 		//

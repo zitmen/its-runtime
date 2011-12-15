@@ -947,259 +947,267 @@ int JITCompiler::gen_new(char *code, Variable *var, const Variable *size)
 
 int JITCompiler::gen_lt(char *code, Variable *dest, const Variable *op1, const Variable *op2)
 {
-	void *x = op1->getAddress(), *y = op2->getAddress(), *z = dest->getAddress(), *zf = &ZF;
 	if(op1->getItemType() == DataType::INTEGER)
 	{
-		__asm
-		{
-			; z = x < y
-			mov ebx, y
-			mov ebx, [ebx]
-			mov eax, x
-			mov eax, [eax]
-			cmp eax, ebx
-			jl _lt
-			mov al, 0
-			jmp _cont
-_lt:		mov al, 1
-_cont:		mov ebx, z
-			mov byte ptr [ebx], al
-		}
+		const int code_len = 31;
+		const char *precompiled = "\xBB????"	//		mov ebx, address(op2)
+								  "\x8B\x1B"	//		mov ebx, [ebx]
+								  "\xB8????"	//		mov eax, address(op1)
+								  "\x8B\x00"	//		mov eax, [eax]
+								  "\x3B\xC3"	//		cmp eax, ebx
+								  "\x7C\x04"	//		jl _lt
+								  "\xB0\x00"	//		mov al, 0
+								  "\xEB\x02"	//		jmp _cont
+								  "\xB0\x01"	//_lt:	mov al, 1
+								  "\xBB????"	//_cont:mov ebx, address(dest)
+								  "\x88\x03";	//		mov byte ptr [ebx], al
+		memcpy(code, precompiled, code_len);
+		(*((void **)(code+1))) = op2->getAddress();
+		(*((void **)(code+8))) = op1->getAddress();
+		(*((void **)(code+25))) = dest->getAddress();
+		return code_len;
 	}
 	else if(op1->getItemType() == DataType::DOUBLE)
 	{
-		__asm
-		{
-			; z = x < y
-			mov eax, y
-			fld qword ptr [eax]
-			mov eax, x
-			fld qword ptr [eax]
-			fcompp
-			fnstsw ax	; copy flags to AX
-			and ax, 256	; gen C0 flag (8th bit; C0 = compare less than - carry flag)
-			jnz _less
-			mov al, 0
-			jmp _continue
-_less:		mov al, 1
-_continue:	mov ebx, z
-			mov byte ptr [ebx], al
-		}
+		const int code_len = 37;
+		const char *precompiled = "\xB8????"			//				mov eax, address(op2)
+								  "\xDD\x00"			//				fld qword ptr [eax]
+								  "\xB8????"			//				mov eax, address(op1)
+								  "\xDD\x00"			//				fld qword ptr [eax]
+								  "\xDE\xD9"			//				fcompp
+								  "\xDF\xE0"			//				fnstsw ax	; copy flags to AX
+								  "\x66\x25\x00\x01"	//				and ax, 100h; gen C0 flag (8th bit; C0 = compare less than - carry flag)
+								  "\x75\x04"			//				jne _less
+								  "\xB0\x00"			//				mov al, 0
+								  "\xEB\x02"			//				jmp _continue
+								  "\xB0\x01"			//_less:		mov al, 1
+								  "\xBB????"			//_continue:	mov ebx, address(dest)
+								  "\x88\x03";			//				mov byte ptr [ebx], al
+		memcpy(code, precompiled, code_len);
+		(*((void **)(code+1))) = op2->getAddress();
+		(*((void **)(code+8))) = op1->getAddress();
+		(*((void **)(code+31))) = dest->getAddress();
+		return code_len;
 	}
 	else
 		throw new std::exception("JITCompiler::gen_lt: invalid data type!");
-	//
-	return 0;
 }
 
 int JITCompiler::gen_gt(char *code, Variable *dest, const Variable *op1, const Variable *op2)
 {
-	void *x = op1->getAddress(), *y = op2->getAddress(), *z = dest->getAddress(), *zf = &ZF;
 	if(op1->getItemType() == DataType::INTEGER)
 	{
-		__asm
-		{
-			; z = x > y
-			mov ebx, y
-			mov ebx, [ebx]
-			mov eax, x
-			mov eax, [eax]
-			cmp eax, ebx
-			jg _gt
-			mov al, 0
-			jmp _cont
-_gt:		mov al, 1
-_cont:		mov ebx, z
-			mov byte ptr [ebx], al
-		}
+		const int code_len = 31;
+		const char *precompiled = "\xBB????"	//		mov ebx, address(op2)
+								  "\x8B\x1B"	//		mov ebx, [ebx]
+								  "\xB8????"	//		mov eax, address(op1)
+								  "\x8B\x00"	//		mov eax, [eax]
+								  "\x3B\xC3"	//		cmp eax, ebx
+								  "\x7F\x04"	//		jg _gt
+								  "\xB0\x00"	//		mov al, 0
+								  "\xEB\x02"	//		jmp _cont
+								  "\xB0\x01"	//_gt:	mov al, 1
+								  "\xBB????"	//_cont:mov ebx, address(dest)
+								  "\x88\x03";	//		mov byte ptr [ebx], al
+		memcpy(code, precompiled, code_len);
+		(*((void **)(code+1))) = op2->getAddress();
+		(*((void **)(code+8))) = op1->getAddress();
+		(*((void **)(code+25))) = dest->getAddress();
+		return code_len;
 	}
 	else if(op1->getItemType() == DataType::DOUBLE)
 	{
-		__asm
-		{
-			; z = x > y
-			mov eax, y
-			fld qword ptr [eax]
-			mov eax, x
-			fld qword ptr [eax]
-			fcompp
-			fnstsw ax	; copy flags to AX
-			and ax, 0x4100	; gen C0 and C3 flags (8th bit - C0 = compare less than - carry flag; 14th bit - C3 = compare equal - zero flag)
-			jz _greater
-			mov al, 0
-			jmp _continue
-_greater:	mov al, 1
-_continue:	mov ebx, z
-			mov byte ptr [ebx], al
-		}
+		const int code_len = 37;
+		const char *precompiled = "\xB8????"			//				mov eax, address(op2)
+								  "\xDD\x00"			//				fld qword ptr [eax]
+								  "\xB8????"			//				mov eax, address(op1)
+								  "\xDD\x00"			//				fld qword ptr [eax]
+								  "\xDE\xD9"			//				fcompp
+								  "\xDF\xE0"			//				fnstsw ax	; copy flags to AX
+								  "\x66\x25\x00\x41"	//				and ax, 4100h; gen C0 and C3 flags (8th bit - C0 = compare less than - carry flag; 14th bit - C3 = compare equal - zero flag)
+								  "\x74\x04"			//				je _greater
+								  "\xB0\x00"			//				mov al, 0
+								  "\xEB\x02"			//				jmp _continue
+								  "\xB0\x01"			//_greater:		mov al, 1
+								  "\xBB????"			//_continue:	mov ebx, address(dest)
+								  "\x88\x03";			//				mov byte ptr [ebx], al
+		memcpy(code, precompiled, code_len);
+		(*((void **)(code+1))) = op2->getAddress();
+		(*((void **)(code+8))) = op1->getAddress();
+		(*((void **)(code+31))) = dest->getAddress();
+		return code_len;
 	}
 	else
 		throw new std::exception("JITCompiler::gen_gt: invalid data type!");
-	//
-	return 0;
 }
 
 int JITCompiler::gen_lte(char *code, Variable *dest, const Variable *op1, const Variable *op2)
 {
-	void *x = op1->getAddress(), *y = op2->getAddress(), *z = dest->getAddress(), *zf = &ZF;
 	if(op1->getItemType() == DataType::INTEGER)
 	{
-		__asm
-		{
-			; z = x <= y
-			mov ebx, y
-			mov ebx, [ebx]
-			mov eax, x
-			mov eax, [eax]
-			cmp eax, ebx
-			jle _lte
-			mov al, 0
-			jmp _cont
-_lte:		mov al, 1
-_cont:		mov ebx, z
-			mov byte ptr [ebx], al
-		}
+		const int code_len = 31;
+		const char *precompiled = "\xBB????"	//		mov ebx, address(op2)
+								  "\x8B\x1B"	//		mov ebx, [ebx]
+								  "\xB8????"	//		mov eax, address(op1)
+								  "\x8B\x00"	//		mov eax, [eax]
+								  "\x3B\xC3"	//		cmp eax, ebx
+								  "\x7E\x04"	//		jle _lte
+								  "\xB0\x00"	//		mov al, 0
+								  "\xEB\x02"	//		jmp _cont
+								  "\xB0\x01"	//_lte:	mov al, 1
+								  "\xBB????"	//_cont:mov ebx, address(dest)
+								  "\x88\x03";	//		mov byte ptr [ebx], al
+		memcpy(code, precompiled, code_len);
+		(*((void **)(code+1))) = op2->getAddress();
+		(*((void **)(code+8))) = op1->getAddress();
+		(*((void **)(code+25))) = dest->getAddress();
+		return code_len;
 	}
 	else if(op1->getItemType() == DataType::DOUBLE)
 	{
-		__asm
-		{
-			; z = x <= y
-			mov eax, y
-			fld qword ptr [eax]
-			mov eax, x
-			fld qword ptr [eax]
-			fcompp
-			fnstsw ax	; copy flags to AX
-			and ax, 0x4100	; gen C0 and C3 flags (8th bit - C0 = compare less than - carry flag; 14th bit - C3 = compare equal - zero flag)
-			jnz _less_eq
-			mov al, 0
-			jmp _continue
-_less_eq:	mov al, 1
-_continue:	mov ebx, z
-			mov byte ptr [ebx], al
-		}
+		const int code_len = 37;
+		const char *precompiled = "\xB8????"			//				mov eax, address(op2)
+								  "\xDD\x00"			//				fld qword ptr [eax]
+								  "\xB8????"			//				mov eax, address(op1)
+								  "\xDD\x00"			//				fld qword ptr [eax]
+								  "\xDE\xD9"			//				fcompp
+								  "\xDF\xE0"			//				fnstsw ax	; copy flags to AX
+								  "\x66\x25\x00\x41"	//				and ax, 4100h; gen C0 and C3 flags (8th bit - C0 = compare less than - carry flag; 14th bit - C3 = compare equal - zero flag)
+								  "\x75\x04"			//				jne _less_eq
+								  "\xB0\x00"			//				mov al, 0
+								  "\xEB\x02"			//				jmp _continue
+								  "\xB0\x01"			//_greater:		mov al, 1
+								  "\xBB????"			//_continue:	mov ebx, address(dest)
+								  "\x88\x03";			//				mov byte ptr [ebx], al
+		memcpy(code, precompiled, code_len);
+		(*((void **)(code+1))) = op2->getAddress();
+		(*((void **)(code+8))) = op1->getAddress();
+		(*((void **)(code+31))) = dest->getAddress();
+		return code_len;
 	}
 	else
 		throw new std::exception("JITCompiler::gen_lte: invalid data type!");
-	//
-	return 0;
 }
 
 int JITCompiler::gen_gte(char *code, Variable *dest, const Variable *op1, const Variable *op2)
 {
-	void *x = op1->getAddress(), *y = op2->getAddress(), *z = dest->getAddress(), *zf = &ZF;
 	if(op1->getItemType() == DataType::INTEGER)
 	{
-		__asm
-		{
-			; z = x >= y
-			mov ebx, y
-			mov ebx, [ebx]
-			mov eax, x
-			mov eax, [eax]
-			cmp eax, ebx
-			jge _gte
-			mov al, 0
-			jmp _cont
-_gte:		mov al, 1
-_cont:		mov ebx, z
-			mov byte ptr [ebx], al
-		}
+		const int code_len = 31;
+		const char *precompiled = "\xBB????"	//		mov ebx, address(op2)
+								  "\x8B\x1B"	//		mov ebx, [ebx]
+								  "\xB8????"	//		mov eax, address(op1)
+								  "\x8B\x00"	//		mov eax, [eax]
+								  "\x3B\xC3"	//		cmp eax, ebx
+								  "\x7D\x04"	//		jge _gte
+								  "\xB0\x00"	//		mov al, 0
+								  "\xEB\x02"	//		jmp _cont
+								  "\xB0\x01"	//_gte:	mov al, 1
+								  "\xBB????"	//_cont:mov ebx, address(dest)
+								  "\x88\x03";	//		mov byte ptr [ebx], al
+		memcpy(code, precompiled, code_len);
+		(*((void **)(code+1))) = op2->getAddress();
+		(*((void **)(code+8))) = op1->getAddress();
+		(*((void **)(code+25))) = dest->getAddress();
+		return code_len;
 	}
 	else if(op1->getItemType() == DataType::DOUBLE)
 	{
-		__asm
-		{
-			; z = x >= y
-			mov eax, y
-			fld qword ptr [eax]
-			mov eax, x
-			fld qword ptr [eax]
-			fcompp
-			fnstsw ax	; copy flags to AX
-			and ax, 256	; gen C0 and C3 flags (8th bit - C0 = compare less than - carry flag)
-			jz _great_eq
-			mov al, 0
-			jmp _continue
-_great_eq:	mov al, 1
-_continue:	mov ebx, z
-			mov byte ptr [ebx], al
-		}
+		const int code_len = 37;
+		const char *precompiled = "\xB8????"			//				mov eax, address(op2)
+								  "\xDD\x00"			//				fld qword ptr [eax]
+								  "\xB8????"			//				mov eax, address(op1)
+								  "\xDD\x00"			//				fld qword ptr [eax]
+								  "\xDE\xD9"			//				fcompp
+								  "\xDF\xE0"			//				fnstsw ax	; copy flags to AX
+								  "\x66\x25\x00\x01"	//				and ax, 100h; gen C0 flag (8th bit; C0 = compare less than - carry flag)
+								  "\x74\x04"			//				je _great_eq
+								  "\xB0\x00"			//				mov al, 0
+								  "\xEB\x02"			//				jmp _continue
+								  "\xB0\x01"			//_less:		mov al, 1
+								  "\xBB????"			//_continue:	mov ebx, address(dest)
+								  "\x88\x03";			//				mov byte ptr [ebx], al
+		memcpy(code, precompiled, code_len);
+		(*((void **)(code+1))) = op2->getAddress();
+		(*((void **)(code+8))) = op1->getAddress();
+		(*((void **)(code+31))) = dest->getAddress();
+		return code_len;
 	}
 	else
 		throw new std::exception("JITCompiler::gen_gte: invalid data type!");
-	//
-	return 0;
 }
 
 int JITCompiler::gen_eq(char *code, Variable *dest, const Variable *op1, const Variable *op2)
 {
-	void *x = op1->getAddress(), *y = op2->getAddress(), *z = dest->getAddress(), *zf = &ZF;
-	if(op1->getItemType() == DataType::BOOLEAN)
+	if((op1->getItemType() == DataType::BOOLEAN))
 	{
-		__asm
-		{
-			; z = x == y
-			mov ebx, y
-			mov bl, byte ptr [ebx]
-			mov eax, x
-			mov al, byte ptr [eax]
-			cmp al, bl
-			je _eq_b
-			mov al, 0
-			jmp _cont_b
-_eq_b:		mov al, 1
-_cont_b:	mov ebx, z
-			mov byte ptr [ebx], al
-		}
+		const int code_len = 31;
+		const char *precompiled = "\xBB????"	//			mov ebx, address(op2)
+								  "\x8A\x1B"	//			mov bl, byte ptr [ebx]
+								  "\xB8????"	//			mov eax, address(op1)
+								  "\x8A\x00"	//			mov al, byte ptr [eax]
+								  "\x3A\xC3"	//			cmp al, bl
+								  "\x74\x04"	//			je _eq_b
+								  "\xB0\x00"	//			mov al, 0
+								  "\xEB\x02"	//			jmp _cont_b
+								  "\xB0\x01"	//_eq_b:	mov al, 1
+								  "\xBB????"	//_cont_b:	mov ebx, address(dest)
+								  "\x88\x03";	//			mov byte ptr [ebx], al
+		memcpy(code, precompiled, code_len);
+		(*((void **)(code+1))) = op2->getAddress();
+		(*((void **)(code+8))) = op1->getAddress();
+		(*((void **)(code+25))) = dest->getAddress();
+		return code_len;
 	}
 	else if(op1->getItemType() == DataType::INTEGER)
 	{
-		__asm
-		{
-			; z = x == y
-			mov ebx, y
-			mov ebx, [ebx]
-			mov eax, x
-			mov eax, [eax]
-			cmp eax, ebx
-			je _eq_i
-			mov al, 0
-			jmp _cont_i
-_eq_i:		mov al, 1
-_cont_i:	mov ebx, z
-			mov byte ptr [ebx], al
-		}
+		const int code_len = 31;
+		const char *precompiled = "\xBB????"	//			mov ebx, address(op2)
+								  "\x8B\x1B"	//			mov ebx, [ebx]
+								  "\xB8????"	//			mov eax, address(op1)
+								  "\x8B\x00"	//			mov eax, [eax]
+								  "\x3B\xC3"	//			cmp eax, ebx
+								  "\x74\x04"	//			je _eq_i
+								  "\xB0\x00"	//			mov al, 0
+								  "\xEB\x02"	//			jmp _cont_i
+								  "\xB0\x01"	//_eq_i:	mov al, 1
+								  "\xBB????"	//_cont_i:	mov ebx, address(dest)
+								  "\x88\x03";	//			mov byte ptr [ebx], al
+		memcpy(code, precompiled, code_len);
+		(*((void **)(code+1))) = op2->getAddress();
+		(*((void **)(code+8))) = op1->getAddress();
+		(*((void **)(code+25))) = dest->getAddress();
+		return code_len;
 	}
 	else if(op1->getItemType() == DataType::DOUBLE)
 	{
-		__asm
-		{
-			; z = x == y
-			mov eax, y
-			fld qword ptr [eax]
-			mov eax, x
-			fld qword ptr [eax]
-			fcompp
-			fnstsw ax	; copy flags to AX
-			and ax, 0x4000	; gen C3 flag (14th bit - C3 = compare equal - zero flag)
-			jnz _eq_d
-			mov al, 0
-			jmp _cont_d
-_eq_d:		mov al, 1
-_cont_d:	mov ebx, z
-			mov byte ptr [ebx], al
-		}
+		const int code_len = 37;
+		const char *precompiled = "\xB8????"			//			mov eax, address(op2)
+								  "\xDD\x00"			//			fld qword ptr [eax]
+								  "\xB8????"			//			mov eax, address(op1)
+								  "\xDD\x00"			//			fld qword ptr [eax]
+								  "\xDE\xD9"			//			fcompp
+								  "\xDF\xE0"			//			fnstsw ax		; copy flags to AX
+								  "\x66\x25\x00\x40"	//			and ax, 4000h	; gen C3 flag (14th bit - C3 = compare equal - zero flag)
+								  "\x75\x04"			//			jne _eq_d
+								  "\xB0\x00"			//			mov al, 0
+								  "\xEB\x02"			//			jmp _cont_d
+								  "\xB0\x01"			//_eq_d:	mov al, 1
+								  "\xBB????"			//_cont_d:	mov ebx, address(dest)
+								  "\x88\x03";			//			mov byte ptr [ebx], al
+		memcpy(code, precompiled, code_len);
+		(*((void **)(code+1))) = op2->getAddress();
+		(*((void **)(code+8))) = op1->getAddress();
+		(*((void **)(code+31))) = dest->getAddress();
+		return code_len;
 	}
 	else
 		throw new std::exception("JITCompiler::gen_eq: invalid data type!");
-	//
-	return 0;
 }
 
 int JITCompiler::gen_neq(char *code, Variable *dest, const Variable *op1, const Variable *op2)
 {
+/*
 	void *x = op1->getAddress(), *y = op2->getAddress(), *z = dest->getAddress(), *zf = &ZF;
 	if(op1->getItemType() == DataType::BOOLEAN)
 	{
@@ -1258,7 +1266,69 @@ _cont_d:	mov ebx, z
 		}
 	}
 	else
+*/
+	if((op1->getItemType() == DataType::BOOLEAN))
+	{
+		const int code_len = 31;
+		const char *precompiled = "\xBB????"	//			mov ebx, address(op2)
+								  "\x8A\x1B"	//			mov bl, byte ptr [ebx]
+								  "\xB8????"	//			mov eax, address(op1)
+								  "\x8A\x00"	//			mov al, byte ptr [eax]
+								  "\x3A\xC3"	//			cmp al, bl
+								  "\x75\x04"	//			jne _neq_b
+								  "\xB0\x00"	//			mov al, 0
+								  "\xEB\x02"	//			jmp _cont_b
+								  "\xB0\x01"	//_neq_b:	mov al, 1
+								  "\xBB????"	//_cont_b:	mov ebx, address(dest)
+								  "\x88\x03";	//			mov byte ptr [ebx], al
+		memcpy(code, precompiled, code_len);
+		(*((void **)(code+1))) = op2->getAddress();
+		(*((void **)(code+8))) = op1->getAddress();
+		(*((void **)(code+25))) = dest->getAddress();
+		return code_len;
+	}
+	else if(op1->getItemType() == DataType::INTEGER)
+	{
+		const int code_len = 31;
+		const char *precompiled = "\xBB????"	//			mov ebx, address(op2)
+								  "\x8B\x1B"	//			mov ebx, [ebx]
+								  "\xB8????"	//			mov eax, address(op1)
+								  "\x8B\x00"	//			mov eax, [eax]
+								  "\x3B\xC3"	//			cmp eax, ebx
+								  "\x75\x04"	//			jne _neq_i
+								  "\xB0\x00"	//			mov al, 0
+								  "\xEB\x02"	//			jmp _cont_i
+								  "\xB0\x01"	//_neq_i:	mov al, 1
+								  "\xBB????"	//_cont_i:	mov ebx, address(dest)
+								  "\x88\x03";	//			mov byte ptr [ebx], al
+		memcpy(code, precompiled, code_len);
+		(*((void **)(code+1))) = op2->getAddress();
+		(*((void **)(code+8))) = op1->getAddress();
+		(*((void **)(code+25))) = dest->getAddress();
+		return code_len;
+	}
+	else if(op1->getItemType() == DataType::DOUBLE)
+	{
+		const int code_len = 37;
+		const char *precompiled = "\xB8????"			//			mov eax, address(op2)
+								  "\xDD\x00"			//			fld qword ptr [eax]
+								  "\xB8????"			//			mov eax, address(op1)
+								  "\xDD\x00"			//			fld qword ptr [eax]
+								  "\xDE\xD9"			//			fcompp
+								  "\xDF\xE0"			//			fnstsw ax		; copy flags to AX
+								  "\x66\x25\x00\x40"	//			and ax, 4000h	; gen C3 flag (14th bit - C3 = compare equal - zero flag)
+								  "\x74\x04"			//			je _neq_d
+								  "\xB0\x00"			//			mov al, 0
+								  "\xEB\x02"			//			jmp _cont_d
+								  "\xB0\x01"			//_neq_d:	mov al, 1
+								  "\xBB????"			//_cont_d:	mov ebx, address(dest)
+								  "\x88\x03";			//			mov byte ptr [ebx], al
+		memcpy(code, precompiled, code_len);
+		(*((void **)(code+1))) = op2->getAddress();
+		(*((void **)(code+8))) = op1->getAddress();
+		(*((void **)(code+31))) = dest->getAddress();
+		return code_len;
+	}
+	else
 		throw new std::exception("JITCompiler::gen_neq: invalid data type!");
-	//
-	return 0;
 }
