@@ -784,30 +784,31 @@ int JITCompiler::gen_neg(char *code, Variable *dest, const Variable *src)
 
 int JITCompiler::gen_minus(char *code, Variable *dest, const Variable *src)
 {
-	void *x = src->getAddress(), *y = dest->getAddress(), *zf = &ZF;
 	if(src->getItemType() == DataType::INTEGER)
 	{
-		__asm
-		{
-			; y = -x
-			mov eax, x
-			mov eax, [eax]
-			neg eax
-			mov ebx, y
-			mov [ebx], eax
-		}
+		const int code_len = 16;
+		const char *precompiled = "\xB8????"	//mov eax, address(src)
+								  "\x8B\x00"	//mov eax, [eax]
+								  "\xF7\xD8"	//neg eax  
+								  "\xBB????"	//mov ebx, address(dest)
+								  "\x89\x03";	//mov [ebx], eax
+		memcpy(code, precompiled, code_len);
+		(*((void **)(code+1))) = src->getAddress();
+		(*((void **)(code+10))) = dest->getAddress();
+		return code_len;
 	}
 	else if(src->getItemType() == DataType::DOUBLE)
 	{
-		__asm
-		{
-			; y = -x
-			mov eax, x
-			fld qword ptr [eax]
-			fchs
-			mov eax, y
-			fstp qword ptr [eax]
-		}
+		const int code_len = 16;
+		const char *precompiled = "\xB8????"	//mov eax, address(src)
+								  "\xDD\x00"	//fld qword ptr [eax]  
+								  "\xD9\xE0"	//fchs
+								  "\xB8????"	//mov eax, address(dest)
+								  "\xDD\x18";	//fstp qword ptr [eax]
+		memcpy(code, precompiled, code_len);
+		(*((void **)(code+1))) = src->getAddress();
+		(*((void **)(code+10))) = dest->getAddress();
+		return code_len;
 	}
 	else
 		throw new std::exception("JITCompiler::gen_minus: invalid data type!");
