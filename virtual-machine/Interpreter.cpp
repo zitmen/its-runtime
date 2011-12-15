@@ -31,7 +31,7 @@ void Interpreter::_call(FunctionSignature *fn, const vector<Argument *> &args)
 		fn_calls[fn->name]++;
 		if(fn_calls[fn->name] > options[Options::JITCompiler])
 		{
-			printf("JIT Compiler: running compiled function '%s'.\n", fn->name.c_str());
+			//printf("JIT Compiler: running compiled function '%s'.\n", fn->name.c_str());
 			jitc->run(fn->name);
 			// TODO: RET(V) --> IP/ZF nastavovat v zkompilovanym programu!
 			IP += fn->length - 1;

@@ -8,7 +8,6 @@
 
 int main()
 {
-/*
 	try
 	{
 		bool ZF;
@@ -34,11 +33,14 @@ int main()
 		Interpreter interpreter(NULL, NULL, NULL);
 		interpreter.init();
 		//
+		Variable size("size", new DataType(DataType::INTEGER));// size.setValue(new Integer(10));
+		//
 		typedef void (*compiled_program)(void);
 		char *compiled = new char[4096];	// 4kB
 		int length = 0;
 		length += jit.gen_prolog(compiled+length);
-		length += jit.gen_jmp(compiled+length, new Integer(10));
+		length += jit.gen_new(compiled+length, new Variable("x", new DataType(DataType::ARRAY)), &size);
+		//length += jit.gen_jmp(compiled+length, new Integer(10));
 		//length += jit.gen_st(compiled+length, &z1, &x1);
 		//length += jit.gen_st(compiled+length, &z2, &x2);
 		//length += jit.gen_st(compiled+length, &z3, &x3);
@@ -80,7 +82,7 @@ int main()
 		std::cerr << e->what() << std::endl;
 		delete e;
 	}
-*/
+/*
 	try
 	{
 		ProgramLoader loader("jit.run");
@@ -99,5 +101,6 @@ int main()
 		std::cerr << e->what() << std::endl;
 		delete e;
 	}
+*/
 	return 0;
 }

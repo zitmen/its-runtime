@@ -903,53 +903,49 @@ int JITCompiler::gen_ldcn(char *code, Variable *var, Reference *constant)
 
 int JITCompiler::gen_new(char *code, Variable *var, const Variable *size)
 {
-	return 0;
-	// TODO: not tested yet!
-	int item_size = var->getItemTypeSize();
-	void *p_heapAlloc = heapAlloc;
-	void *x = var->getAddress();
-	//
 	if(var->getItemType() == DataType::ARRAY)
 	{
-		void *len = size->getAddress();
-		int item_type = var->getItemDataType()->subtype->type;
-		__asm
-		{
-			; x = heapAlloc(item_size * length + 8)
-			mov eax, item_size
-			mov ecx, len
-			mov ecx, [ecx]
-			mul ecx
-			add eax, 8
-			push eax
-			mov eax, p_heapAlloc
-			call eax
-			mov ebx, x
-			mov [ebx], eax
-			; x->length = len
-			; x->item_type = item_type
-			mov [eax], ecx
-			mov ebx, item_type
-			mov [eax + 4], ebx
-		}
+		const int code_len = 45;
+		const char *precompiled = // ; x = heapAlloc(sizeof(var))
+								  "\xB8????"		//mov eax, value(var->item_size)
+								  "\xB9????"		//mov ecx, address(size)
+								  "\x8B\x09"		//mov ecx, [ecx]
+								  "\xF7\xE1"		//mul ecx
+								  "\x83\xC0\x08"	//add eax, 8
+								  "\x50"			//push eax
+								  "\xB8????"		//mov eax, address(heapAlloc)
+								  "\xFF\xD0"		//call eax
+								  "\x83\xC6\x04"	//add esi, 4	; pop function argument
+								  "\xBB????"		//mov ebx, address(var)
+								  "\x89\x03"		//mov [ebx], eax	; save ptr into var
+								  // ; x->length = len
+								  // ; x->item_type = item_type
+								  "\x89\x08"		//mov [eax], ecx
+								  "\xBB????"		//mov ebx, value(var->item_type)
+								  "\x89\x58\x04";	//mov [eax+4], ebx
+		memcpy(code, precompiled, code_len);
+		(*((int *)(code+1))) = var->getItemTypeSize();
+		(*((void **)(code+6))) = size->getAddress();
+		(*((void **)(code+19))) = heapAlloc;
+		(*((void **)(code+29))) = var->getAddress();
+		(*((int *)(code+38))) = var->getItemDataType()->subtype->type;
+		return code_len;
 	}
 	else	// structure
 	{
-		int item_size = var->getItemTypeSize();
-		void *p_heapAlloc = heapAlloc;
-		void *x = var->getAddress();
-		__asm
-		{
-			; ptr = heapAlloc(sizeof(x))
-			; x = ptr
-			mov eax, item_size
-			push eax
-			mov eax, p_heapAlloc
-			call eax
-			add esi, 4	; pop function argument
-			mov ebx, x
-			mov [ebx], eax	; save ptr into x
-		}
+		const int code_len = 45;
+		const char *precompiled = "\xB8????"		//mov eax, value(var->item_size)
+								  "\x50"			//push eax
+								  "\xB8????"		//mov eax, address(heapAlloc)
+								  "\xFF\xD0"		//call eax
+								  "\x83\xC6\x04"	//add esi, 4	; pop function argument
+								  "\xBB????"		//mov ebx, address(var)
+								  "\x89\x03";		//mov [ebx], eax	; save ptr into var
+		memcpy(code, precompiled, code_len);
+		(*((int *)(code+1))) = var->getItemTypeSize();
+		(*((void **)(code+7))) = heapAlloc;
+		(*((void **)(code+17))) = var->getAddress();
+		return code_len;
 	}
 }
 

@@ -34,7 +34,8 @@ class JITCompiler
 			return (a->pointer < b->pointer);
 		}
 
-	protected:
+	//protected:
+public:
 		int gen_prolog(char *code);
 		int gen_epilog(char *code);
 		int gen_call(char *code, FunctionSignature *fn, const vector<Argument *> &args);
