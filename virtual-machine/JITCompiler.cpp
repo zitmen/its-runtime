@@ -743,42 +743,38 @@ int JITCompiler::gen_dec(char *code, Variable *var)
 
 int JITCompiler::gen_not(char *code, Variable *dest, const Variable *src)
 {
-	void *x = src->getAddress(), *y = dest->getAddress(), *zf = &ZF;
-	if(src->getItemType() == DataType::BOOLEAN)
+	if((src->getItemType() == DataType::BOOLEAN))
 	{
-		__asm
-		{
-			; y = !x
-			mov eax, x
-			mov al, byte ptr [eax]
-			not al
-			and al, 1
-			mov ebx, y
-			mov byte ptr [ebx], al
-		}
+		const int code_len = 18;
+		const char *precompiled = "\xB8????"	//mov eax, address(src)
+								  "\x8A\x00"	//mov al, byte ptr [eax]
+								  "\xF6\xD0"	//not al
+								  "\x24\x01"	//and al, 1
+								  "\xBB????"	//mov ebx, address(dest)
+								  "\x88\x03";	//mov byte ptr [ebx],al
+		memcpy(code, precompiled, code_len);
+		(*((void **)(code+1))) = src->getAddress();
+		(*((void **)(code+12))) = dest->getAddress();
+		return code_len;
 	}
 	else
 		throw new std::exception("JITCompiler::gen_not: invalid data type!");
-	//
-	return 0;
 }
 
 int JITCompiler::gen_neg(char *code, Variable *dest, const Variable *src)
 {
-	void *x = src->getAddress(), *y = dest->getAddress(), *zf = &ZF;
 	if(src->getItemType() == DataType::INTEGER)
 	{
-		__asm
-		{
-			; y = ~x
-			mov eax, x
-			mov eax, [eax]
-			not eax
-			mov ebx, y
-			mov [ebx], eax
-		}
-		//
-		return 0;
+		const int code_len = 16;
+		const char *precompiled = "\xB8????"	//mov eax, address(src)
+								  "\x8B\x00"	//mov eax, [eax]
+								  "\xF7\xD0"	//not eax  
+								  "\xBB????"	//mov ebx, address(dest)
+								  "\x89\x03";	//mov [ebx], eax
+		memcpy(code, precompiled, code_len);
+		(*((void **)(code+1))) = src->getAddress();
+		(*((void **)(code+10))) = dest->getAddress();
+		return code_len;
 	}
 	else if(src->getItemType() == DataType::BOOLEAN)
 		return gen_not(code, dest, src);
