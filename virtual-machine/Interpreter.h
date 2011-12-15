@@ -14,6 +14,7 @@ using std::vector;
 #include "BuiltInRoutines.h"
 #include "MemoryManager.h"
 #include "InstructionSet.h"
+#include "JITCompiler.h"
 
 class Interpreter
 {
@@ -29,6 +30,7 @@ class Interpreter
 		map<string, int> fn_calls;	// counter of function calls; first=fn_name,second=counter
 		int IP;	// Instruction Pointer -- points to an instruction after the currently processed one
 		bool ZF;	// Zero Flag -- was the result of the previous arithmetic/bit/logic instruction zero?
+		JITCompiler *jitc;	// Just-In-Time Compiler
 
 	protected:
 		void _call(FunctionSignature *fn, const vector<Argument *> &args);
@@ -93,6 +95,12 @@ class Interpreter
 			options[Options::StackSize] = 32*1024*1024;	// 32MB
 			options[Options::GarbageCollector] = 0.9;	// 90% of heap is full
 			options[Options::JITCompiler] = 10;	// 10 iterations over 1 function
+			jitc = new JITCompiler(program, functions);
+		}
+
+		~Interpreter()
+		{
+			delete jitc;
 		}
 
 		void setOption(int option, double val)

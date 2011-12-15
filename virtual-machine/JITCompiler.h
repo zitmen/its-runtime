@@ -18,19 +18,11 @@ using std::vector;
 class JITCompiler
 {
 	private:
-		stack<FunctionSignature *> call_stack;
-		MemoryManager *memory;
-		double options[4];
 		vector<Instruction *> *program;
-		static map<string, StructureSignature *> *structures;
-		static map<string, FunctionSignature *> *functions;
-		int IP;	// Instruction Pointer -- points to an instruction after the currently processed one
+		map<string, FunctionSignature *> *functions;
+		map<string, char *> compiled_functions;
 
-	public:
-		bool ZF;	// Zero Flag -- was the result of the previous arithmetic/bit/logic instruction zero?
-
-	//protected:
-	public:
+	protected:
 		int gen_prolog(char *code);
 		int gen_epilog(char *code);
 		int gen_call(char *code, FunctionSignature *fn, const vector<Argument *> &args);
@@ -73,7 +65,45 @@ class JITCompiler
 		int gen_neq(char *code, Variable *dest, const Variable *op1, const Variable *op2);
 
 	public:
-		// TODO
+		JITCompiler(vector<Instruction *> *program, map<string, FunctionSignature *> *functions)
+		{
+			this->program = program;
+			this->functions = functions;
+		}
+
+		~JITCompiler()
+		{
+			for(map<string, char *>::iterator it = compiled_functions.begin(); it != compiled_functions.end(); ++it)
+				if(it->second != NULL)
+					delete [] it->second;
+		}
+
+		void compile(const string &fnName)
+		{
+			char *code = new char[4096];	// 4kB
+			int length = 0;
+			//
+			length += gen_prolog(code+length);
+			// TODO
+			// for i from
+			// start = functions->find(fnName)->second->pointer
+			// to
+			// end = ??? -- seradit funkce podle pointeru (ve vektoru) a do dalsi mapy <string, int> nacpat length kazde funkce!
+			length += gen_epilog(code+length);
+			//
+			compiled_functions.insert(pair<string, char *>(fnName, code));
+		}
+
+		void run(const string &fnName)
+		{
+			// compile (if it has not been done yet)
+			if(compiled_functions.find(fnName) == compiled_functions.end())
+				compile(fnName);
+			// run
+			typedef void (*compiled_program)(void);
+			compiled_program exec = (compiled_program)compiled_functions[fnName];
+			exec();
+		}
 };
 
 #endif	// _RUN_JIT_COMPILER_H_
