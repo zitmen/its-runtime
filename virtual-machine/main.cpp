@@ -12,7 +12,7 @@ int main()
 	{
 		bool ZF;
 		JITCompiler jit(NULL, NULL, &ZF);
-		int ix = 255, iy = 3, iz;
+		int ix = 10, iy = 3, iz;
 		Variable x1("x", new DataType(DataType::INTEGER)); x1.setAddress(&ix);
 		Variable y1("y", new DataType(DataType::INTEGER)); y1.setAddress(&iy);
 		Variable z1("z", new DataType(DataType::INTEGER)); z1.setAddress(&iz);
@@ -27,19 +27,24 @@ int main()
 		Variable y3("y", new DataType(DataType::BOOLEAN)); y3.setAddress(&by);
 		Variable z3("z", new DataType(DataType::BOOLEAN)); z3.setAddress(&bz);
 		//
-		char *str;
-		Variable z4("str", new DataType(DataType::STRING)); z4.setAddress(&str);
+		char *str = "rand";
+		//Variable z4("str", new DataType(DataType::STRING)); z4.setAddress(&str);
 		//
 		Interpreter interpreter(NULL, NULL, NULL);
 		interpreter.init();
+		BuiltInRoutines::init();
 		//
 		Variable size("size", new DataType(DataType::INTEGER));// size.setValue(new Integer(10));
+		Variable routineName("rand", new DataType(DataType::STRING)); routineName.setAddress(&str);
+		vector<Argument *> arguments; arguments.push_back(&routineName); arguments.push_back(&x1);
 		//
 		typedef void (*compiled_program)(void);
 		char *compiled = new char[4096];	// 4kB
 		int length = 0;
 		length += jit.gen_prolog(compiled+length);
-		length += jit.gen_new(compiled+length, new Variable("x", new DataType(DataType::ARRAY)), &size);
+		length += jit.gen_invoke(compiled+length, &routineName,  arguments);
+		length += jit.gen_pop(compiled+length, &z1);
+		//length += jit.gen_new(compiled+length, new Variable("x", new DataType(DataType::ARRAY)), &size);
 		//length += jit.gen_jmp(compiled+length, new Integer(10));
 		//length += jit.gen_st(compiled+length, &z1, &x1);
 		//length += jit.gen_st(compiled+length, &z2, &x2);
@@ -52,18 +57,18 @@ int main()
 		//length += jit.gen_xor(compiled+length, &z3, &x3, &y3);
 		//length += jit.gen_xor(compiled+length, &z3, &x3, &y3);
 		//length += jit.gen_ldzf_alu(compiled+length, &x3);
-		length += jit.gen_sub(compiled+length, &z2, &x2, &y2);
-		length += jit.gen_ldzf_fpu(compiled+length, &y3);
+		//length += jit.gen_sub(compiled+length, &z2, &x2, &y2);
+		//length += jit.gen_ldzf_fpu(compiled+length, &y3);
 		length += jit.gen_epilog(compiled+length);
 		//
 		compiled_program exec = (compiled_program)compiled;
 		exec();
-		//printf("iz=%d\n", iz);
+		printf("iz=%d\n", iz);
 		//printf("ix=%d\n", ix);
 		//printf("iy=%d\n", iy);
 		//printf("dz=%f\n", dz);
 		//printf("bx=%d\n", bx);
-		printf("by=%d\n", by);
+		//printf("by=%d\n", by);
 		//printf("bz=%d\n", bz);
 		//printf("str=%s\n", str);
 		//
