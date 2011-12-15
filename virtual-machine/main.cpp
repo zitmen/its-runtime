@@ -11,7 +11,7 @@ int main()
 	try
 	{
 		JITCompiler jit;
-		int ix = 5, iy = 2, iz;
+		int ix = 5, iy = 21, iz;
 		Variable x1("x", new DataType(DataType::INTEGER)); x1.setAddress(&ix);
 		Variable y1("y", new DataType(DataType::INTEGER)); y1.setAddress(&iy);
 		Variable z1("z", new DataType(DataType::INTEGER)); z1.setAddress(&iz);
@@ -25,7 +25,7 @@ int main()
 		//jit.gen_st(&z2, &x2);
 		//printf("dz=%f\n", dz);
 		//
-		bool bx = true, by, bz;
+		bool bx = true, by = true, bz;
 		Variable x3("x", new DataType(DataType::BOOLEAN)); x3.setAddress(&bx);
 		Variable y3("y", new DataType(DataType::BOOLEAN)); y3.setAddress(&by);
 		Variable z3("z", new DataType(DataType::BOOLEAN)); z3.setAddress(&bz);
@@ -37,13 +37,15 @@ int main()
 		char *compiled = new char[4096];	// 4kB
 		int length = 0;
 		length += jit.gen_prolog(compiled+length);
-		length += jit.gen_and(compiled+length, &z1, &x1, &y1);
+		length += jit.gen_xor(compiled+length, &z1, &x1, &y1);
+		length += jit.gen_xor(compiled+length, &z3, &x3, &y3);
 		length += jit.gen_epilog(compiled+length);
 		//
 		compiled_program exec = (compiled_program)compiled;
 		exec();
 		printf("iz=%d\n", iz);
 		//printf("dz=%f\n", dz);
+		printf("bz=%d\n", bz);
 		//
 		delete [] compiled;
 		//

@@ -478,8 +478,6 @@ int JITCompiler::gen_mul(char *code, Variable *dest, const Variable *op1, const 
 	}
 	else
 		throw new std::exception("JITCompiler::gen_mul: invalid data type!");
-	//
-	return 0;
 }
 
 int JITCompiler::gen_div(char *code, Variable *dest, const Variable *op1, const Variable *op2)
@@ -552,119 +550,120 @@ int JITCompiler::gen_mod(char *code, Variable *dest, const Variable *op1, const 
 	}
 	else
 		throw new std::exception("JITCompiler::gen_mod: invalid data type!");
-	//
-	return 0;
 }
 
 int JITCompiler::gen_and(char *code, Variable *dest, const Variable *op1, const Variable *op2)
 {
-	void *x = op1->getAddress(), *y = op2->getAddress(), *z = dest->getAddress(), *zf = &ZF;
-	if((op1->getItemType() == DataType::INTEGER))
+	if(op1->getItemType() == DataType::INTEGER)
 	{
-		__asm
-		{
-			; z = x & y
-			mov eax, x
-			mov eax, [eax]
-			mov ebx, y
-			mov ebx, [ebx]
-			and eax, ebx
-			mov ebx, z
-			mov [ebx], eax
-		}
+		const int code_len = 23;
+		const char *precompiled = "\xB8????"	//mov eax, address(op1)
+								  "\x8B\x00"	//mov eax, [eax]
+								  "\xBB????"	//mov ebx, address(op2)
+								  "\x8B\x1B"	//mov ebx, [ebx]
+								  "\x23\xC3"	//and eax, ebx
+								  "\xBB????"	//mov ebx, address(dest)
+								  "\x89\x03";	//mov [ebx], eax
+		memcpy(code, precompiled, code_len);
+		(*((void **)(code+1))) = op1->getAddress();
+		(*((void **)(code+8))) = op2->getAddress();
+		(*((void **)(code+17))) = dest->getAddress();
+		return code_len;
 	}
 	else if((op1->getItemType() == DataType::BOOLEAN))
 	{
-		__asm
-		{
-			; z = x & y
-			mov eax, x
-			mov al, byte ptr [eax]
-			mov ebx, y
-			mov bl, byte ptr [ebx]
-			and al, bl
-			mov ebx, z
-			mov byte ptr [ebx], al
-		}
+		const int code_len = 23;
+		const char *precompiled = "\xB8????"	//mov eax, address(op1)
+								  "\x8A\x00"	//mov al, byte ptr [eax]
+								  "\xBB????"	//mov ebx, address(op2)
+								  "\x8A\x1B"	//mov bl, byte ptr [ebx]
+								  "\x22\xC3"	//and al,bl
+								  "\xBB????"	//mov ebx, address(dest)
+								  "\x88\x03";	//mov byte ptr [ebx],al
+		memcpy(code, precompiled, code_len);
+		(*((void **)(code+1))) = op1->getAddress();
+		(*((void **)(code+8))) = op2->getAddress();
+		(*((void **)(code+17))) = dest->getAddress();
+		return code_len;
 	}
 	else
 		throw new std::exception("JITCompiler::gen_and: invalid data type!");
-	//
-	return 0;
 }
 
 int JITCompiler::gen_or(char *code, Variable *dest, const Variable *op1, const Variable *op2)
 {
-	void *x = op1->getAddress(), *y = op2->getAddress(), *z = dest->getAddress(), *zf = &ZF;
-	if((op1->getItemType() == DataType::INTEGER))
+	if(op1->getItemType() == DataType::INTEGER)
 	{
-		__asm
-		{
-			; z = x | y
-			mov eax, x
-			mov eax, [eax]
-			mov ebx, y
-			mov ebx, [ebx]
-			or eax, ebx
-			mov ebx, z
-			mov [ebx], eax
-		}
+		const int code_len = 23;
+		const char *precompiled = "\xB8????"	//mov eax, address(op1)
+								  "\x8B\x00"	//mov eax, [eax]
+								  "\xBB????"	//mov ebx, address(op2)
+								  "\x8B\x1B"	//mov ebx, [ebx]
+								  "\x0B\xC3"	//or eax, ebx
+								  "\xBB????"	//mov ebx, address(dest)
+								  "\x89\x03";	//mov [ebx], eax
+		memcpy(code, precompiled, code_len);
+		(*((void **)(code+1))) = op1->getAddress();
+		(*((void **)(code+8))) = op2->getAddress();
+		(*((void **)(code+17))) = dest->getAddress();
+		return code_len;
 	}
 	else if((op1->getItemType() == DataType::BOOLEAN))
 	{
-		__asm
-		{
-			; z = x | y
-			mov eax, x
-			mov al, byte ptr [eax]
-			mov ebx, y
-			mov bl, byte ptr [ebx]
-			or al, bl
-			mov ebx, z
-			mov byte ptr [ebx], al
-		}
+		const int code_len = 23;
+		const char *precompiled = "\xB8????"	//mov eax, address(op1)
+								  "\x8A\x00"	//mov al, byte ptr [eax]
+								  "\xBB????"	//mov ebx, address(op2)
+								  "\x8A\x1B"	//mov bl, byte ptr [ebx]
+								  "\x0A\xC3"	//or al, bl
+								  "\xBB????"	//mov ebx, address(dest)
+								  "\x88\x03";	//mov byte ptr [ebx],al
+		memcpy(code, precompiled, code_len);
+		(*((void **)(code+1))) = op1->getAddress();
+		(*((void **)(code+8))) = op2->getAddress();
+		(*((void **)(code+17))) = dest->getAddress();
+		return code_len;
 	}
 	else
 		throw new std::exception("JITCompiler::gen_or: invalid data type!");
-	//
-	return 0;
 }
 
 int JITCompiler::gen_xor(char *code, Variable *dest, const Variable *op1, const Variable *op2)
 {
-	void *x = op1->getAddress(), *y = op2->getAddress(), *z = dest->getAddress(), *zf = &ZF;
-	if((op1->getItemType() == DataType::INTEGER))
+	if(op1->getItemType() == DataType::INTEGER)
 	{
-		__asm
-		{
-			; z = x ^ y
-			mov eax, x
-			mov eax, [eax]
-			mov ebx, y
-			mov ebx, [ebx]
-			xor eax, ebx
-			mov ebx, z
-			mov [ebx], eax
-		}
+		const int code_len = 23;
+		const char *precompiled = "\xB8????"	//mov eax, address(op1)
+								  "\x8B\x00"	//mov eax, [eax]
+								  "\xBB????"	//mov ebx, address(op2)
+								  "\x8B\x1B"	//mov ebx, [ebx]
+								  "\x33\xC3"	//xor eax, ebx
+								  "\xBB????"	//mov ebx, address(dest)
+								  "\x89\x03";	//mov [ebx], eax
+		memcpy(code, precompiled, code_len);
+		(*((void **)(code+1))) = op1->getAddress();
+		(*((void **)(code+8))) = op2->getAddress();
+		(*((void **)(code+17))) = dest->getAddress();
+		return code_len;
 	}
 	else if((op1->getItemType() == DataType::BOOLEAN))
 	{
-		__asm
-		{
-			; z = x ^ y
-			mov eax, x
-			mov al, byte ptr [eax]
-			mov ebx, y
-			mov bl, byte ptr [ebx]
-			xor al, bl
-			mov ebx, z
-			mov byte ptr [ebx], al
-		}
+		const int code_len = 23;
+		const char *precompiled = "\xB8????"	//mov eax, address(op1)
+								  "\x8A\x00"	//mov al, byte ptr [eax]
+								  "\xBB????"	//mov ebx, address(op2)
+								  "\x8A\x1B"	//mov bl, byte ptr [ebx]
+								  "\x32\xC3"	//xor al, bl
+								  "\xBB????"	//mov ebx, address(dest)
+								  "\x88\x03";	//mov byte ptr [ebx],al
+		memcpy(code, precompiled, code_len);
+		(*((void **)(code+1))) = op1->getAddress();
+		(*((void **)(code+8))) = op2->getAddress();
+		(*((void **)(code+17))) = dest->getAddress();
+		return code_len;
 	}
 	else
 		throw new std::exception("JITCompiler::gen_xor: invalid data type!");
-	//
-	return 0;
 }
 
 int JITCompiler::gen_lsh(char *code, Variable *dest, const Variable *op1, const Variable *op2)
