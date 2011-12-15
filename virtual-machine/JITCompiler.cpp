@@ -7,6 +7,7 @@
 // mov ebx, 12345678h --> BB 78 56 34 12
 // mov ecx, 12345678h --> B9 78 56 34 12
 // mov edx, 12345678h --> BA 78 56 34 12
+// jmp _label         --> EB ?? (?? is 1B offset(=count of bytes to the instruction you're jumping to) to the _label; for longer jumps use long jump/call/...)
 
 /*
 		typedef int (*func)(int, int);
@@ -483,34 +484,37 @@ int JITCompiler::gen_sub(char *code, Variable *dest, const Variable *op1, const 
 
 int JITCompiler::gen_mul(char *code, Variable *dest, const Variable *op1, const Variable *op2)
 {
-	void *x = op1->getAddress(), *y = op2->getAddress(), *z = dest->getAddress(), *zf = &ZF;
 	if(op1->getItemType() == DataType::INTEGER)
 	{
-		__asm
-		{
-			; z = x * y
-			mov eax, x
-			mov eax, [eax]
-			mov ebx, y
-			mov ebx, [ebx]
-			mul ebx
-			mov ebx, z
-			mov [ebx], eax
-		}
+		const int code_len = 23;
+		const char *precompiled = "\xB8????"	//mov eax, address(op1)
+								  "\x8B\x00"	//mov eax, [eax]
+								  "\xBB????"	//mov ebx, address(op2)
+								  "\x8B\x1B"	//mov ebx, [ebx]
+								  "\xF7\xE3"	//mul ebx
+								  "\xBB????"	//mov ebx, address(dest)
+								  "\x89\x03";	//mov [ebx], eax
+		memcpy(code, precompiled, code_len);
+		(*((void **)(code+1))) = op1->getAddress();
+		(*((void **)(code+8))) = op2->getAddress();
+		(*((void **)(code+17))) = dest->getAddress();
+		return code_len;
 	}
 	else if(op1->getItemType() == DataType::DOUBLE)
 	{
-		__asm
-		{
-			; z = x * y
-			mov eax, x
-			fld qword ptr [eax]
-			mov eax, y
-			fld qword ptr [eax]
-			fmul
-			mov eax, z
-			fstp qword ptr [eax]
-		}
+		const int code_len = 23;
+		const char *precompiled = "\xB8????"	//mov eax, address(op1)
+								  "\xDD\x00"	//fld qword ptr [eax]
+								  "\xB8????"	//mov eax, address(op2)
+								  "\xDD\x00"	//fld qword ptr [eax] 
+								  "\xDE\xC9"	//fmul
+								  "\xB8????"	//mov eax, address(dest)
+								  "\xDD\x18";	//fstp qword ptr [eax]
+		memcpy(code, precompiled, code_len);
+		(*((void **)(code+1))) = op1->getAddress();
+		(*((void **)(code+8))) = op2->getAddress();
+		(*((void **)(code+17))) = dest->getAddress();
+		return code_len;
 	}
 	else
 		throw new std::exception("JITCompiler::gen_mul: invalid data type!");
@@ -520,44 +524,46 @@ int JITCompiler::gen_mul(char *code, Variable *dest, const Variable *op1, const 
 
 int JITCompiler::gen_div(char *code, Variable *dest, const Variable *op1, const Variable *op2)
 {
-	void *error = divByZeroEx;
-	void *x = op1->getAddress(), *y = op2->getAddress(), *z = dest->getAddress(), *zf = &ZF;
 	if(op1->getItemType() == DataType::INTEGER)
 	{
-		__asm
-		{
-			; z = x / y
-			mov ebx, y
-			mov ebx, [ebx]
-			or ebx, ebx		; sets ZF if ebx(=y) is zero
-			jnz _valid
-			mov eax, error
-			call eax
-_valid:		mov eax, x
-			mov eax, [eax]
-			div ebx
-			mov ebx, z
-			mov [ebx], eax
-		}
+		const int code_len = 37;
+		const char *precompiled = "\xBB????"	//			mov ebx, address(op2)
+								  "\x8B\x1B"	//			mov ebx, [ebx]
+								  "\x83\xFB\x00"//			cmp ebx, 0
+								  "\x75\x07"	//			jne _valid
+								  "\xB8????"	//			mov eax, address(divByZeroEx)
+								  "\xFF\xD0"	//			call eax
+								  "\xB8????"	//_valid:	mov eax, address(op1)
+								  "\x8B\x00"	//			mov eax, [eax]
+								  "\x33\xD2"	//			xor edx, edx	;before division, the edx has to be set to zero
+								  "\xF7\xF3"	//			div ebx
+								  "\xBB????"	//			mov ebx, address(dest)
+								  "\x89\x03";	//			mov [ebx], eax
+		memcpy(code, precompiled, code_len);
+		(*((void **)(code+1))) = op2->getAddress();
+		(*((void **)(code+13))) = divByZeroEx;
+		(*((void **)(code+20))) = op1->getAddress();
+		(*((void **)(code+31))) = dest->getAddress();
+		return code_len;
 	}
 	else if(op1->getItemType() == DataType::DOUBLE)
 	{
-		__asm
-		{
-			; z = x / y
-			mov eax, x
-			fld qword ptr [eax]
-			mov eax, y
-			fld qword ptr [eax]
-			fdiv
-			mov eax, z
-			fstp qword ptr [eax]
-		}
+		const int code_len = 23;
+		const char *precompiled = "\xB8????"	//mov eax, address(op1)
+								  "\xDD\x00"	//fld qword ptr [eax]
+								  "\xB8????"	//mov eax, address(op2)
+								  "\xDD\x00"	//fld qword ptr [eax]
+								  "\xDE\xF9"	//fdivp
+								  "\xB8????"	//mov eax, address(dest)
+								  "\xDD\x18";	//fstp qword ptr [eax]
+		memcpy(code, precompiled, code_len);
+		(*((void **)(code+1))) = op1->getAddress();
+		(*((void **)(code+8))) = op2->getAddress();
+		(*((void **)(code+17))) = dest->getAddress();
+		return code_len;
 	}
 	else
 		throw new std::exception("JITCompiler::gen_div: invalid data type!");
-	//
-	return 0;
 }
 
 int JITCompiler::gen_mod(char *code, Variable *dest, const Variable *op1, const Variable *op2)

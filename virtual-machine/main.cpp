@@ -11,7 +11,7 @@ int main()
 	try
 	{
 		JITCompiler jit;
-		int ix = 4, iy = 3, iz;
+		int ix = 4, iy = 0, iz;
 		Variable x1("x", new DataType(DataType::INTEGER)); x1.setAddress(&ix);
 		Variable y1("y", new DataType(DataType::INTEGER)); y1.setAddress(&iy);
 		Variable z1("z", new DataType(DataType::INTEGER)); z1.setAddress(&iz);
@@ -37,7 +37,7 @@ int main()
 		char *compiled = new char[4096];	// 4kB
 		int length = 0;
 		length += jit.gen_prolog(compiled+length);
-		length += jit.gen_sub(compiled+length, &z1, &x1, &y1);
+		length += jit.gen_div(compiled+length, &z1, &x1, &y1);
 		length += jit.gen_epilog(compiled+length);
 		//
 		compiled_program exec = (compiled_program)compiled;
