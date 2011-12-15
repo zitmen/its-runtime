@@ -296,42 +296,42 @@ int JITCompiler::gen_pop(char *code, Variable *dest)
 
 int JITCompiler::gen_st(char *code, Variable *dest, Variable *src)
 {
-	void *x = dest->getAddress(), *y = src->getAddress();
 	if(src->getItemType() == DataType::DOUBLE)	// 8B, FPU
 	{
-		__asm
-		{
-			; x = y
-			mov eax, y
-			fld qword ptr [eax]
-			mov ebx, x
-			fstp qword ptr [ebx]
-		}
+		const int code_len = 14;
+		const char *precompiled = "\xB8????"	//mov eax, address(src)
+								  "\xDD\x00"	//fld qword ptr [eax]
+								  "\xBB????"	//mov ebx, address(dest)
+								  "\xDD\x1B";	//fstp qword ptr [ebx]
+		memcpy(code, precompiled, code_len);
+		(*((void **)(code+1))) = src->getAddress();
+		(*((void **)(code+8))) = dest->getAddress();
+		return code_len;
 	}
 	else if(src->getItemType() == DataType::BOOLEAN)	// 1B, ALU
 	{
-		__asm
-		{
-			; x = y
-			mov eax, y
-			mov al, byte ptr [eax]
-			mov ebx, x
-			mov byte ptr [ebx], al
-		}
+		const int code_len = 14;
+		const char *precompiled = "\xB8????"	//mov eax, address(src)
+								  "\x8A\x00"	//mov al, byte ptr [eax]
+								  "\xBB????"	//mov ebx, address(dest)
+								  "\x88\x03";	//mov byte ptr [ebx], al
+		memcpy(code, precompiled, code_len);
+		(*((void **)(code+1))) = src->getAddress();
+		(*((void **)(code+8))) = dest->getAddress();
+		return code_len;
 	}
 	else	// INTEGER, REFERENCE, ARRAY, STRUCTURE, STRING -- 4B, ALU
 	{
-		__asm
-		{
-			; x = y
-			mov eax, y
-			mov eax, [eax]
-			mov ebx, x
-			mov [ebx], eax
-		}
+		const int code_len = 14;
+		const char *precompiled = "\xB8????"	//mov eax, address(src)
+								  "\x8B\x00"	//mov eax, dword ptr [eax]
+								  "\xBB????"	//mov ebx, address(dest)
+								  "\x89\x03";	//mov [ebx], eax
+		memcpy(code, precompiled, code_len);
+		(*((void **)(code+1))) = src->getAddress();
+		(*((void **)(code+8))) = dest->getAddress();
+		return code_len;
 	}
-	//
-	return 0;
 }
 
 int JITCompiler::gen_ldzf_int(char *code, Variable *dest)
