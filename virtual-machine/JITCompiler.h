@@ -42,8 +42,8 @@ class JITCompiler
 		int gen_retv(char *code, const Variable *var);
 		int gen_pop(char *code, Variable *dest);
 		int gen_st(char *code, Variable *dest, Variable *src);
-		int gen_ldzf_int(char *code, Variable *dest);
-		int gen_ldzf_double(char *code, Variable *dest);
+		int gen_ldzf_alu(char *code, Variable *dest);
+		int gen_ldzf_fpu(char *code, Variable *dest);
 		int gen_add(char *code, Variable *dest, const Variable *op1, const Variable *op2);
 		int gen_sub(char *code, Variable *dest, const Variable *op1, const Variable *op2);
 		int gen_mul(char *code, Variable *dest, const Variable *op1, const Variable *op2);

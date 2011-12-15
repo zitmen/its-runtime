@@ -334,37 +334,35 @@ int JITCompiler::gen_st(char *code, Variable *dest, Variable *src)
 	}
 }
 
-int JITCompiler::gen_ldzf_int(char *code, Variable *dest)
+int JITCompiler::gen_ldzf_alu(char *code, Variable *dest)
 {
-	void *zf = dest->getAddress();
-	__asm
-	{
-		; update Zero-Flag inside of the interpreter
-		pushf
-		mov eax, 0
-		pop ax	; flag register is only 2B
-		mov ebx, 1	; mask for extracting ZF stored at bit 0
-		and ebx, eax
-		mov eax, zf
-		mov [eax], ebx
-	}
 	//
-	return 0;
+	if(dest->getItemType() != DataType::BOOLEAN) throw new std::exception("JITCompiler::gen_ldzf: invalid data type!");
+	//
+	// update Zero-Flag inside of the interpreter
+	const int code_len = 22;
+	const char *precompiled = "\x66\x9C"			//pushf
+							  "\x66\x58"			//pop ax	; flag register is only 2Bytes
+							  "\x66\xBB\x40\x00"	//mov bx, 64; mask for extracting ZF stored at bit 6
+							  "\x66\x23\xD8"		//and bx, ax
+							  "\x66\xC1\xEB\x06"	//shr bx, 6	; shift to the right to get 0 or 1
+							  "\xB8????"			//mov eax, address(dest)
+							  "\x88\x18";			//mov byte ptr [eax], bl
+	memcpy(code, precompiled, code_len);
+	(*((void **)(code+16))) = dest->getAddress();
+	return code_len;
 }
 
-int JITCompiler::gen_ldzf_double(char *code, Variable *dest)
+int JITCompiler::gen_ldzf_fpu(char *code, Variable *dest)
 {
-	const int code_length = 0;
-	void *zf = dest->getAddress();
-	__asm
-	{
-		; update Zero-Flag inside of the machine (physical)
-		fstsw ax        ; copy the status word to the AX register
-		fwait           ; wait until the instruction is completed
-		sahf            ; copy the condition bits in the CPU's flag register
-	}
-	//	then use the ZF detection for integers
-	return gen_ldzf_int(code+code_length, dest);
+	// update Zero-Flag inside of the machine (physical)
+	const int code_len = 4;
+	const char *precompiled = "\x9B"		//wait		; wait until the running instruction is done (if any)
+							  "\xDF\xE0"	//fnstsw ax	; copy the status word to the AX register
+							  "\x9E";		//sahf		; copy the condition bits in the CPU's flag register
+	memcpy(code, precompiled, code_len);
+	// then use the ZF detection for integers
+	return (code_len + gen_ldzf_alu(code+code_len, dest));
 }
 
 int JITCompiler::gen_add(char *code, Variable *dest, const Variable *op1, const Variable *op2)
