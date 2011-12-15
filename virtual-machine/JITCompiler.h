@@ -5,6 +5,7 @@
 #include <map>
 #include <exception>
 #include <stack>
+#include <algorithm>
 using std::stack;
 using std::map;
 using std::vector;
@@ -21,6 +22,11 @@ class JITCompiler
 		vector<Instruction *> *program;
 		map<string, FunctionSignature *> *functions;
 		map<string, char *> compiled_functions;
+
+		static bool functionsComparator(FunctionSignature *a, FunctionSignature *b)
+		{
+			return (a->pointer < b->pointer);
+		}
 
 	protected:
 		int gen_prolog(char *code);
@@ -69,6 +75,15 @@ class JITCompiler
 		{
 			this->program = program;
 			this->functions = functions;
+			//
+			// get length of functions
+			vector<FunctionSignature *> fns;
+			for(map<string, FunctionSignature *>::iterator it = functions->begin(); it != functions->end(); ++it)
+				fns.push_back(it->second);
+			std::sort(fns.begin(), fns.end(), JITCompiler::functionsComparator);
+			for(size_t i = 0, im = fns.size() - 1; i < im; i++)
+				fns[i]->length = fns[i+1]->pointer - fns[i]->pointer;
+			fns[fns.size()-1]->length = program->size() - fns[fns.size()-1]->pointer;
 		}
 
 		~JITCompiler()
@@ -78,17 +93,70 @@ class JITCompiler
 					delete [] it->second;
 		}
 
+		int compileInstruction(Instruction *instr, char *code)
+		{
+			switch(instr->code)
+			{
+				case InstructionCode::JZ:     gen_jz(code, (Integer *)instr->args[0]); break;
+				case InstructionCode::JNZ:    gen_jnz(code, (Integer *)instr->args[0]); break;
+				case InstructionCode::JMP:    gen_jmp(code, (Integer *)instr->args[0]); break;
+				case InstructionCode::RET:    gen_ret(code); break;
+				case InstructionCode::RETV:   gen_retv(code, (Variable *)instr->args[0]); break;
+				case InstructionCode::POP:    gen_pop(code, (Variable *)instr->args[0]); break;
+				case InstructionCode::ST:     gen_st(code, (Variable *)instr->args[0], (Variable *)instr->args[1]); break;
+				case InstructionCode::ADD:    gen_add(code, (Variable *)instr->args[0], (Variable *)instr->args[1], (Variable *)instr->args[2]); break;
+				case InstructionCode::SUB:    gen_sub(code, (Variable *)instr->args[0], (Variable *)instr->args[1], (Variable *)instr->args[2]); break;
+				case InstructionCode::MUL:    gen_mul(code, (Variable *)instr->args[0], (Variable *)instr->args[1], (Variable *)instr->args[2]); break;
+				case InstructionCode::DIV:    gen_div(code, (Variable *)instr->args[0], (Variable *)instr->args[1], (Variable *)instr->args[2]); break;
+				case InstructionCode::MOD:    gen_mod(code, (Variable *)instr->args[0], (Variable *)instr->args[1], (Variable *)instr->args[2]); break;
+				case InstructionCode::AND:    gen_and(code, (Variable *)instr->args[0], (Variable *)instr->args[1], (Variable *)instr->args[2]); break;
+				case InstructionCode::OR:     gen_or(code, (Variable *)instr->args[0], (Variable *)instr->args[1], (Variable *)instr->args[2]); break;
+				case InstructionCode::XOR:    gen_xor(code, (Variable *)instr->args[0], (Variable *)instr->args[1], (Variable *)instr->args[2]); break;
+				case InstructionCode::LSH:    gen_lsh(code, (Variable *)instr->args[0], (Variable *)instr->args[1], (Variable *)instr->args[2]); break;
+				case InstructionCode::RSH:    gen_rsh(code, (Variable *)instr->args[0], (Variable *)instr->args[1], (Variable *)instr->args[2]); break;
+				case InstructionCode::INC:    gen_inc(code, (Variable *)instr->args[0]); break;
+				case InstructionCode::DEC:    gen_dec(code, (Variable *)instr->args[0]); break;
+				case InstructionCode::NOT:    gen_not(code, (Variable *)instr->args[0], (Variable *)instr->args[1]); break;
+				case InstructionCode::NEG:    gen_neg(code, (Variable *)instr->args[0], (Variable *)instr->args[1]); break;
+				case InstructionCode::MINUS:  gen_minus(code, (Variable *)instr->args[0], (Variable *)instr->args[1]); break;
+				case InstructionCode::CALL:   gen_call(code, functions->find(((Variable *)instr->args[0])->getName())->second, instr->args); break;
+				case InstructionCode::INVOKE: gen_invoke(code, (Variable *)instr->args[0], instr->args); break;
+				case InstructionCode::LDCI:   gen_ldci(code, (Variable *)instr->args[0], (Integer *)instr->args[1]); break;
+				case InstructionCode::LDCB:   gen_ldcb(code, (Variable *)instr->args[0], (Boolean *)instr->args[1]); break;
+				case InstructionCode::LDCR:   gen_ldcr(code, (Variable *)instr->args[0], (Double *)instr->args[1]); break;
+				case InstructionCode::LDCS:   gen_ldcs(code, (Variable *)instr->args[0], (String *)instr->args[1]); break;
+				case InstructionCode::LDCN:   gen_ldcn(code, (Variable *)instr->args[0], (Reference *)instr->args[1]); break;
+				case InstructionCode::NEW:    gen_new(code, (Variable *)instr->args[0], (Variable *)instr->args[1]); break;
+				case InstructionCode::LT:     gen_lt(code, (Variable *)instr->args[0], (Variable *)instr->args[1], (Variable *)instr->args[2]); break;
+				case InstructionCode::GT:     gen_gt(code, (Variable *)instr->args[0], (Variable *)instr->args[1], (Variable *)instr->args[2]); break;
+				case InstructionCode::LTE:    gen_lte(code, (Variable *)instr->args[0], (Variable *)instr->args[1], (Variable *)instr->args[2]); break;
+				case InstructionCode::GTE:    gen_gte(code, (Variable *)instr->args[0], (Variable *)instr->args[1], (Variable *)instr->args[2]); break;
+				case InstructionCode::EQ:     gen_eq(code, (Variable *)instr->args[0], (Variable *)instr->args[1], (Variable *)instr->args[2]); break;
+				case InstructionCode::NEQ:    gen_neq(code, (Variable *)instr->args[0], (Variable *)instr->args[1], (Variable *)instr->args[2]); break;
+				default: throw new std::exception("JITCompiler::compileInstruction: invalid instruction code!");
+			}
+		}
+
 		void compile(const string &fnName)
 		{
-			char *code = new char[4096];	// 4kB
+			int capacity = 4096, limit = 4000;	// 4kiB, 4kB
+			char *code = new char[capacity];
 			int length = 0;
 			//
 			length += gen_prolog(code+length);
-			// TODO
-			// for i from
-			// start = functions->find(fnName)->second->pointer
-			// to
-			// end = ??? -- seradit funkce podle pointeru (ve vektoru) a do dalsi mapy <string, int> nacpat length kazde funkce!
+			//
+			for(int i = functions->find(fnName)->second->pointer, im = i + functions->find(fnName)->second->length; i < im; i++)
+			{
+				length += compileInstruction(program->at(i), code+length);
+				if(length > limit)
+				{	// realloc
+					capacity *= 2; limit = capacity - 100;
+					char *new_code = new char[capacity];
+					memcpy(new_code, code, length);
+					delete [] code;
+					code = new_code;
+				}
+			}
 			length += gen_epilog(code+length);
 			//
 			compiled_functions.insert(pair<string, char *>(fnName, code));

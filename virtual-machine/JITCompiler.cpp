@@ -46,14 +46,16 @@ int JITCompiler::gen_epilog(char *code)
 
 int JITCompiler::gen_call(char *code, FunctionSignature *fn, const vector<Argument *> &args)
 {
+	return 0;
+	MemoryManager *memory = Interpreter::memory;
 	// TODO
 	//
 	// 0. push signature to call stack
-	call_stack.push(fn);
+	//call_stack.push(fn);
 	// 1. push IP
-	memory->push(new Integer(IP + 1));
+	//memory->push(new Integer(IP + 1));
 	// 2. set new IP
-	IP = fn->pointer;
+	//IP = fn->pointer;
 	// 3. push SFB
 	memory->push(new Reference(memory->SFB));
 	// 4. set new SFB
@@ -68,22 +70,22 @@ int JITCompiler::gen_call(char *code, FunctionSignature *fn, const vector<Argume
 	// 7. set values of arguments on the stack
 	for(size_t i = 0, im = values.size(); i < im; i++)
         fn->variables[fn->arguments_ordering[i]]->setValue(values[i]);
-	//
-	return 0;
 }
 
 int JITCompiler::gen_ret(char *code)
 {
+	return 0;
+	MemoryManager *memory = Interpreter::memory;
 	// TODO
 	//
 	// 0. pop signature from call stack
-	FunctionSignature *fn = call_stack.top(); call_stack.pop();
+	FunctionSignature *fn;// = call_stack.top(); call_stack.pop();
 	// 1. restore SP to the state before call -- top was at SFB (there is still old SFB and IP - next steps)
 	memory->SP = memory->SFB;
 	// 2. restore SFB of previous stack fram
 	memory->SFB = (*((void **)(memory->popAndGetTopValAddr(DataType::REFERENCE))));
 	// 3. restore IP
-	IP = (*((int *)(memory->popAndGetTopValAddr(DataType::INTEGER))));
+	//IP = (*((int *)(memory->popAndGetTopValAddr(DataType::INTEGER))));
 	// 4. restore local variables
 	int offset = 0;
 	map<string, Variable *>::iterator it = fn->variables.end();
@@ -93,23 +95,22 @@ int JITCompiler::gen_ret(char *code)
 		offset += DataType::getTypeSize(it->second->getType());
 		it->second->setAddress((void *)((char *)(memory->SP) - offset));
 	} while(it != fn->variables.begin());
-	//
-	return 0;
 }
 
 int JITCompiler::gen_retv(char *code, const Variable *var)
 {
+	return 0;
 	// TODO
 	Argument *retval = var->getValue();
 	gen_ret(code);
-	memory->push(retval);
-	//
-	return 0;
+	//memory->push(retval);
 }
 
 int JITCompiler::gen_invoke(char *code, Variable *name, const vector<Argument *> &args)
 {
+	return 0;
 	// TODO
+	MemoryManager *memory = Interpreter::memory;
 	if(name->getName() == "cloneArray")
 	{
 		memory->push(BuiltInRoutines::cloneArray(memory, (Array *)(((Variable *)args[1])->getValue())));
@@ -252,8 +253,6 @@ int JITCompiler::gen_invoke(char *code, Variable *name, const vector<Argument *>
 	}
 	else
 		throw new std::exception(("JITCompiler::gen_invoke: routine '" + name->getName() + "' was not found!").c_str());
-	//
-	return 0;
 }
 
 // Hint: asi podobne, jako pri generovani bytecodu
@@ -262,36 +261,32 @@ int JITCompiler::gen_invoke(char *code, Variable *name, const vector<Argument *>
 //  -- to ma cenu resit az budu mit opravdovy generovani
 int JITCompiler::gen_jz(char *code, const Integer *to)
 {
-	// TODO - jak prepocitat ten offset?? (const Integer to*)
-	if(ZF) IP = to->getValue();
-	else ++IP;
-	//
 	return 0;
+	// TODO - jak prepocitat ten offset?? (const Integer to*)
+	//if(ZF) IP = to->getValue();
+	//else ++IP;
 }
 
 int JITCompiler::gen_jnz(char *code, const Integer *to)
 {
-	// TODO - jak prepocitat ten offset?? (const Integer to*)
-	if(!ZF) IP = to->getValue();
-	else ++IP;
-	//
 	return 0;
+	// TODO - jak prepocitat ten offset?? (const Integer to*)
+	//if(!ZF) IP = to->getValue();
+	//else ++IP;
 }
 
 int JITCompiler::gen_jmp(char *code, const Integer *to)
 {
-	// TODO - jak prepocitat ten offset?? (const Integer to*)
-	IP = to->getValue();
-	//
 	return 0;
+	// TODO - jak prepocitat ten offset?? (const Integer to*)
+	//IP = to->getValue();
 }
 
 int JITCompiler::gen_pop(char *code, Variable *dest)
 {
-	// TODO
-	dest->setValue(memory->popAndGetTopValAddr(dest->getItemType()));
-	//
 	return 0;
+	// TODO
+	//dest->setValue(memory->popAndGetTopValAddr(dest->getItemType()));
 }
 
 int JITCompiler::gen_st(char *code, Variable *dest, Variable *src)
@@ -892,7 +887,9 @@ int JITCompiler::gen_ldcn(char *code, Variable *var, Reference *constant)
 }
 
 int JITCompiler::gen_new(char *code, Variable *var, const Variable *size)
-{	// TODO: not tested yet!
+{
+	return 0;
+	// TODO: not tested yet!
 	int item_size = var->getItemTypeSize();
 	void *p_heapAlloc = heapAlloc;
 	void *x = var->getAddress();
@@ -939,8 +936,6 @@ int JITCompiler::gen_new(char *code, Variable *var, const Variable *size)
 			mov [ebx], eax	; save ptr into x
 		}
 	}
-	//
-	return 0;
 }
 
 int JITCompiler::gen_lt(char *code, Variable *dest, const Variable *op1, const Variable *op2)
