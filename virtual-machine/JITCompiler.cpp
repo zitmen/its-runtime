@@ -544,27 +544,123 @@ int JITCompiler::gen_invoke(char *code, Variable *name, const vector<Argument *>
 	}
 	else if(name->getName() == "int2str")
 	{
-		memory->push(BuiltInRoutines::int2str(memory, (Integer *)(((Variable *)args[1])->getValue())));
+		const int code_len = 36;
+		const char *precompiled = "\xB8????"			//mov eax, args[2] (Integer *)
+								  "\x50"				//push eax
+								  "\xB8????"			//mov eax, args[1] (MemoryManager *)
+								  "\x50"				//push eax
+								  "\xB8????"			//mov eax, address(BuiltInRoutines::int2str)
+								  "\xFF\xD0"			//call eax
+								  "\xBB\x00\x00\x00\x00"//mov ebx, 0	; type = NULL
+								  "\x53"				//push ebx
+								  "\x50"				//push eax		; val = return value from int2str (Argument *)
+								  "\xB8????"			//mov eax, address(pushVal)
+								  "\xFF\xD0"			//call eax		; pushVal(val, type);
+								  "\x83\xC4\x10";		//add esp, 16	; pop functions arguments from both int2str and pushVal
+		memcpy(code, precompiled, code_len);
+		(*((void **)(code+1))) = Interpreter::memory;
+		(*((void **)(code+7))) = ((Variable *)(args[1]))->getValue();
+		(*((void **)(code+13))) = BuiltInRoutines::int2str;
+		(*((void **)(code+27))) = pushVal;
+		return code_len;
 	}
 	else if(name->getName() == "double2str")
 	{
-		memory->push(BuiltInRoutines::double2str(memory, (Double *)(((Variable *)args[1])->getValue())));
+		const int code_len = 36;
+		const char *precompiled = "\xB8????"			//mov eax, args[2] (Double *)
+								  "\x50"				//push eax
+								  "\xB8????"			//mov eax, args[1] (MemoryManager *)
+								  "\x50"				//push eax
+								  "\xB8????"			//mov eax, address(BuiltInRoutines::double2str)
+								  "\xFF\xD0"			//call eax
+								  "\xBB\x00\x00\x00\x00"//mov ebx, 0	; type = NULL
+								  "\x53"				//push ebx
+								  "\x50"				//push eax		; val = return value from double2str (Argument *)
+								  "\xB8????"			//mov eax, address(pushVal)
+								  "\xFF\xD0"			//call eax		; pushVal(val, type);
+								  "\x83\xC4\x10";		//add esp, 16	; pop functions arguments from both double2str and pushVal
+		memcpy(code, precompiled, code_len);
+		(*((void **)(code+1))) = Interpreter::memory;
+		(*((void **)(code+7))) = ((Variable *)(args[1]))->getValue();
+		(*((void **)(code+13))) = BuiltInRoutines::double2str;
+		(*((void **)(code+27))) = pushVal;
+		return code_len;
 	}
 	else if(name->getName() == "str2int")
 	{
-		memory->push(BuiltInRoutines::str2int((String *)(((Variable *)args[1])->getValue())));
+		const int code_len = 30;
+		const char *precompiled = "\xB8????"			//mov eax, args[1] (String *)
+								  "\x50"				//push eax
+								  "\xB8????"			//mov eax, address(BuiltInRoutines::str2int)
+								  "\xFF\xD0"			//call eax
+								  "\xBB\x00\x00\x00\x00"//mov ebx, 0	; type = NULL
+								  "\x53"				//push ebx
+								  "\x50"				//push eax		; val = return value from str2int (Argument *)
+								  "\xB8????"			//mov eax, address(pushVal)
+								  "\xFF\xD0"			//call eax		; pushVal(val, type);
+								  "\x83\xC4\x0C";		//add esp, 12	; pop functions arguments from both str2int and pushVal
+		memcpy(code, precompiled, code_len);
+		(*((void **)(code+1))) = ((Variable *)(args[1]))->getValue();
+		(*((void **)(code+7))) = BuiltInRoutines::str2int;
+		(*((void **)(code+21))) = pushVal;
+		return code_len;
 	}
 	else if(name->getName() == "double2int")
 	{
-		memory->push(BuiltInRoutines::double2int((Double *)(((Variable *)args[1])->getValue())));
+		const int code_len = 30;
+		const char *precompiled = "\xB8????"			//mov eax, args[1] (Double *)
+								  "\x50"				//push eax
+								  "\xB8????"			//mov eax, address(BuiltInRoutines::double2int)
+								  "\xFF\xD0"			//call eax
+								  "\xBB\x00\x00\x00\x00"//mov ebx, 0	; type = NULL
+								  "\x53"				//push ebx
+								  "\x50"				//push eax		; val = return value from double2int (Argument *)
+								  "\xB8????"			//mov eax, address(pushVal)
+								  "\xFF\xD0"			//call eax		; pushVal(val, type);
+								  "\x83\xC4\x0C";		//add esp, 12	; pop functions arguments from both double2int and pushVal
+		memcpy(code, precompiled, code_len);
+		(*((void **)(code+1))) = ((Variable *)(args[1]))->getValue();
+		(*((void **)(code+7))) = BuiltInRoutines::double2int;
+		(*((void **)(code+21))) = pushVal;
+		return code_len;
 	}
 	else if(name->getName() == "str2double")
 	{
-		memory->push(BuiltInRoutines::str2double((String *)(((Variable *)args[1])->getValue())));
+		const int code_len = 30;
+		const char *precompiled = "\xB8????"			//mov eax, args[1] (String *)
+								  "\x50"				//push eax
+								  "\xB8????"			//mov eax, address(BuiltInRoutines::str2double)
+								  "\xFF\xD0"			//call eax
+								  "\xBB\x00\x00\x00\x00"//mov ebx, 0	; type = NULL
+								  "\x53"				//push ebx
+								  "\x50"				//push eax		; val = return value from str2double (Argument *)
+								  "\xB8????"			//mov eax, address(pushVal)
+								  "\xFF\xD0"			//call eax		; pushVal(val, type);
+								  "\x83\xC4\x0C";		//add esp, 12	; pop functions arguments from both str2double and pushVal
+		memcpy(code, precompiled, code_len);
+		(*((void **)(code+1))) = ((Variable *)(args[1]))->getValue();
+		(*((void **)(code+7))) = BuiltInRoutines::str2double;
+		(*((void **)(code+21))) = pushVal;
+		return code_len;
 	}
 	else if(name->getName() == "int2double")
 	{
-		memory->push(BuiltInRoutines::int2double((Integer *)(((Variable *)args[1])->getValue())));
+		const int code_len = 30;
+		const char *precompiled = "\xB8????"			//mov eax, args[1] (Integer *)
+								  "\x50"				//push eax
+								  "\xB8????"			//mov eax, address(BuiltInRoutines::int2double)
+								  "\xFF\xD0"			//call eax
+								  "\xBB\x00\x00\x00\x00"//mov ebx, 0	; type = NULL
+								  "\x53"				//push ebx
+								  "\x50"				//push eax		; val = return value from int2double (Argument *)
+								  "\xB8????"			//mov eax, address(pushVal)
+								  "\xFF\xD0"			//call eax		; pushVal(val, type);
+								  "\x83\xC4\x0C";		//add esp, 12	; pop functions arguments from both int2double and pushVal
+		memcpy(code, precompiled, code_len);
+		(*((void **)(code+1))) = ((Variable *)(args[1]))->getValue();
+		(*((void **)(code+7))) = BuiltInRoutines::int2double;
+		(*((void **)(code+21))) = pushVal;
+		return code_len;
 	}
 	else
 		throw new std::exception(("JITCompiler::gen_invoke: routine '" + name->getName() + "' was not found!").c_str());
