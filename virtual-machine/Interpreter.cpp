@@ -24,6 +24,19 @@ void Interpreter::_call(FunctionSignature *fn, const vector<Argument *> &args)
 	// 7. set values of arguments on the stack
 	for(size_t i = 0, im = values.size(); i < im; i++)
         fn->variables[fn->arguments_ordering[i]]->setValue(values[i]);
+	//
+	// JIT Compiler
+	if(options[Options::JITCompiler] >= 0)
+	{
+		fn_calls[fn->name]++;
+		if(fn_calls[fn->name] > options[Options::JITCompiler])
+		{
+			printf("JIT Compiler: compiling function '%s'.\n", fn->name.c_str());
+			// compile
+			// run
+			// IP = RET(V)
+		}
+	}
 }
 
 void Interpreter::_ret()

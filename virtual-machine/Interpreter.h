@@ -26,6 +26,7 @@ class Interpreter
 		vector<Instruction *> *program;
 		static map<string, StructureSignature *> *structures;
 		static map<string, FunctionSignature *> *functions;
+		map<string, int> fn_calls;	// counter of function calls; first=fn_name,second=counter
 		int IP;	// Instruction Pointer -- points to an instruction after the currently processed one
 		bool ZF;	// Zero Flag -- was the result of the previous arithmetic/bit/logic instruction zero?
 
@@ -104,6 +105,10 @@ class Interpreter
 			IP = 0;
 			ZF = false;
 			memory = new MemoryManager(options[Options::StackSize], options[Options::HeapSize], options[Options::GarbageCollector]);
+			//
+			if(functions)
+				for(map<string, FunctionSignature *>::iterator it = functions->begin(); it != functions->end(); ++it)
+					fn_calls.insert(pair<string, int>(it->first, 0));
 		}
 
 		void run()
