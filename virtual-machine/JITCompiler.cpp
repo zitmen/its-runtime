@@ -16,6 +16,11 @@ void * heapAlloc(int size)
 	return Interpreter::memory->alloc(size);
 }
 
+void * popAndGetTopValAddr(int type)
+{
+	return Interpreter::memory->popAndGetTopValAddr(type);
+}
+
 // ============================================================
 // x86 Assembly - frequently used instructions
 // ------------------------------------------------------------
@@ -108,16 +113,37 @@ int JITCompiler::gen_retv(char *code, const Variable *var)
 
 int JITCompiler::gen_pop(char *code, Variable *dest)
 {
-	return 0;
-	// TODO
-	//dest->setValue(memory->popAndGetTopValAddr(dest->getItemType()));
+	const int code_len = 45;
+	const char *precompiled = "\xB8????"		//mov eax, value(var->item_type)
+							  "\x50"			//push eax
+							  "\xB8????"		//mov eax, address(popAndGetTopValAddr)
+							  "\xFF\xD0"		//call eax
+							  "\x83\xC6\x04"	//add esi, 4	; pop function argument
+							  "\xBB????"		//mov ebx, address(dest)
+							  "\x89\x03";		//mov [ebx], eax	; save ptr into dest
+	memcpy(code, precompiled, code_len);
+	(*((int *)(code+1))) = dest->getItemType();
+	(*((void **)(code+7))) = popAndGetTopValAddr;
+	(*((void **)(code+17))) = dest->getAddress();
+	return code_len;
 }
 
 int JITCompiler::gen_invoke(char *code, Variable *name, const vector<Argument *> &args)
 {
-	return 0;
-	// TODO
-	MemoryManager *memory = Interpreter::memory;
+	const int code_len = 45;
+	const char *precompiled = "\xB8????"		//mov eax, value(var->item_size)
+								"\x50"			//push eax
+								"\xB8????"		//mov eax, address(heapAlloc)
+								"\xFF\xD0"		//call eax
+								"\x83\xC6\x04"	//add esi, 4	; pop function argument
+								"\xBB????"		//mov ebx, address(var)
+								"\x89\x03";		//mov [ebx], eax	; save ptr into var
+	memcpy(code, precompiled, code_len);
+	(*((int *)(code+1))) = var->getItemTypeSize();
+	(*((void **)(code+7))) = heapAlloc;
+	(*((void **)(code+17))) = var->getAddress();
+	return code_len;
+	//
 	if(name->getName() == "cloneArray")
 	{
 		memory->push(BuiltInRoutines::cloneArray(memory, (Array *)(((Variable *)args[1])->getValue())));
