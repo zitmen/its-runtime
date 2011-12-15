@@ -32,12 +32,17 @@ int main()
 		//jit.gen_st(&z3, &x3);
 		//printf("bz=%d\n", bz);
 		//
-		//jit.gen_st(&z1, &x1);
+		char *str;
+		Variable z4("str", new DataType(DataType::STRING)); z4.setAddress(&str);
+		//
+		Interpreter interpreter(NULL, NULL, NULL);
+		interpreter.init();
+		//
 		typedef void (*compiled_program)(void);
 		char *compiled = new char[4096];	// 4kB
 		int length = 0;
 		length += jit.gen_prolog(compiled+length);
-		length += jit.gen_ldcb(compiled+length, &z3, new Boolean(true));
+		length += jit.gen_ldcs(compiled+length, &z4, new String("Byl jsem tu, Fantomas."));
 		//length += jit.gen_inc(compiled+length, &x1);
 		//length += jit.gen_dec(compiled+length, &y1);
 		//length += jit.gen_xor(compiled+length, &z3, &x3, &y3);
@@ -49,7 +54,8 @@ int main()
 		//printf("ix=%d\n", ix);
 		//printf("iy=%d\n", iy);
 		//printf("dz=%f\n", dz);
-		printf("bz=%d\n", bz);
+		//printf("bz=%d\n", bz);
+		printf("str=%s\n", str);
 		//
 		delete [] compiled;
 		//

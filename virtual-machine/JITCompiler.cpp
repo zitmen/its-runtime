@@ -859,35 +859,33 @@ int JITCompiler::gen_ldcr(char *code, Variable *var, Double *constant)
 
 int JITCompiler::gen_ldcs(char *code, Variable *var, String *constant)
 {
-	void *p_strlen = strlen, *p_heapAlloc = heapAlloc, *p_strcpy = strcpy;
-	void *x = var->getAddress();
-	char *s = constant->getValue();
-	__asm
-	{
-		; ptr = heapAlloc(strlen(s))
-		; strcpy(ptr, s);
-		; x = ptr;
-		mov eax, s
-		push eax
-		mov eax, p_strlen
-		call eax
-		add esp, 4	; pop function argument
-		add eax, 2
-		push eax
-		mov eax, p_heapAlloc
-		call eax
-		add esp, 4	; pop function argument
-		mov ebx, s
-		push ebx	; constant string value
-		push eax	; allocated space ptr
-		mov eax, p_strcpy
-		call eax
-		add esp, 8	; pop function arguments (2*4B)
-		mov ebx, x
-		mov [ebx], eax	; string copied into the newly allocated memory block
-	}
-	//
-	return 0;
+	const int code_len = 52;
+	const char *precompiled = "\xB8????"		//mov eax, value(constant)
+							  "\x50"			//push eax
+							  "\xB8????"		//mov eax, address(strlen)
+							  "\xFF\xD0"		//call eax
+							  "\x83\xC4\x04"	//add esp, 4	; pop function argument
+							  "\x40"			//inc eax		; strlen + 1B for ending zero
+							  "\x50"			//push eax
+							  "\xB8????"		//mov eax, address(heapAlloc)
+							  "\xFF\xD0"		//call eax
+							  "\x83\xC4\x04"	//add esp, 4	; pop function argument
+							  "\xBB????"		//mov ebx, value(constant)
+							  "\x53"			//push ebx		; constant string value
+							  "\x50"			//push eax		; allocated space ptr
+							  "\xB8????"		//mov eax, address(strcpy)
+							  "\xFF\xD0"		//call eax		; pop function arguments (2*4Bytes)
+							  "\x83\xC4\x08"	//add esp, 8
+							  "\xBB????"		//mov ebx, address(var)
+							  "\x89\x03";		//mov dword ptr [ebx],eax	; string copied into the newly allocated memory block
+	memcpy(code, precompiled, code_len);
+	(*((char **)(code+1))) = constant->getValue();
+	(*((void **)(code+7))) = strlen;
+	(*((void **)(code+19))) = heapAlloc;
+	(*((char **)(code+29))) = constant->getValue();
+	(*((void **)(code+36))) = strcpy;
+	(*((void **)(code+46))) = var->getAddress();
+	return code_len;
 }
 
 int JITCompiler::gen_ldcn(char *code, Variable *var, Reference *constant)
