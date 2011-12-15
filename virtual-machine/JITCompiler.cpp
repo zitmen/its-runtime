@@ -504,43 +504,220 @@ int JITCompiler::gen_invoke(char *code, Variable *name, const vector<Argument *>
 	}
 	else if(name->getName() == "indexOf")
 	{
-		memory->push(BuiltInRoutines::indexOf((String *)(((Variable *)args[1])->getValue()), (String *)(((Variable *)args[2])->getValue())));
+		const int code_len = 36;
+		const char *precompiled = "\xB8????"			//mov eax, args[2] (String *)
+								  "\x50"				//push eax
+								  "\xB8????"			//mov eax, args[1] (String *)
+								  "\x50"				//push eax
+								  "\xB8????"			//mov eax, address(BuiltInRoutines::indexOf)
+								  "\xFF\xD0"			//call eax
+								  "\xBB\x00\x00\x00\x00"//mov ebx, 0	; type = NULL
+								  "\x53"				//push ebx
+								  "\x50"				//push eax		; val = return value from indexOf (Argument *)
+								  "\xB8????"			//mov eax, address(pushVal)
+								  "\xFF\xD0"			//call eax		; pushVal(val, type);
+								  "\x83\xC4\x10";		//add esp, 16	; pop functions arguments from both indexOf and pushVal
+		memcpy(code, precompiled, code_len);
+		(*((void **)(code+1))) = ((Variable *)(args[2]))->getValue();
+		(*((void **)(code+7))) = ((Variable *)(args[1]))->getValue();
+		(*((void **)(code+13))) = BuiltInRoutines::indexOf;
+		(*((void **)(code+27))) = pushVal;
+		return code_len;
 	}
 	else if(name->getName() == "lastIndexOf")
 	{
-		memory->push(BuiltInRoutines::lastIndexOf((String *)(((Variable *)args[1])->getValue()), (String *)(((Variable *)args[2])->getValue())));
+		const int code_len = 36;
+		const char *precompiled = "\xB8????"			//mov eax, args[2] (String *)
+								  "\x50"				//push eax
+								  "\xB8????"			//mov eax, args[1] (String *)
+								  "\x50"				//push eax
+								  "\xB8????"			//mov eax, address(BuiltInRoutines::lastIndexOf)
+								  "\xFF\xD0"			//call eax
+								  "\xBB\x00\x00\x00\x00"//mov ebx, 0	; type = NULL
+								  "\x53"				//push ebx
+								  "\x50"				//push eax		; val = return value from lastIndexOf (Argument *)
+								  "\xB8????"			//mov eax, address(pushVal)
+								  "\xFF\xD0"			//call eax		; pushVal(val, type);
+								  "\x83\xC4\x10";		//add esp, 16	; pop functions arguments from both lastIndexOf and pushVal
+		memcpy(code, precompiled, code_len);
+		(*((void **)(code+1))) = ((Variable *)(args[2]))->getValue();
+		(*((void **)(code+7))) = ((Variable *)(args[1]))->getValue();
+		(*((void **)(code+13))) = BuiltInRoutines::lastIndexOf;
+		(*((void **)(code+27))) = pushVal;
+		return code_len;
 	}
 	else if(name->getName() == "substring")
 	{
-		memory->push(BuiltInRoutines::substring(memory, (String *)(((Variable *)args[1])->getValue()), (Integer *)(((Variable *)args[2])->getValue()), (Integer *)(((Variable *)args[3])->getValue())));
+		const int code_len = 48;
+		const char *precompiled = "\xB8????"			//mov eax, args[3] (String *)
+								  "\x50"				//push eax
+								  "\xB8????"			//mov eax, args[2] (String *)
+								  "\x50"				//push eax
+								  "\xB8????"			//mov eax, args[1] (String *)
+								  "\x50"				//push eax
+								  "\xB8????"			//mov eax, (MemoryManager *)
+								  "\x50"				//push eax
+								  "\xB8????"			//mov eax, address(BuiltInRoutines::substring)
+								  "\xFF\xD0"			//call eax
+								  "\xBB\x00\x00\x00\x00"//mov ebx, 0	; type = NULL
+								  "\x53"				//push ebx
+								  "\x50"				//push eax		; val = return value from substring (Argument *)
+								  "\xB8????"			//mov eax, address(pushVal)
+								  "\xFF\xD0"			//call eax		; pushVal(val, type);
+								  "\x83\xC4\x18";		//add esp, 24	; pop functions arguments from both substring and pushVal
+		memcpy(code, precompiled, code_len);
+		(*((void **)(code+1))) = ((Variable *)(args[3]))->getValue();
+		(*((void **)(code+7))) = ((Variable *)(args[2]))->getValue();
+		(*((void **)(code+13))) = ((Variable *)(args[1]))->getValue();
+		(*((void **)(code+19))) = Interpreter::memory;
+		(*((void **)(code+25))) = BuiltInRoutines::substring;
+		(*((void **)(code+39))) = pushVal;
+		return code_len;
 	}
 	else if(name->getName() == "toLower")
 	{
-		memory->push(BuiltInRoutines::toLower(memory, (String *)(((Variable *)args[1])->getValue())));
+		const int code_len = 30;
+		const char *precompiled = "\xB8????"			//mov eax, args[1] (String *)
+								  "\x50"				//push eax
+								  "\xB8????"			//mov eax, address(BuiltInRoutines::toLower)
+								  "\xFF\xD0"			//call eax
+								  "\xBB\x00\x00\x00\x00"//mov ebx, 0	; type = NULL
+								  "\x53"				//push ebx
+								  "\x50"				//push eax		; val = return value from toLower (Argument *)
+								  "\xB8????"			//mov eax, address(pushVal)
+								  "\xFF\xD0"			//call eax		; pushVal(val, type);
+								  "\x83\xC4\x0C";		//add esp, 12	; pop functions arguments from both toLower and pushVal
+		memcpy(code, precompiled, code_len);
+		(*((void **)(code+1))) = ((Variable *)(args[1]))->getValue();
+		(*((void **)(code+7))) = BuiltInRoutines::toLower;
+		(*((void **)(code+21))) = pushVal;
+		return code_len;
 	}
 	else if(name->getName() == "toUpper")
 	{
-		memory->push(BuiltInRoutines::toUpper(memory, (String *)(((Variable *)args[1])->getValue())));
+		const int code_len = 30;
+		const char *precompiled = "\xB8????"			//mov eax, args[1] (String *)
+								  "\x50"				//push eax
+								  "\xB8????"			//mov eax, address(BuiltInRoutines::toUpper)
+								  "\xFF\xD0"			//call eax
+								  "\xBB\x00\x00\x00\x00"//mov ebx, 0	; type = NULL
+								  "\x53"				//push ebx
+								  "\x50"				//push eax		; val = return value from toUpper (Argument *)
+								  "\xB8????"			//mov eax, address(pushVal)
+								  "\xFF\xD0"			//call eax		; pushVal(val, type);
+								  "\x83\xC4\x0C";		//add esp, 12	; pop functions arguments from both toUpper and pushVal
+		memcpy(code, precompiled, code_len);
+		(*((void **)(code+1))) = ((Variable *)(args[1]))->getValue();
+		(*((void **)(code+7))) = BuiltInRoutines::toUpper;
+		(*((void **)(code+21))) = pushVal;
+		return code_len;
 	}
 	else if(name->getName() == "trim")
 	{
-		memory->push(BuiltInRoutines::trim(memory, (String *)(((Variable *)args[1])->getValue())));
+		const int code_len = 30;
+		const char *precompiled = "\xB8????"			//mov eax, args[1] (String *)
+								  "\x50"				//push eax
+								  "\xB8????"			//mov eax, address(BuiltInRoutines::trim)
+								  "\xFF\xD0"			//call eax
+								  "\xBB\x00\x00\x00\x00"//mov ebx, 0	; type = NULL
+								  "\x53"				//push ebx
+								  "\x50"				//push eax		; val = return value from trim (Argument *)
+								  "\xB8????"			//mov eax, address(pushVal)
+								  "\xFF\xD0"			//call eax		; pushVal(val, type);
+								  "\x83\xC4\x0C";		//add esp, 12	; pop functions arguments from both trim and pushVal
+		memcpy(code, precompiled, code_len);
+		(*((void **)(code+1))) = ((Variable *)(args[1]))->getValue();
+		(*((void **)(code+7))) = BuiltInRoutines::trim;
+		(*((void **)(code+21))) = pushVal;
+		return code_len;
 	}
 	else if(name->getName() == "startsWith")
 	{
-		memory->push(BuiltInRoutines::startsWith((String *)(((Variable *)args[1])->getValue()), (String *)(((Variable *)args[2])->getValue())));
+		const int code_len = 36;
+		const char *precompiled = "\xB8????"			//mov eax, args[2] (String *)
+								  "\x50"				//push eax
+								  "\xB8????"			//mov eax, args[1] (String *)
+								  "\x50"				//push eax
+								  "\xB8????"			//mov eax, address(BuiltInRoutines::startsWith)
+								  "\xFF\xD0"			//call eax
+								  "\xBB\x00\x00\x00\x00"//mov ebx, 0	; type = NULL
+								  "\x53"				//push ebx
+								  "\x50"				//push eax		; val = return value from startsWith (Argument *)
+								  "\xB8????"			//mov eax, address(pushVal)
+								  "\xFF\xD0"			//call eax		; pushVal(val, type);
+								  "\x83\xC4\x10";		//add esp, 16	; pop functions arguments from both startsWith and pushVal
+		memcpy(code, precompiled, code_len);
+		(*((void **)(code+1))) = ((Variable *)(args[2]))->getValue();
+		(*((void **)(code+7))) = ((Variable *)(args[1]))->getValue();
+		(*((void **)(code+13))) = BuiltInRoutines::startsWith;
+		(*((void **)(code+27))) = pushVal;
+		return code_len;
 	}
 	else if(name->getName() == "endsWith")
 	{
-		memory->push(BuiltInRoutines::endsWith((String *)(((Variable *)args[1])->getValue()), (String *)(((Variable *)args[2])->getValue())));
+		const int code_len = 36;
+		const char *precompiled = "\xB8????"			//mov eax, args[2] (String *)
+								  "\x50"				//push eax
+								  "\xB8????"			//mov eax, args[1] (String *)
+								  "\x50"				//push eax
+								  "\xB8????"			//mov eax, address(BuiltInRoutines::endsWith)
+								  "\xFF\xD0"			//call eax
+								  "\xBB\x00\x00\x00\x00"//mov ebx, 0	; type = NULL
+								  "\x53"				//push ebx
+								  "\x50"				//push eax		; val = return value from endsWith (Argument *)
+								  "\xB8????"			//mov eax, address(pushVal)
+								  "\xFF\xD0"			//call eax		; pushVal(val, type);
+								  "\x83\xC4\x10";		//add esp, 16	; pop functions arguments from both endsWith and pushVal
+		memcpy(code, precompiled, code_len);
+		(*((void **)(code+1))) = ((Variable *)(args[2]))->getValue();
+		(*((void **)(code+7))) = ((Variable *)(args[1]))->getValue();
+		(*((void **)(code+13))) = BuiltInRoutines::endsWith;
+		(*((void **)(code+27))) = pushVal;
+		return code_len;
 	}
 	else if(name->getName() == "concat")
 	{
-		memory->push(BuiltInRoutines::concat(memory, (String *)(((Variable *)args[1])->getValue()), (String *)(((Variable *)args[2])->getValue())));
+		const int code_len = 42;
+		const char *precompiled = "\xB8????"			//mov eax, args[2] (String *)
+								  "\x50"				//push eax
+								  "\xB8????"			//mov eax, args[1] (String *)
+								  "\x50"				//push eax
+								  "\xB8????"			//mov eax, (MemoryManager *)
+								  "\x50"				//push eax
+								  "\xB8????"			//mov eax, address(BuiltInRoutines::concat)
+								  "\xFF\xD0"			//call eax
+								  "\xBB\x00\x00\x00\x00"//mov ebx, 0	; type = NULL
+								  "\x53"				//push ebx
+								  "\x50"				//push eax		; val = return value from concat (Argument *)
+								  "\xB8????"			//mov eax, address(pushVal)
+								  "\xFF\xD0"			//call eax		; pushVal(val, type);
+								  "\x83\xC4\x14";		//add esp, 20	; pop functions arguments from both concat and pushVal
+		memcpy(code, precompiled, code_len);
+		(*((void **)(code+1))) = ((Variable *)(args[2]))->getValue();
+		(*((void **)(code+7))) = ((Variable *)(args[1]))->getValue();
+		(*((void **)(code+13))) = Interpreter::memory;
+		(*((void **)(code+19))) = BuiltInRoutines::concat;
+		(*((void **)(code+33))) = pushVal;
+		return code_len;
 	}
 	else if(name->getName() == "strlen")
 	{
-		memory->push(BuiltInRoutines::strlen((String *)(((Variable *)args[1])->getValue())));
+		const int code_len = 30;
+		const char *precompiled = "\xB8????"			//mov eax, args[1] (String *)
+								  "\x50"				//push eax
+								  "\xB8????"			//mov eax, address(BuiltInRoutines::strlen)
+								  "\xFF\xD0"			//call eax
+								  "\xBB\x00\x00\x00\x00"//mov ebx, 0	; type = NULL
+								  "\x53"				//push ebx
+								  "\x50"				//push eax		; val = return value from strlen (Argument *)
+								  "\xB8????"			//mov eax, address(pushVal)
+								  "\xFF\xD0"			//call eax		; pushVal(val, type);
+								  "\x83\xC4\x0C";		//add esp, 12	; pop functions arguments from both strlen and pushVal
+		memcpy(code, precompiled, code_len);
+		(*((void **)(code+1))) = ((Variable *)(args[1]))->getValue();
+		(*((void **)(code+7))) = BuiltInRoutines::strlen;
+		(*((void **)(code+21))) = pushVal;
+		return code_len;
 	}
 	else if(name->getName() == "int2str")
 	{
