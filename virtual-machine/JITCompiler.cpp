@@ -26,6 +26,7 @@ void * heapAlloc(int size)
 // jmp _label         --> EB ?? (?? is 1B offset(=count of bytes to the instruction you're jumping to) to the _label; for longer jumps use long jump/call/...)
 // jnz _label         --> doesn't work! --> use `jne`
 // jne _label         --> 75 ?? --> 0x75 is opcode of `jnz`, but it still translates as `jne`...wtf?!
+// --> if any argument is pointer without specification it is `dword ptr` --> 32b platform
 // ============================================================
 
 int JITCompiler::gen_prolog(char *code)
@@ -668,48 +669,46 @@ int JITCompiler::gen_xor(char *code, Variable *dest, const Variable *op1, const 
 
 int JITCompiler::gen_lsh(char *code, Variable *dest, const Variable *op1, const Variable *op2)
 {
-	void *x = op1->getAddress(), *y = op2->getAddress(), *z = dest->getAddress(), *zf = &ZF;
-	if((op1->getItemType() == DataType::INTEGER))
+	if(op1->getItemType() == DataType::INTEGER)
 	{
-		__asm
-		{
-			; z = x << y
-			mov eax, x
-			mov eax, [eax]
-			mov ecx, y
-			mov ecx, [ecx]
-			shl eax, cl
-			mov ebx, z
-			mov [ebx], eax
-		}
+		const int code_len = 23;
+		const char *precompiled = "\xB8????"	//mov eax, address(op1)
+								  "\x8B\x00"	//mov eax, [eax]
+								  "\xB9????"	//mov ecx, address(op2)
+								  "\x8B\x09"	//mov ecx, [ecx]
+								  "\xD3\xE0"	//shl eax, cl
+								  "\xBB????"	//mov ebx, address(dest)
+								  "\x89\x03";	//mov [ebx], eax
+		memcpy(code, precompiled, code_len);
+		(*((void **)(code+1))) = op1->getAddress();
+		(*((void **)(code+8))) = op2->getAddress();
+		(*((void **)(code+17))) = dest->getAddress();
+		return code_len;
 	}
 	else
 		throw new std::exception("JITCompiler::gen_lsh: invalid data type!");
-	//
-	return 0;
 }
 
 int JITCompiler::gen_rsh(char *code, Variable *dest, const Variable *op1, const Variable *op2)
 {
-	void *x = op1->getAddress(), *y = op2->getAddress(), *z = dest->getAddress(), *zf = &ZF;
-	if((op1->getItemType() == DataType::INTEGER))
+	if(op1->getItemType() == DataType::INTEGER)
 	{
-		__asm
-		{
-			; z = x >> y
-			mov eax, x
-			mov eax, [eax]
-			mov ecx, y
-			mov ecx, [ecx]
-			shr eax, cl
-			mov ebx, z
-			mov [ebx], eax
-		}
+		const int code_len = 23;
+		const char *precompiled = "\xB8????"	//mov eax, address(op1)
+								  "\x8B\x00"	//mov eax, [eax]
+								  "\xB9????"	//mov ecx, address(op2)
+								  "\x8B\x09"	//mov ecx, [ecx]
+								  "\xD3\xE8"	//shr eax, cl
+								  "\xBB????"	//mov ebx, address(dest)
+								  "\x89\x03";	//mov [ebx], eax
+		memcpy(code, precompiled, code_len);
+		(*((void **)(code+1))) = op1->getAddress();
+		(*((void **)(code+8))) = op2->getAddress();
+		(*((void **)(code+17))) = dest->getAddress();
+		return code_len;
 	}
 	else
 		throw new std::exception("JITCompiler::gen_rsh: invalid data type!");
-	//
-	return 0;
 }
 
 int JITCompiler::gen_inc(char *code, Variable *var)
