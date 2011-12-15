@@ -37,7 +37,7 @@ int main()
 		char *compiled = new char[4096];	// 4kB
 		int length = 0;
 		length += jit.gen_prolog(compiled+length);
-		length += jit.gen_minus(compiled+length, &z2, &x2);
+		length += jit.gen_ldcb(compiled+length, &z3, new Boolean(true));
 		//length += jit.gen_inc(compiled+length, &x1);
 		//length += jit.gen_dec(compiled+length, &y1);
 		//length += jit.gen_xor(compiled+length, &z3, &x3, &y3);
@@ -48,8 +48,8 @@ int main()
 		//printf("iz=%d\n", iz);
 		//printf("ix=%d\n", ix);
 		//printf("iy=%d\n", iy);
-		printf("dz=%f\n", dz);
-		//printf("bz=%d\n", bz);
+		//printf("dz=%f\n", dz);
+		printf("bz=%d\n", bz);
 		//
 		delete [] compiled;
 		//

@@ -818,47 +818,43 @@ int JITCompiler::gen_minus(char *code, Variable *dest, const Variable *src)
 
 int JITCompiler::gen_ldci(char *code, Variable *var, Integer *constant)
 {
-	void *x = var->getAddress();
-	int i = constant->getValue();
-	__asm
-	{
-		; x = i
-		mov eax, x
-		mov ebx, i
-		mov [eax], ebx
-	}
-	//
-	return 0;
+	const int code_len = 12;
+	const char *precompiled = "\xB8????"	//mov eax, address(var)
+							  "\xBB????"	//mov ebx, value(constant)
+							  "\x89\x18";	//mov [eax], ebx  
+	memcpy(code, precompiled, code_len);
+	(*((void **)(code+1))) = var->getAddress();
+	(*((int *)(code+6))) = constant->getValue();
+	return code_len;
 }
 
 int JITCompiler::gen_ldcb(char *code, Variable *var, Boolean *constant)
 {
-	void *x = var->getAddress();
-	bool b = constant->getValue();
-	__asm
-	{
-		; x = b
-		mov eax, x
-		mov bl, b
-		mov byte ptr [eax], bl
-	}
-	//
-	return 0;
+	const int code_len = 9;
+	const char *precompiled = "\xB8????"	//mov eax, address(var)
+							  "\xB3?"		//mov bl, value(constant)
+							  "\x88\x18";	//mov byte ptr [eax], bl
+	memcpy(code, precompiled, code_len);
+	(*((void **)(code+1))) = var->getAddress();
+	(*((bool *)(code+6))) = constant->getValue();
+	return code_len;
 }
 
 int JITCompiler::gen_ldcr(char *code, Variable *var, Double *constant)
 {
-	void *x = var->getAddress();
-	double d = constant->getValue();
-	__asm
-	{
-		; x = d
-		mov eax, x
-		fld qword ptr [d]
-		fstp qword ptr [eax]
-	}
-	//
-	return 0;
+	// this is kind of hack used in exploits :)
+	// -- save double value inside of the code and use labels for addressing the constant
+	const int code_len = 23;
+	const char *precompiled = "\xEB\x08"	//_const:	jump _instr
+							  "????????"	//			; value(constant)
+							  "\xB8????"	//_instr:	mov eax, address(var)
+							  "\xDD\x05????"//			fld qword ptr [_const]
+							  "\xDD\x18";	//			fstp qword ptr [eax]
+	memcpy(code, precompiled, code_len);
+	(*((double *)(code+2))) = constant->getValue();
+	(*((void **)(code+11))) = var->getAddress();
+	(*((void **)(code+17))) = (code+2);
+	return code_len;
 }
 
 int JITCompiler::gen_ldcs(char *code, Variable *var, String *constant)
