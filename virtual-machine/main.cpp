@@ -27,7 +27,7 @@ int main()
 		Variable y3("y", new DataType(DataType::BOOLEAN)); y3.setAddress(&by);
 		Variable z3("z", new DataType(DataType::BOOLEAN)); z3.setAddress(&bz);
 		//
-		char *str = "log";
+		char *str = "pow";
 		//Variable z4("str", new DataType(DataType::STRING)); z4.setAddress(&str);
 		//
 		Interpreter interpreter(NULL, NULL, NULL);
@@ -35,8 +35,8 @@ int main()
 		BuiltInRoutines::init();
 		//
 		Variable size("size", new DataType(DataType::INTEGER));// size.setValue(new Integer(10));
-		Variable routineName("log", new DataType(DataType::STRING)); routineName.setAddress(&str);
-		vector<Argument *> arguments; arguments.push_back(&routineName); arguments.push_back(&x2);
+		Variable routineName("pow", new DataType(DataType::STRING)); routineName.setAddress(&str);
+		vector<Argument *> arguments; arguments.push_back(&routineName); arguments.push_back(&x2); arguments.push_back(&y2);
 		//
 		typedef void (*compiled_program)(void);
 		char *compiled = new char[4096];	// 4kB

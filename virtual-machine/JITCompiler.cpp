@@ -174,21 +174,6 @@ int JITCompiler::gen_pop(char *code, Variable *dest)
 int JITCompiler::gen_invoke(char *code, Variable *name, const vector<Argument *> &args)
 {
 	MemoryManager *memory = Interpreter::memory;
-	/*
-	const int code_len = 45;
-	const char *precompiled = "\xB8????"		//mov eax, value(var->item_size)
-								"\x50"			//push eax
-								"\xB8????"		//mov eax, address(heapAlloc)
-								"\xFF\xD0"		//call eax
-								"\x83\xC6\x04"	//add esi, 4	; pop function argument
-								"\xBB????"		//mov ebx, address(var)
-								"\x89\x03";		//mov [ebx], eax	; save ptr into var
-	memcpy(code, precompiled, code_len);
-	(*((int *)(code+1))) = var->getItemTypeSize();
-	(*((void **)(code+7))) = heapAlloc;
-	(*((void **)(code+17))) = var->getAddress();
-	return code_len;
-	*/
 	//
 	if(name->getName() == "cloneArray")
 	{
@@ -229,31 +214,6 @@ int JITCompiler::gen_invoke(char *code, Variable *name, const vector<Argument *>
 	else if(name->getName() == "println")
 	{
 		BuiltInRoutines::println((String *)(((Variable *)args[1])->getValue()));
-		/*
-		//
-		__asm
-		{
-			mov eax, [args[1]->getSTR()]
-			push eax
-			mov eax, [println]
-			call eax
-			add esi, 4
-		}
-		//
-		const int code_len = 45;
-		const char *precompiled = "\xB8????"		//mov eax, value(var->item_size)
-									"\x50"			//push eax
-									"\xB8????"		//mov eax, address(heapAlloc)
-									"\xFF\xD0"		//call eax
-									"\x83\xC6\x04"	//add esi, 4	; pop function argument
-									"\xBB????"		//mov ebx, address(var)
-									"\x89\x03";		//mov [ebx], eax	; save ptr into var
-		memcpy(code, precompiled, code_len);
-		(*((int *)(code+1))) = var->getItemTypeSize();
-		(*((void **)(code+7))) = heapAlloc;
-		(*((void **)(code+17))) = var->getAddress();
-		return code_len;
-		*/
 	}
 	else if(name->getName() == "print")
 	{
@@ -277,11 +237,44 @@ int JITCompiler::gen_invoke(char *code, Variable *name, const vector<Argument *>
 	}
 	else if(name->getName() == "pow")
 	{
-		memory->push(BuiltInRoutines::pow((Double *)(((Variable *)args[1])->getValue()), (Double *)(((Variable *)args[2])->getValue())));
+		const int code_len = 36;
+		const char *precompiled = "\xB8????"			//mov eax, args[2] (Double *)
+								  "\x50"				//push eax
+								  "\xB8????"			//mov eax, args[1] (Double *)
+								  "\x50"				//push eax
+								  "\xB8????"			//mov eax, address(BuiltInRoutines::pow)
+								  "\xFF\xD0"			//call eax
+								  "\xBB\x00\x00\x00\x00"//mov ebx, 0	; type = NULL
+								  "\x53"				//push ebx
+								  "\x50"				//push eax		; val = return value from rand (Argument *)
+								  "\xB8????"			//mov eax, address(pushVal)
+								  "\xFF\xD0"			//call eax		; pushVal(val, type);
+								  "\x83\xC4\x10";		//add esp, 16	; pop functions arguments from both rand and pushVal
+		memcpy(code, precompiled, code_len);
+		(*((void **)(code+1))) = ((Variable *)(args[2]))->getValue();
+		(*((void **)(code+7))) = ((Variable *)(args[1]))->getValue();
+		(*((void **)(code+13))) = BuiltInRoutines::pow;
+		(*((void **)(code+27))) = pushVal;
+		return code_len;
 	}
 	else if(name->getName() == "sqrt")
 	{
-		memory->push(BuiltInRoutines::sqrt((Double *)(((Variable *)args[1])->getValue())));
+		const int code_len = 30;
+		const char *precompiled = "\xB8????"			//mov eax, args[1] (Double *)
+								  "\x50"				//push eax
+								  "\xB8????"			//mov eax, address(BuiltInRoutines::sqrt)
+								  "\xFF\xD0"			//call eax
+								  "\xBB\x00\x00\x00\x00"//mov ebx, 0	; type = NULL
+								  "\x53"				//push ebx
+								  "\x50"				//push eax		; val = return value from rand (Argument *)
+								  "\xB8????"			//mov eax, address(pushVal)
+								  "\xFF\xD0"			//call eax		; pushVal(val, type);
+								  "\x83\xC4\x0C";		//add esp, 12	; pop functions arguments from both rand and pushVal
+		memcpy(code, precompiled, code_len);
+		(*((void **)(code+1))) = ((Variable *)(args[1]))->getValue();
+		(*((void **)(code+7))) = BuiltInRoutines::sqrt;
+		(*((void **)(code+21))) = pushVal;
+		return code_len;
 	}
 	else if(name->getName() == "log")
 	{
