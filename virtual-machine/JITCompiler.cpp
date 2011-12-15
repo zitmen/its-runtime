@@ -1,58 +1,6 @@
 #include "JITCompiler.h"
 #include "Interpreter.h"
 
-// Help
-// ------------------------------------------------------------
-// mov eax, 12345678h --> B8 78 56 34 12
-// mov ebx, 12345678h --> BB 78 56 34 12
-// mov ecx, 12345678h --> B9 78 56 34 12
-// mov edx, 12345678h --> BA 78 56 34 12
-// jmp _label         --> EB ?? (?? is 1B offset(=count of bytes to the instruction you're jumping to) to the _label; for longer jumps use long jump/call/...)
-
-/*
-		typedef int (*func)(int, int);
-		char *compiledCode = new char[32];
-		strcpy(compiledCode, "\x55\x8b\xec\xb8????\xff\xd0\x8b\x45\x08\x8b\x55\x0c\x03\xc2\x5d\xc3");
-		int addr = (int)(&notify);
-		memcpy(compiledCode + 4, &addr, 4);
-		func f = (func)compiledCode;
-		printf("2+3=%d\n", f(2, 3));
-		delete [] compiledCode;
-		*/
-
-/*
-     8: double dbl()
-     9: {
-00471BB0 55                   push        ebp  
-00471BB1 8B EC                mov         ebp,esp  
-00471BB3 81 EC F0 00 00 00    sub         esp,0F0h  
-00471BB9 53                   push        ebx  
-00471BBA 56                   push        esi  
-00471BBB 57                   push        edi  
-00471BBC 8D BD 10 FF FF FF    lea         edi,[ebp-0F0h]  
-00471BC2 B9 3C 00 00 00       mov         ecx,3Ch  
-00471BC7 B8 CC CC CC CC       mov         eax,0CCCCCCCCh  
-00471BCC F3 AB                rep stos    dword ptr es:[edi]  
-    10: 	double x = 5.0, y = 3.0, z;
-00471BCE DD 05 48 08 4B 00    fld         qword ptr [__real@4014000000000000 (4B0848h)]  
-00471BD4 DD 5D F4             fstp        qword ptr [x]  
-00471BD7 DD 05 38 08 4B 00    fld         qword ptr [__real@4008000000000000 (4B0838h)]  
-00471BDD DD 5D E4             fstp        qword ptr [y]  
-    11: 	z = x / y;
-00471BE0 DD 45 F4             fld         qword ptr [x]  
-00471BE3 DC 75 E4             fdiv        qword ptr [y]  
-00471BE6 DD 5D D4             fstp        qword ptr [z]  
-    12: 	return z;
-00471BE9 DD 45 D4             fld         qword ptr [z]  
-    13: }
-00471BEC 5F                   pop         edi  
-00471BED 5E                   pop         esi  
-00471BEE 5B                   pop         ebx  
-00471BEF 8B E5                mov         esp,ebp  
-00471BF1 5D                   pop         ebp  
-00471BF2 C3                   ret  
-*/
-
 void divByZeroEx()
 {
 	throw new std::exception("Runtime exception: Division by zero!");
@@ -67,6 +15,18 @@ void * heapAlloc(int size)
 {
 	return Interpreter::memory->alloc(size);
 }
+
+// ============================================================
+// x86 Assembly - frequently used instructions
+// ------------------------------------------------------------
+// mov eax, 12345678h --> B8 78 56 34 12
+// mov ebx, 12345678h --> BB 78 56 34 12
+// mov ecx, 12345678h --> B9 78 56 34 12
+// mov edx, 12345678h --> BA 78 56 34 12
+// jmp _label         --> EB ?? (?? is 1B offset(=count of bytes to the instruction you're jumping to) to the _label; for longer jumps use long jump/call/...)
+// jnz _label         --> doesn't work! --> use `jne`
+// jne _label         --> 75 ?? --> 0x75 is opcode of `jnz`, but it still translates as `jne`...wtf?!
+// ============================================================
 
 int JITCompiler::gen_prolog(char *code)
 {
@@ -568,25 +528,27 @@ int JITCompiler::gen_div(char *code, Variable *dest, const Variable *op1, const 
 
 int JITCompiler::gen_mod(char *code, Variable *dest, const Variable *op1, const Variable *op2)
 {
-	void *error = modByZeroEx;
-	void *x = op1->getAddress(), *y = op2->getAddress(), *z = dest->getAddress(), *zf = &ZF;
 	if(op1->getItemType() == DataType::INTEGER)
 	{
-		__asm
-		{
-			; z = x % y
-			mov ebx, y
-			mov ebx, [ebx]
-			or ebx, ebx		; sets ZF if ebx(=y) is zero
-			jnz _valid
-			mov eax, error
-			call eax
-_valid:		mov eax, x
-			mov eax, [eax]
-			div ebx
-			mov ebx, z
-			mov [ebx], edx
-		}
+		const int code_len = 37;
+		const char *precompiled = "\xBB????"	//			mov ebx, address(op2)
+								  "\x8B\x1B"	//			mov ebx, [ebx]
+								  "\x83\xFB\x00"//			cmp ebx, 0
+								  "\x75\x07"	//			jne _valid
+								  "\xB8????"	//			mov eax, address(modByZeroEx)
+								  "\xFF\xD0"	//			call eax
+								  "\xB8????"	//_valid:	mov eax, address(op1)
+								  "\x8B\x00"	//			mov eax, [eax]
+								  "\x33\xD2"	//			xor edx, edx	;before division, the edx has to be set to zero
+								  "\xF7\xF3"	//			div ebx
+								  "\xBB????"	//			mov ebx, address(dest)
+								  "\x89\x13";	//			mov [ebx], edx
+		memcpy(code, precompiled, code_len);
+		(*((void **)(code+1))) = op2->getAddress();
+		(*((void **)(code+13))) = modByZeroEx;
+		(*((void **)(code+20))) = op1->getAddress();
+		(*((void **)(code+31))) = dest->getAddress();
+		return code_len;
 	}
 	else
 		throw new std::exception("JITCompiler::gen_mod: invalid data type!");
