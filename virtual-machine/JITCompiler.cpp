@@ -1,5 +1,6 @@
 #include "JITCompiler.h"
 #include "Interpreter.h"
+#include <cstdarg>
 
 void divByZeroEx()
 {
@@ -26,6 +27,60 @@ void pushVal(Argument *val, DataType *type)
 	Interpreter::memory->push(val, type);
 }
 
+stack<FunctionSignature *> JITCompiler::call_stack;
+
+void JITCompiler::callFn(FunctionSignature *fn, int argc, ...)
+{
+	// 0. push signature to call stack
+	call_stack.push(fn);
+	// 1. push IP
+	//memory->push(new Integer(IP + 1));
+	// 2. set new IP
+	//IP = fn->pointer;
+	// 3. push SFB
+	Interpreter::memory->push(new Reference(Interpreter::memory->SFB));
+	// 4. set new SFB
+	Interpreter::memory->SFB = Interpreter::memory->SP;
+	// 5. get arguments values from the stack before variables addresses will be changed
+	vector<Argument *> values;
+	va_list args;
+	va_start(args, argc);
+	Variable *var;
+	for(int i = 0; i < argc; i++)
+	{
+		var = va_arg(args, Variable*);
+		values.push_back(var->getValue());
+	}
+	va_end(args);
+	// 6. setup the stack - 1st come parameters, 2nd declared variables; set SP
+    for(map<string, Variable *>::iterator it = fn->variables.begin(); it != fn->variables.end(); ++it)
+		it->second->setAddress(Interpreter::memory->reserve(it->second));
+	// 7. set values of arguments on the stack
+	for(size_t i = 0, im = values.size(); i < im; i++)
+        fn->variables[fn->arguments_ordering[i]]->setValue(values[i]);
+}
+
+void JITCompiler::retFromFn()
+{
+	// 0. pop signature from call stack
+	FunctionSignature *fn = call_stack.top(); call_stack.pop();
+	// 1. restore SP to the state before call -- top was at SFB (there is still old SFB and IP - next steps)
+	Interpreter::memory->SP = Interpreter::memory->SFB;
+	// 2. restore SFB of previous stack fram
+	Interpreter::memory->SFB = (*((void **)(Interpreter::memory->popAndGetTopValAddr(DataType::REFERENCE))));
+	// 3. restore IP
+	//IP = (*((int *)(memory->popAndGetTopValAddr(DataType::INTEGER))));
+	// 4. restore local variables
+	int offset = 0;
+	map<string, Variable *>::iterator it = fn->variables.end();
+	do	// had to be done this way, because reverse_iterator didn't work :(
+	{
+		--it;
+		offset += DataType::getTypeSize(it->second->getType());
+		it->second->setAddress((void *)((char *)(Interpreter::memory->SP) - offset));
+	} while(it != fn->variables.begin());
+}
+
 // ============================================================
 // x86 Assembly - frequently used instructions
 // ------------------------------------------------------------
@@ -40,80 +95,81 @@ void pushVal(Argument *val, DataType *type)
 // ============================================================
 
 int JITCompiler::gen_prolog(char *code)
-{
-	// i don't need it, at least for now
+{	// i don't need it, at least for now
 	return 0;
 }
 
 int JITCompiler::gen_epilog(char *code)
-{
-	// i don't need it, at least for now; just `ret`
-	const int code_len = 1;
-	const char *precompiled = "\xC3";	//ret
-	memcpy(code, precompiled, code_len);
-	return code_len;
+{	// i don't need it, at least for now
+	return 0;
 }
 
 int JITCompiler::gen_call(char *code, FunctionSignature *fn, const vector<Argument *> &args)
 {
-	return 0;
-	MemoryManager *memory = Interpreter::memory;
-	// TODO
+	const int args_len = 6;
+	const char *args_precompiled = "\xB8????"	//mov eax, address(args[?]) ; take address, because it is all Variables; no constant there
+								   "\x50";		//push eax
 	//
-	// 0. push signature to call stack
-	//call_stack.push(fn);
-	// 1. push IP
-	//memory->push(new Integer(IP + 1));
-	// 2. set new IP
-	//IP = fn->pointer;
-	// 3. push SFB
-	memory->push(new Reference(memory->SFB));
-	// 4. set new SFB
-	memory->SFB = memory->SP;
-	// 5. get arguments values from the stack before variables addresses will be changed
-	vector<Argument *> values;
-	for(size_t i = 1, im = args.size(); i < im; i++)
-		values.push_back(((Variable *)args[i])->getValue());
-	// 6. setup the stack - 1st come parameters, 2nd declared variables; set SP
-    for(map<string, Variable *>::iterator it = fn->variables.begin(); it != fn->variables.end(); ++it)
-		it->second->setAddress(memory->reserve(it->second));
-	// 7. set values of arguments on the stack
-	for(size_t i = 0, im = values.size(); i < im; i++)
-        fn->variables[fn->arguments_ordering[i]]->setValue(values[i]);
+	const int code_len = 29;
+	const char *precompiled = "\xB8????"	//mov eax, value(args.size()-1) ; 0th argument is name of the called function
+							  "\x50"		//push eax
+							  "\xB8????"	//mov eax, address(fn)
+							  "\x50"		//push eax
+							  "\xB8????"	//mov eax, address(JITCompiler::callFn)
+							  "\xFF\xD0"	//call eax
+							  "\xB8????"	//mov eax, address(called_function)	; compiled_functions[fn->name]
+							  "\xFF\xD0"	//call eax
+							  "\x83\xC4?";	//add esp, ?	; pop all (args.size()-1)+2 arguments
+	//
+	int len = 0;
+	// function arguments
+	for(size_t a = 1, am = args.size(); a < am; a++)
+	{
+		memcpy(code+len, args_precompiled, args_len);
+		(*((void **)(code+len+1))) = ((Variable *)(args[a]))->getAddress();
+		len += args_len;
+	}
+	// the rest of the code
+	memcpy(code+len, precompiled, code_len);
+	(*((size_t *)(code+len+1))) = args.size()-1;
+	(*((void **)(code+len+7))) = fn;
+	(*((void **)(code+len+13))) = JITCompiler::callFn;
+	(*((void **)(code+len+20))) = compiled_functions[fn->name];
+	(*((char *)(code+len+28))) = (char)(args.size()+1);
+	len += code_len;
+	//
+	return len;
 }
 
 int JITCompiler::gen_ret(char *code)
 {
-	return 0;
-	MemoryManager *memory = Interpreter::memory;
-	// TODO
-	//
-	// 0. pop signature from call stack
-	FunctionSignature *fn;// = call_stack.top(); call_stack.pop();
-	// 1. restore SP to the state before call -- top was at SFB (there is still old SFB and IP - next steps)
-	memory->SP = memory->SFB;
-	// 2. restore SFB of previous stack fram
-	memory->SFB = (*((void **)(memory->popAndGetTopValAddr(DataType::REFERENCE))));
-	// 3. restore IP
-	//IP = (*((int *)(memory->popAndGetTopValAddr(DataType::INTEGER))));
-	// 4. restore local variables
-	int offset = 0;
-	map<string, Variable *>::iterator it = fn->variables.end();
-	do	// had to be done this way, because reverse_iterator didn't work :(
-	{
-		--it;
-		offset += DataType::getTypeSize(it->second->getType());
-		it->second->setAddress((void *)((char *)(memory->SP) - offset));
-	} while(it != fn->variables.begin());
+	const int code_len = 8;
+	const char *precompiled = "\xB8????"	//mov eax, address(retFromFn)
+							  "\xFF\xD0"	//call eax
+							  "\xC3";		//ret
+	memcpy(code, precompiled, code_len);
+	(*((void **)(code+1))) = JITCompiler::retFromFn;
+	return code_len;
 }
 
 int JITCompiler::gen_retv(char *code, const Variable *var)
 {
-	return 0;
-	// TODO
-	Argument *retval = var->getValue();
-	gen_ret(code);
-	//memory->push(retval);
+	const int code_len = 30;
+	const char *precompiled = "\xB8\x00\x00\x00\x00"	//mov eax, 0 ; NULL (DataType *)
+							  "\x50"					//push eax
+							  "\xB8????"				//mov eax, value(var)	; return value (Argument *)
+							  "\x50"					//push eax
+							  "\xB8????"				//mov eax, address(retFromFn) ; does take no arguments so it still lays on the stack prepared for pushVal call
+							  "\xFF\xD0"				//call eax
+							  "\xB8????"				//mov eax, address(pushVal)
+							  "\xFF\xD0"				//call eax
+							  "\x83\xC4\x08"			//add esp, 8	; pop pushVal arguments
+							  "\xC3";					//ret
+	memcpy(code, precompiled, code_len);
+	(*((void **)(code+7))) = var->getValue();
+	(*((void **)(code+13))) = JITCompiler::retFromFn;
+	(*((void **)(code+20))) = pushVal;
+	return code_len;
 }
 
 int JITCompiler::gen_pop(char *code, Variable *dest)

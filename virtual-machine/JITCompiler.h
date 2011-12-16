@@ -19,6 +19,7 @@ using std::vector;
 class JITCompiler
 {
 	private:
+		static stack<FunctionSignature *> call_stack;
 		vector<Instruction *> *program;
 		map<string, FunctionSignature *> *functions;
 		map<string, char *> compiled_functions;
@@ -76,6 +77,9 @@ public:
 		int gen_gte(char *code, Variable *dest, const Variable *op1, const Variable *op2);
 		int gen_eq(char *code, Variable *dest, const Variable *op1, const Variable *op2);
 		int gen_neq(char *code, Variable *dest, const Variable *op1, const Variable *op2);
+
+		static void callFn(FunctionSignature *fn, int argc, ...);
+		static void retFromFn();
 
 		bool isConditionalJump(Instruction *instr)
 		{
