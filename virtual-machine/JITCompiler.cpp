@@ -173,19 +173,60 @@ int JITCompiler::gen_pop(char *code, Variable *dest)
 
 int JITCompiler::gen_invoke(char *code, Variable *name, const vector<Argument *> &args)
 {
-	MemoryManager *memory = Interpreter::memory;
-	//
 	if(name->getName() == "cloneArray")
 	{
-		memory->push(BuiltInRoutines::cloneArray(memory, (Array *)(((Variable *)args[1])->getValue())));
+		const int code_len = 36;
+		const char *precompiled = "\xB8????"		//mov eax, args[1] (Array *)
+								  "\x50"			//push eax
+								  "\xB8????"		//mov eax, (MemoryManager *)
+								  "\x50"			//push eax
+								  "\xB8????"		//mov eax, address(BuiltInRoutines::cloneArray)
+								  "\xFF\xD0"		//call eax
+								  "\xBB????"		//mov ebx, address(var->data_type)
+								  "\x53"			//push ebx
+								  "\x50"			//push eax		; val = return value from cloneArray (Argument *)
+								  "\xB8????"		//mov eax, address(pushVal)
+								  "\xFF\xD0"		//call eax		; pushVal(val, type);
+								  "\x83\xC4\x0C";	//add esp, 12	; pop functions arguments from both cloneArray and pushVal
+		memcpy(code, precompiled, code_len);
+		(*((void **)(code+1))) = ((Variable *)(args[1]))->getValue();
+		(*((void **)(code+7))) = Interpreter::memory;
+		(*((void **)(code+13))) = BuiltInRoutines::cloneArray;
+		(*((void **)(code+20))) = ((Variable *)(args[1]))->getDataType();
+		(*((void **)(code+27))) = pushVal;
+		return code_len;
 	}
 	else if(name->getName() == "clearArray")
 	{
-		BuiltInRoutines::clearArray((Array *)(((Variable *)args[1])->getValue()));
+		const int code_len = 16;
+		const char *precompiled = "\xB8????"			//mov eax, args[1] (Array *)
+								  "\x50"				//push eax
+								  "\xB8????"			//mov eax, address(BuiltInRoutines::clearArray)
+								  "\xFF\xD0"			//call eax
+								  "\x83\xC4\x04";		//add esp, 4	; pop functions arguments from pushVal
+		memcpy(code, precompiled, code_len);
+		(*((void **)(code+1))) = ((Variable *)(args[1]))->getValue();
+		(*((void **)(code+7))) = BuiltInRoutines::clearArray;
+		return code_len;
 	}
 	else if(name->getName() == "length")
 	{
-		memory->push(BuiltInRoutines::length((Array *)(((Variable *)args[1])->getValue())));
+		const int code_len = 30;
+		const char *precompiled = "\xB8????"			//mov eax, args[1] (Array *)
+								  "\x50"				//push eax
+								  "\xB8????"			//mov eax, address(BuiltInRoutines::length)
+								  "\xFF\xD0"			//call eax
+								  "\xBB\x00\x00\x00\x00"//mov ebx, 0	; type = NULL
+								  "\x53"				//push ebx
+								  "\x50"				//push eax		; val = return value from length (Argument *)
+								  "\xB8????"			//mov eax, address(pushVal)
+								  "\xFF\xD0"			//call eax		; pushVal(val, type);
+								  "\x83\xC4\x0C";		//add esp, 12	; pop functions arguments from both length and pushVal
+		memcpy(code, precompiled, code_len);
+		(*((void **)(code+1))) = ((Variable *)(args[1]))->getValue();
+		(*((void **)(code+7))) = BuiltInRoutines::length;
+		(*((void **)(code+21))) = pushVal;
+		return code_len;
 	}
 	else if(name->getName() == "openRFile")
 	{
@@ -230,122 +271,86 @@ int JITCompiler::gen_invoke(char *code, Variable *name, const vector<Argument *>
 	}
 	else if(name->getName() == "closeFile")
 	{
-		const int code_len = 30;
+		const int code_len = 16;
 		const char *precompiled = "\xB8????"			//mov eax, args[1] (File *)
 								  "\x50"				//push eax
 								  "\xB8????"			//mov eax, address(BuiltInRoutines::closeFile)
 								  "\xFF\xD0"			//call eax
-								  "\xBB\x00\x00\x00\x00"//mov ebx, 0	; type = NULL
-								  "\x53"				//push ebx
-								  "\x50"				//push eax		; val = return value from closeFile (Argument *)
-								  "\xB8????"			//mov eax, address(pushVal)
-								  "\xFF\xD0"			//call eax		; pushVal(val, type);
-								  "\x83\xC4\x0C";		//add esp, 12	; pop functions arguments from both closeFile and pushVal
+								  "\x83\xC4\x04";		//add esp, 4	; pop functions arguments from pushVal
 		memcpy(code, precompiled, code_len);
 		(*((void **)(code+1))) = ((Variable *)(args[1]))->getValue();
 		(*((void **)(code+7))) = BuiltInRoutines::closeFile;
-		(*((void **)(code+21))) = pushVal;
 		return code_len;
 	}
 	else if(name->getName() == "flushFile")
 	{
-		const int code_len = 30;
+		const int code_len = 16;
 		const char *precompiled = "\xB8????"			//mov eax, args[1] (File *)
 								  "\x50"				//push eax
 								  "\xB8????"			//mov eax, address(BuiltInRoutines::flushFile)
 								  "\xFF\xD0"			//call eax
-								  "\xBB\x00\x00\x00\x00"//mov ebx, 0	; type = NULL
-								  "\x53"				//push ebx
-								  "\x50"				//push eax		; val = return value from flushFile (Argument *)
-								  "\xB8????"			//mov eax, address(pushVal)
-								  "\xFF\xD0"			//call eax		; pushVal(val, type);
-								  "\x83\xC4\x0C";		//add esp, 12	; pop functions arguments from both flushFile and pushVal
+								  "\x83\xC4\x04";		//add esp, 4	; pop functions arguments from pushVal
 		memcpy(code, precompiled, code_len);
 		(*((void **)(code+1))) = ((Variable *)(args[1]))->getValue();
 		(*((void **)(code+7))) = BuiltInRoutines::flushFile;
-		(*((void **)(code+21))) = pushVal;
 		return code_len;
 	}
 	else if(name->getName() == "printlnFile")
 	{
-		const int code_len = 36;
+		const int code_len = 22;
 		const char *precompiled = "\xB8????"			//mov eax, args[2] (String *)
 								  "\x50"				//push eax
 								  "\xB8????"			//mov eax, args[1] (File *)
 								  "\x50"				//push eax
 								  "\xB8????"			//mov eax, address(BuiltInRoutines::printlnFile)
 								  "\xFF\xD0"			//call eax
-								  "\xBB\x00\x00\x00\x00"//mov ebx, 0	; type = NULL
-								  "\x53"				//push ebx
-								  "\x50"				//push eax		; val = return value from printlnFile (Argument *)
-								  "\xB8????"			//mov eax, address(pushVal)
-								  "\xFF\xD0"			//call eax		; pushVal(val, type);
-								  "\x83\xC4\x10";		//add esp, 16	; pop functions arguments from both printlnFile and pushVal
+								  "\x83\xC4\x08";		//add esp, 8	; pop functions arguments from pushVal
 		memcpy(code, precompiled, code_len);
 		(*((void **)(code+1))) = ((Variable *)(args[2]))->getValue();
 		(*((void **)(code+7))) = ((Variable *)(args[1]))->getValue();
 		(*((void **)(code+13))) = BuiltInRoutines::printlnFile;
-		(*((void **)(code+27))) = pushVal;
 		return code_len;
 	}
 	else if(name->getName() == "printFile")
 	{
-		const int code_len = 36;
+		const int code_len = 22;
 		const char *precompiled = "\xB8????"			//mov eax, args[2] (String *)
 								  "\x50"				//push eax
 								  "\xB8????"			//mov eax, args[1] (File *)
 								  "\x50"				//push eax
 								  "\xB8????"			//mov eax, address(BuiltInRoutines::printFile)
 								  "\xFF\xD0"			//call eax
-								  "\xBB\x00\x00\x00\x00"//mov ebx, 0	; type = NULL
-								  "\x53"				//push ebx
-								  "\x50"				//push eax		; val = return value from printFile (Argument *)
-								  "\xB8????"			//mov eax, address(pushVal)
-								  "\xFF\xD0"			//call eax		; pushVal(val, type);
-								  "\x83\xC4\x10";		//add esp, 16	; pop functions arguments from both printFile and pushVal
+								  "\x83\xC4\x08";		//add esp, 8	; pop functions arguments from pushVal
 		memcpy(code, precompiled, code_len);
 		(*((void **)(code+1))) = ((Variable *)(args[2]))->getValue();
 		(*((void **)(code+7))) = ((Variable *)(args[1]))->getValue();
 		(*((void **)(code+13))) = BuiltInRoutines::printFile;
-		(*((void **)(code+27))) = pushVal;
 		return code_len;
 	}
 	else if(name->getName() == "println")
 	{
-		const int code_len = 30;
+		const int code_len = 16;
 		const char *precompiled = "\xB8????"			//mov eax, args[1] (String *)
 								  "\x50"				//push eax
 								  "\xB8????"			//mov eax, address(BuiltInRoutines::println)
 								  "\xFF\xD0"			//call eax
-								  "\xBB\x00\x00\x00\x00"//mov ebx, 0	; type = NULL
-								  "\x53"				//push ebx
-								  "\x50"				//push eax		; val = return value from print (Argument *)
-								  "\xB8????"			//mov eax, address(pushVal)
-								  "\xFF\xD0"			//call eax		; pushVal(val, type);
-								  "\x83\xC4\x0C";		//add esp, 12	; pop functions arguments from both println and pushVal
+								  "\x83\xC4\x04";		//add esp, 4	; pop functions arguments from pushVal
 		memcpy(code, precompiled, code_len);
 		(*((void **)(code+1))) = ((Variable *)(args[1]))->getValue();
 		(*((void **)(code+7))) = BuiltInRoutines::println;
-		(*((void **)(code+21))) = pushVal;
 		return code_len;
 	}
 	else if(name->getName() == "print")
 	{
-		const int code_len = 30;
+		const int code_len = 16;
 		const char *precompiled = "\xB8????"			//mov eax, args[1] (String *)
 								  "\x50"				//push eax
 								  "\xB8????"			//mov eax, address(BuiltInRoutines::print)
 								  "\xFF\xD0"			//call eax
-								  "\xBB\x00\x00\x00\x00"//mov ebx, 0	; type = NULL
-								  "\x53"				//push ebx
-								  "\x50"				//push eax		; val = return value from print (Argument *)
-								  "\xB8????"			//mov eax, address(pushVal)
-								  "\xFF\xD0"			//call eax		; pushVal(val, type);
-								  "\x83\xC4\x0C";		//add esp, 12	; pop functions arguments from both print and pushVal
+								  "\x83\xC4\x04";		//add esp, 4	; pop functions arguments from pushVal
 		memcpy(code, precompiled, code_len);
 		(*((void **)(code+1))) = ((Variable *)(args[1]))->getValue();
 		(*((void **)(code+7))) = BuiltInRoutines::print;
-		(*((void **)(code+21))) = pushVal;
 		return code_len;
 	}
 	else if(name->getName() == "inputFile")
