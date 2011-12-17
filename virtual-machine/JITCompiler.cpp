@@ -135,8 +135,12 @@ int JITCompiler::gen_epilog(char *code)
 
 int JITCompiler::gen_call(char *code, FunctionSignature *fn, const vector<Argument *> &args)
 {
-	const int args_len = 6;
-	const char *args_precompiled = "\xB8????"	//mov eax, address(args[?]) ; take address, because it is all Variables; no constant there
+	const int args_init_len = 5;
+	const char *args_init = "\xBB????";		//mov ebx, address(SFB)
+	//
+	const int args_len = 8;
+	const char *args_precompiled = "\xB8????"	//mov eax, offset(args[?]) ; take address(offset), because it is all Variables; no constant there
+								   "\x03\x03"	//add eax, [ebx]	; absolute address of args[?]
 								   "\x50";		//push eax
 	//
 	const int code_len = 35;
@@ -154,10 +158,16 @@ int JITCompiler::gen_call(char *code, FunctionSignature *fn, const vector<Argume
 	//
 	int len = 0;
 	// function arguments
+	if(args.size() > 1)
+	{
+		memcpy(code+len, args_init, args_init_len);
+		(*((void **)(code+len+1))) = &(Interpreter::memory->SFB);
+		len += args_init_len;
+	}
 	for(size_t a = 1, am = args.size(); a < am; a++)
 	{
 		memcpy(code+len, args_precompiled, args_len);
-		(*((void **)(code+len+1))) = ((Variable *)(args[a]))->getAddress();
+		(*((void **)(code+len+1))) = (void *)((char *)(((Variable *)(args[a]))->getAddress()) - ((char *)Interpreter::memory->SFB));	// offset
 		len += args_len;
 	}
 	// the rest of the code
@@ -193,11 +203,13 @@ int JITCompiler::gen_ret(char *code)
 
 int JITCompiler::gen_retv(char *code, const Variable *var)
 {
-	const int code_len = 41;
+	const int code_len = 48;
 	const char *precompiled = "\xB8????"		//mov eax, [type] ; (DataType *)
 							  "\x50"			//push eax
-							  "\xB8????"		//mov eax, address(var)	; points to a return value
-							  "\x8B\x00"		//mov eax, [eax]	; get value rather then pointer -- co DOUBLE!!!!!??? zasobnik FPU?
+							  "\xBB????"		//mov ebx, address(SFB)
+							  "\xB8????"		//mov eax, offset(var)	; points to a return value
+							  "\x03\x03"		//add eax, [ebx]	; absolute address of var
+							  "\x8B\x00"		//mov eax, [eax]	; get value rather then pointer -- co DOUBLE!!!!!??? zasobnik FPU? nevraci se tady neco jinyho nez v invoke?
 							  "\x50"			//push eax
 							  "\xB8????"		//mov eax, address(call_stack)
 							  "\x50"			//push eax
@@ -209,34 +221,35 @@ int JITCompiler::gen_retv(char *code, const Variable *var)
 							  "\x83\xC4\x08"	//add esp, 8	; pop pushXXXVal arguments
 							  "\xC3";			//ret
 	memcpy(code, precompiled, code_len);
-	(*((void **)(code+7))) = var->getAddress();
-	(*((void **)(code+15))) = call_stack;
-	(*((void **)(code+21))) = retFromFn;
+	(*((void **)(code+7))) = &(Interpreter::memory->SFB);
+	(*((void **)(code+12))) = (void *)((char *)(var->getAddress()) - ((char *)Interpreter::memory->SFB));	// offset
+	(*((void **)(code+22))) = call_stack;
+	(*((void **)(code+28))) = retFromFn;
 	// of what type is the retval?
 	if(var->getDataType()->type == DataType::INTEGER)
 	{
 		(*((void **)(code+1))) = NULL;
-		(*((void **)(code+31))) = pushIntVal;
+		(*((void **)(code+38))) = pushIntVal;
 	}
 	else if(var->getDataType()->type == DataType::BOOLEAN)
 	{
 		(*((void **)(code+1))) = NULL;
-		(*((void **)(code+31))) = pushBoolVal;
+		(*((void **)(code+38))) = pushBoolVal;
 	}
 	else if(var->getDataType()->type == DataType::DOUBLE)
 	{
 		(*((void **)(code+1))) = NULL;
-		(*((void **)(code+31))) = pushDblVal;
+		(*((void **)(code+38))) = pushDblVal;
 	}
 	else if(var->getDataType()->type == DataType::STRING)
 	{
 		(*((void **)(code+1))) = NULL;
-		(*((void **)(code+31))) = pushStrVal;
+		(*((void **)(code+38))) = pushStrVal;
 	}
 	else	// REFERENCE: ARRAY or STRUCTURE
 	{
 		(*((void **)(code+1))) = var->getDataType();
-		(*((void **)(code+31))) = pushPtrVal;
+		(*((void **)(code+38))) = pushPtrVal;
 	}
 	return code_len;
 }
@@ -245,53 +258,62 @@ int JITCompiler::gen_pop(char *code, Variable *dest)
 {
 	if(dest->getItemType() == DataType::BOOLEAN)
 	{
-		const int code_len = 25;
+		const int code_len = 32;
 		const char *precompiled = "\xB8????"		//mov eax, value(var->item_type)
 								  "\x50"			//push eax
 								  "\xB8????"		//mov eax, address(popAndGetTopValAddr)
 								  "\xFF\xD0"		//call eax
 								  "\x83\xC4\x04"	//add esi, 4	; pop function argument
 								  "\x8A\x00"		//mov al, byte ptr [eax]
-								  "\xBB????"		//mov ebx, address(dest)
+								  "\xB9????"		//mov ecx, address(SFB)
+								  "\xBB????"		//mov ebx, offset(dest)
+								  "\x03\x19"		//add ebx, [ecx]	; absolute address of dest
 								  "\x88\x03";		//mov byte ptr [ebx], al	; save into dest
 		memcpy(code, precompiled, code_len);
 		(*((int *)(code+1))) = dest->getItemType();
 		(*((void **)(code+7))) = popAndGetTopValAddr;
-		(*((void **)(code+19))) = dest->getAddress();
+		(*((void **)(code+19))) = &(Interpreter::memory->SFB);
+		(*((void **)(code+24))) = (void *)(((char *)(dest->getAddress())) - ((char *)Interpreter::memory->SFB));	// offset
 		return code_len;
 	}
 	else if(dest->getItemType() == DataType::DOUBLE)
 	{
-		const int code_len = 25;
+		const int code_len = 32;
 		const char *precompiled = "\xB8????"		//mov eax, value(var->item_type)
 								  "\x50"			//push eax
 								  "\xB8????"		//mov eax, address(popAndGetTopValAddr)
 								  "\xFF\xD0"		//call eax
 								  "\x83\xC4\x04"	//add esi, 4	; pop function argument
 								  "\xDD\x00"		//fld qword ptr[eax]
-								  "\xB8????"		//mov eax, address(dest)
+								  "\xBB????"		//mov ebx, address(SFB)
+								  "\xB8????"		//mov eax, offset(dest)
+								  "\x03\x03"		//add eax, [ebx]	; absolute address of dest
 								  "\xDD\x18";		//fstp qword ptr [eax]	; save into dest
 		memcpy(code, precompiled, code_len);
 		(*((int *)(code+1))) = dest->getItemType();
 		(*((void **)(code+7))) = popAndGetTopValAddr;
-		(*((void **)(code+19))) = dest->getAddress();
+		(*((void **)(code+19))) = &(Interpreter::memory->SFB);
+		(*((void **)(code+24))) = (void *)(((char *)(dest->getAddress())) - ((char *)Interpreter::memory->SFB));	// offset
 		return code_len;
 	}
 	else	// 4B -- INTEGER, REFERENCE, ARRAY, STRUCTURE
 	{
-		const int code_len = 25;
+		const int code_len = 32;
 		const char *precompiled = "\xB8????"		//mov eax, value(var->item_type)
 								  "\x50"			//push eax
 								  "\xB8????"		//mov eax, address(popAndGetTopValAddr)
 								  "\xFF\xD0"		//call eax
 								  "\x83\xC4\x04"	//add esi, 4	; pop function argument
 								  "\x8B\x00"		//mov eax, [eax]
-								  "\xBB????"		//mov ebx, address(dest)
+								  "\xB9????"		//mov ecx, address(SFB)
+								  "\xBB????"		//mov ebx, offset(dest)
+								  "\x03\x19"		//add ebx, [ecx]	; absolute address of dest
 								  "\x89\x03";		//mov [ebx], eax	; save into dest
 		memcpy(code, precompiled, code_len);
 		(*((int *)(code+1))) = dest->getItemType();
 		(*((void **)(code+7))) = popAndGetTopValAddr;
-		(*((void **)(code+19))) = dest->getAddress();
+		(*((void **)(code+19))) = &(Interpreter::memory->SFB);
+		(*((void **)(code+24))) = (void *)(((char *)(dest->getAddress())) - ((char *)Interpreter::memory->SFB));	// offset
 		return code_len;
 	}
 }
@@ -1137,18 +1159,23 @@ int JITCompiler::gen_sub(char *code, Variable *dest, const Variable *op1, const 
 {
 	if(op1->getItemType() == DataType::INTEGER)
 	{
-		const int code_len = 23;
-		const char *precompiled = "\xB8????"	//mov eax, address(op1)
+		const int code_len = 34;
+		const char *precompiled = "\xB9????"	//mov ecx, address(SFB)
+								  "\xB8????"	//mov eax, offset(op1)
+								  "\x03\x01"	//add eax, [ecx]	; absolute address of op1
 								  "\x8B\x00"	//mov eax, [eax]
-								  "\xBB????"	//mov ebx, address(op2)
+								  "\xBB????"	//mov ebx, offset(op2)
+								  "\x03\x19"	//add ebx, [ecx]	; absolute address of op2
 								  "\x8B\x1B"	//mov ebx, [ebx]
 								  "\x2B\xC3"	//sub eax, ebx
-								  "\xBB????"	//mov ebx, address(dest)
+								  "\xBB????"	//mov ebx, offset(dest)
+								  "\x03\x19"	//add ebx, [ecx]	; absolute address of dest
 								  "\x89\x03";	//mov [ebx], eax
 		memcpy(code, precompiled, code_len);
-		(*((void **)(code+1))) = op1->getAddress();
-		(*((void **)(code+8))) = op2->getAddress();
-		(*((void **)(code+17))) = dest->getAddress();
+		(*((void **)(code+1))) = &(Interpreter::memory->SFB);
+		(*((void **)(code+6))) = (void *)(((char *)(op1->getAddress())) - ((char *)Interpreter::memory->SFB));	// offset
+		(*((void **)(code+15))) = (void *)(((char *)(op2->getAddress())) - ((char *)Interpreter::memory->SFB));	// offset
+		(*((void **)(code+26))) = (void *)(((char *)(dest->getAddress())) - ((char *)Interpreter::memory->SFB));	// offset
 		return code_len;
 	}
 	else if(op1->getItemType() == DataType::DOUBLE)
@@ -1175,18 +1202,23 @@ int JITCompiler::gen_mul(char *code, Variable *dest, const Variable *op1, const 
 {
 	if(op1->getItemType() == DataType::INTEGER)
 	{
-		const int code_len = 23;
-		const char *precompiled = "\xB8????"	//mov eax, address(op1)
+		const int code_len = 34;
+		const char *precompiled = "\xB9????"	//mov ecx, address(SFB)
+								  "\xB8????"	//mov eax, offset(op1)
+								  "\x03\x01"	//add eax, [ecx]	; absolute address of op1
 								  "\x8B\x00"	//mov eax, [eax]
-								  "\xBB????"	//mov ebx, address(op2)
+								  "\xBB????"	//mov ebx, offset(op2)
+								  "\x03\x19"	//add ebx, [ecx]	; absolute address of op2
 								  "\x8B\x1B"	//mov ebx, [ebx]
 								  "\xF7\xE3"	//mul ebx
-								  "\xBB????"	//mov ebx, address(dest)
+								  "\xBB????"	//mov ebx, offset(dest)
+								  "\x03\x19"	//add ebx, [ecx]	; absolute address of dest
 								  "\x89\x03";	//mov [ebx], eax
 		memcpy(code, precompiled, code_len);
-		(*((void **)(code+1))) = op1->getAddress();
-		(*((void **)(code+8))) = op2->getAddress();
-		(*((void **)(code+17))) = dest->getAddress();
+		(*((void **)(code+1))) = &(Interpreter::memory->SFB);
+		(*((void **)(code+6))) = (void *)(((char *)(op1->getAddress())) - ((char *)Interpreter::memory->SFB));	// offset
+		(*((void **)(code+15))) = (void *)(((char *)(op2->getAddress())) - ((char *)Interpreter::memory->SFB));	// offset
+		(*((void **)(code+26))) = (void *)(((char *)(dest->getAddress())) - ((char *)Interpreter::memory->SFB));	// offset
 		return code_len;
 	}
 	else if(op1->getItemType() == DataType::DOUBLE)
@@ -1551,13 +1583,16 @@ int JITCompiler::gen_minus(char *code, Variable *dest, const Variable *src)
 
 int JITCompiler::gen_ldci(char *code, Variable *var, Integer *constant)
 {
-	const int code_len = 12;
-	const char *precompiled = "\xB8????"	//mov eax, address(var)
+	const int code_len = 19;
+	const char *precompiled = "\xBB????"	//mov ebx, address(SFB)
+							  "\xB8????"	//mov eax, offset(var)
+							  "\x03\x03"	//add eax, [ebx]	; absolute address of var
 							  "\xBB????"	//mov ebx, value(constant)
 							  "\x89\x18";	//mov [eax], ebx  
 	memcpy(code, precompiled, code_len);
-	(*((void **)(code+1))) = var->getAddress();
-	(*((int *)(code+6))) = constant->getValue();
+	(*((void **)(code+1))) = &(Interpreter::memory->SFB);
+	(*((void **)(code+6))) = (void *)((char *)(var->getAddress()) - ((char *)Interpreter::memory->SFB));	// offset
+	(*((int *)(code+13))) = constant->getValue();
 	return code_len;
 }
 
@@ -1794,27 +1829,32 @@ int JITCompiler::gen_lte(char *code, Variable *dest, const Variable *op1, const 
 {
 	if(op1->getItemType() == DataType::INTEGER)
 	{
-		const int code_len = 40;
-		const char *precompiled = "\xBB????"	//		mov ebx, address(op2)
+		const int code_len = 51;
+		const char *precompiled = "\xB9????"	//		mov ecx, address(SFB)
+								  "\xBB????"	//		mov ebx, offset(op2)
+								  "\x03\x19"	//		add ebx, [ecx]	; absolute address of op2
 								  "\x8B\x1B"	//		mov ebx, [ebx]
-								  "\xB8????"	//		mov eax, address(op1)
+								  "\xB8????"	//		mov eax, offset(op1)
+								  "\x03\x01"	//		add eax, [ecx]	; absolute address of op1
 								  "\x8B\x00"	//		mov eax, [eax]
 								  "\x3B\xC3"	//		cmp eax, ebx
 								  "\x7E\x04"	//		jle _lte
 								  "\xB0\x00"	//		mov al, 0
 								  "\xEB\x02"	//		jmp _cont
 								  "\xB0\x01"	//_lte:	mov al, 1
-								  "\xBB????"	//_cont:mov ebx, address(dest)
+								  "\xBB????"	//_cont:mov ebx, offset(dest)
+								  "\x03\x19"	//		add ebx, [ecx]	; absolute address of dest
 								  "\x88\x03"	//		mov byte ptr [ebx], al
 								  // save ZF
 								  "\x34\x01"	//		xor al,1	; negate LSB (al is 1 if comparison was successful - for ZF, I need the exact opposite)
 								  "\xBB????"	//		mov ebx, address(ZF)
 								  "\x88\x03";	//		mov byte ptr [ebx], al
 		memcpy(code, precompiled, code_len);
-		(*((void **)(code+1))) = op2->getAddress();
-		(*((void **)(code+8))) = op1->getAddress();
-		(*((void **)(code+25))) = dest->getAddress();
-		(*((void **)(code+34))) = pZF;
+		(*((void **)(code+1))) = &(Interpreter::memory->SFB);
+		(*((void **)(code+6))) = (void *)(((char *)(op2->getAddress())) - ((char *)Interpreter::memory->SFB));	// offset
+		(*((void **)(code+15))) = (void *)(((char *)(op1->getAddress())) - ((char *)Interpreter::memory->SFB));	// offset
+		(*((void **)(code+34))) = (void *)(((char *)(dest->getAddress())) - ((char *)Interpreter::memory->SFB));	// offset
+		(*((void **)(code+45))) = pZF;
 		return code_len;
 	}
 	else if(op1->getItemType() == DataType::DOUBLE)

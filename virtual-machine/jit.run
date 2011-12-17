@@ -1,32 +1,22 @@
-FUNCTION <STRING> fact [ INTEGER var1 ] [ STRING var12 INTEGER var9 INTEGER var3 INTEGER var11 INTEGER var1 INTEGER var10 INTEGER var2 ] @ 11
-FUNCTION <STRING> toString [ INTEGER var4 ] [ STRING var14 DOUBLE var13 INTEGER var4 ] @ 23
-FUNCTION <VOID> main [ ] [ STRING var8 INTEGER var7 INTEGER var5 INTEGER var6 INTEGER var0 ] @ 0
+FUNCTION <INTEGER> fact [ INTEGER var1 ] [ INTEGER var9 INTEGER var8 INTEGER var7 INTEGER var1 INTEGER var10 ] @ 13
+FUNCTION <VOID> main [ ] [ INTEGER var5 STRING var6 INTEGER var3 INTEGER var4 INTEGER var2 INTEGER var0 ] @ 0
 CODE
-000: LDCI var5 1
-001: ST var0 var5
-002: LDCI var6 10
-003: LT var7 var0 var6
-004: JZ 10
+000: LDCI var2 1
+001: ST var0 var2
+002: LDCI var3 10
+003: LT var4 var0 var3
+004: JZ 12
 005: CALL fact var0
-006: POP var8
-007: INVOKE println var8
-008: INC var0
-009: JMP 2
-010: RET
-011: LDCI var9 1
-012: ST var2 var9
-013: LDCI var10 2
-014: ST var3 var10
-015: LTE var11 var3 var1
-016: JZ 20
-017: MUL var2 var2 var3
-018: INC var3
-019: JMP 15
-020: CALL toString var2
-021: POP var12
-022: RETV var12
-023: INVOKE int2double var4
-024: POP var13
-025: INVOKE double2str var13
-026: POP var14
-027: RETV var14
+006: POP var5
+007: INVOKE int2str var5
+008: POP var6
+009: INVOKE println var6
+010: INC var0
+011: JMP 2
+012: RET
+013: LDCI var7 1
+014: SUB var8 var1 var7
+015: CALL fact var8
+016: POP var9
+017: MUL var10 var1 var9
+018: RETV var10
