@@ -26,7 +26,7 @@ class JITCompiler
 		bool *pZF;	// pointer to Zero Flag inside of the parent interpreter; it's automatically set by compiled code at instructions neg,lt,gt,lte,gte,eq,neq
 
 		// temporary help structures for code generating -- any content is valid only during a compilation time of a single function
-		stack<map<char, char> *> hlp_addresses;	// addresses used for jumps -> first=address inside of a bytecode, second=address inside of a compiled code
+		stack<map<int, int> *> hlp_addresses;	// addresses used for jumps -> first=address inside of a bytecode, second=address inside of a compiled code
 		stack<vector<char *> *> hlp_jump_loc;	// address insode of a compiled code, where are stored addresses of jump to bytecode --> those needs to be transformed to compiled code addresses during a compilation
 
 		static bool functionsComparator(FunctionSignature *a, FunctionSignature *b)
@@ -161,14 +161,14 @@ class JITCompiler
 			int capacity = 4096, limit = 4000;	// 4kiB, 4kB
 			char *code = new char[capacity];
 			int length = 0;
-			hlp_addresses.push(new map<char, char>());
+			hlp_addresses.push(new map<int, int>());
 			hlp_jump_loc.push(new vector<char *>());
 			//
 			length += gen_prolog(code+length);
 			//
 			for(int i = functions->find(fnName)->second->pointer, im = i + functions->find(fnName)->second->length; i < im; i++)
 			{
-				(*(hlp_addresses.top()))[(char)i] = (char)length;
+				(*(hlp_addresses.top()))[i] = length;
 				length += compileInstruction(program->at(i), code+length);
 				if(length > limit)
 				{	// realloc
@@ -185,8 +185,8 @@ class JITCompiler
 			char *jmp_address;
 			for(size_t i = 0, im = (*(hlp_jump_loc.top())).size(); i < im; i++)
 			{
-				jmp_address = code + (*(hlp_addresses.top()))[(*((char *)((*(hlp_jump_loc.top()))[i])))];
-				(*((char *)((*(hlp_jump_loc.top()))[i]))) = char(jmp_address - (*(hlp_jump_loc.top()))[i] - 1);	// 1B offset! (1-complement)
+				jmp_address = code + (*(hlp_addresses.top()))[(*((int *)((*(hlp_jump_loc.top()))[i])))];
+				(*((int *)((*(hlp_jump_loc.top()))[i]))) = (int)jmp_address;
 			}
 			//
 			compiled_functions[fnName] = code;

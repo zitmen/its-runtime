@@ -243,7 +243,7 @@ class BuiltInRoutines
         
         static Boolean * startsWith(const String *str, const String *prefix)
         {
-            return new Boolean(indexOf(str, prefix) == 0);
+            return new Boolean(indexOf(str, prefix)->getValue() == 0);
         }
         
         static Boolean * endsWith(const String *str, const String *suffix)

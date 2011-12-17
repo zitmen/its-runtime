@@ -1,10 +1,10 @@
 void main()
 {
 	for(int i = 1; i < 10; i++)
-		println(int2str(fact(i)));
+		println(fact(i));
 }
 
-int fact(int x)
+String fact(int x)
 {
 	int f = 1;
 	for(int i = 2; i <= x; i++)
@@ -12,7 +12,12 @@ int fact(int x)
 	return to(f);
 }
 
-int to(int x)
+String to(int x)
 {
-	return str2int(int2str(x));
+	String f = int2str(x);
+	String s = concat(concat(f, ",len="), int2str(strlen(f)));
+	if(endsWith(f, "0") || endsWith(f, "1"))
+		return concat(s, ", true");
+	//else
+		return concat(s, ", false");
 }

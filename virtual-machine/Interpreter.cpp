@@ -237,6 +237,7 @@ void Interpreter::_jmp(const Integer *to)
 void Interpreter::_pop(Variable *dest)
 {
 	dest->setValue(memory->popAndGetTopValAddr(dest->getItemType()));
+	ZF = (((Boolean *)(dest->getValue()))->getValue() == false);
 	//
 	++IP;
 }

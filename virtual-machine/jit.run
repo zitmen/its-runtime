@@ -1,34 +1,52 @@
-FUNCTION <INTEGER> to [ INTEGER var4 ] [ INTEGER var15 STRING var14 INTEGER var4 ] @ 13
-FUNCTION <INTEGER> fact [ INTEGER var1 ] [ INTEGER var13 INTEGER var12 INTEGER var3 INTEGER var11 INTEGER var1 INTEGER var10 INTEGER var2 ] @ 18
-FUNCTION <VOID> main [ ] [ STRING var9 INTEGER var8 INTEGER var7 INTEGER var5 INTEGER var6 INTEGER var0 ] @ 0
+FUNCTION <STRING> to [ INTEGER var4 ] [ STRING var5 STRING var6 INTEGER var4 STRING var15 STRING var24 STRING var23 STRING var26 STRING var25 STRING var19 STRING var18 STRING var17 INTEGER var16 STRING var20 BOOL var22 STRING var21 ] @ 11
+FUNCTION <STRING> fact [ INTEGER var1 ] [ STRING var14 INTEGER var13 INTEGER var12 INTEGER var3 INTEGER var11 INTEGER var1 INTEGER var2 ] @ 36
+FUNCTION <VOID> main [ ] [ INTEGER var9 INTEGER var8 INTEGER var7 STRING var10 INTEGER var0 ] @ 0
 CODE
-000: LDCI var5 1
-001: ST var0 var5
-002: LDCI var6 10
-003: LT var7 var0 var6
-004: JZ 12
+000: LDCI var7 1
+001: ST var0 var7
+002: LDCI var8 10
+003: LT var9 var0 var8
+004: JZ 10
 005: CALL fact var0
-006: POP var8
-007: INVOKE int2str var8
-008: POP var9
-009: INVOKE println var9
-010: INC var0
-011: JMP 2
-012: RET
-013: INVOKE int2str var4
-014: POP var14
-015: INVOKE str2int var14
-016: POP var15
-017: RETV var15
-018: LDCI var10 1
-019: ST var2 var10
-020: LDCI var11 2
-021: ST var3 var11
-022: LTE var12 var3 var1
-023: JZ 27
-024: MUL var2 var2 var3
-025: INC var3
-026: JMP 22
-027: CALL to var2
-028: POP var13
-029: RETV var13
+006: POP var10
+007: INVOKE println var10
+008: INC var0
+009: JMP 2
+010: RET
+011: INVOKE int2str var4
+012: POP var15
+013: ST var5 var15
+014: INVOKE strlen var5
+015: POP var16
+016: INVOKE int2str var16
+017: POP var17
+018: LDCS var18 ",len="
+019: INVOKE concat var5 var18
+020: POP var19
+021: INVOKE concat var19 var17
+022: POP var20
+023: ST var6 var20
+024: LDCS var21 "0"
+025: INVOKE endsWith var5 var21
+026: POP var22
+027: JZ 32
+028: LDCS var23 ", true"
+029: INVOKE concat var6 var23
+030: POP var24
+031: RETV var24
+032: LDCS var25 ", false"
+033: INVOKE concat var6 var25
+034: POP var26
+035: RETV var26
+036: LDCI var11 1
+037: ST var2 var11
+038: LDCI var12 2
+039: ST var3 var12
+040: LTE var13 var3 var1
+041: JZ 45
+042: MUL var2 var2 var3
+043: INC var3
+044: JMP 40
+045: CALL to var2
+046: POP var14
+047: RETV var14
