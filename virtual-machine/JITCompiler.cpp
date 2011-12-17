@@ -926,59 +926,73 @@ int JITCompiler::gen_invoke(char *code, Variable *name, const vector<Argument *>
 	}
 	else if(name->getName() == "str2int")
 	{
-		const int code_len = 30;
-		const char *precompiled = "\xB8????"			//mov eax, args[1] (String *)
+		const int code_len = 39;
+		const char *precompiled = "\xB8????"			//mov eax, offset(args[1])
+								  "\xBB????"			//mov ebx, address(SFB)
+								  "\x03\x03"			//add eax, [ebx]        ; absolute address of var
+								  "\x8B\x00"			//mov eax, [eax]        ; value of arg
 								  "\x50"				//push eax
-								  "\xB8????"			//mov eax, address(BuiltInRoutines::str2int)
+								  "\xB8????"			//mov eax, address(JITBuiltInRoutines::str2int)
 								  "\xFF\xD0"			//call eax
 								  "\xBB\x00\x00\x00\x00"//mov ebx, 0	; type = NULL
 								  "\x53"				//push ebx
-								  "\x50"				//push eax		; val = return value from str2int (Argument *)
+								  "\x50"				//push eax		; val = return value from str2int
 								  "\xB8????"			//mov eax, address(pushIntVal)
 								  "\xFF\xD0"			//call eax		; pushVal(val, type);
 								  "\x83\xC4\x0C";		//add esp, 12	; pop functions arguments from both str2int and pushIntVal
 		memcpy(code, precompiled, code_len);
-		(*((void **)(code+1))) = ((Variable *)(args[1]))->getValue();
-		(*((void **)(code+7))) = BuiltInRoutines::str2int;
-		(*((void **)(code+21))) = pushIntVal;
+		(*((void **)(code+1))) = (void *)(((char *)((Variable *)(args[1]))->getAddress()) - ((char *)Interpreter::memory->SFB));        // offset
+		(*((void **)(code+6))) = &(Interpreter::memory->SFB);
+		(*((void **)(code+16))) = JITBuiltInRoutines::str2int;
+		(*((void **)(code+30))) = pushIntVal;
 		return code_len;
 	}
 	else if(name->getName() == "double2int")
 	{
-		const int code_len = 30;
-		const char *precompiled = "\xB8????"			//mov eax, args[1] (Double *)
-								  "\x50"				//push eax
-								  "\xB8????"			//mov eax, address(BuiltInRoutines::double2int)
+		const int code_len = 44;
+		const char *precompiled = "\xB8????"			//mov eax, offset(args[1])
+								  "\xBB????"			//mov ebx, address(SFB)
+								  "\x03\x03"			//add eax, [ebx]        ; absolute address of var
+								  "\xDD\x00"			//fld qword ptr [eax]
+								  "\x83\xEC\x08"		//sub esp, 8    ; 'alloc' room on system stack for double retval
+								  "\xDD\x1C\x24"		//fstp qword ptr [esp]  ; save retval from FPU stack to the ALU stack as parameter for double2int
+								  "\xB8????"			//mov eax, address(JITBuiltInRoutines::double2int)
 								  "\xFF\xD0"			//call eax
 								  "\xBB\x00\x00\x00\x00"//mov ebx, 0	; type = NULL
 								  "\x53"				//push ebx
 								  "\x50"				//push eax		; val = return value from double2int (Argument *)
 								  "\xB8????"			//mov eax, address(pushIntVal)
 								  "\xFF\xD0"			//call eax		; pushVal(val, type);
-								  "\x83\xC4\x0C";		//add esp, 12	; pop functions arguments from both double2int and pushIntVal
+								  "\x83\xC4\x10";		//add esp, 16	; pop functions arguments from both double2int and pushIntVal
 		memcpy(code, precompiled, code_len);
-		(*((void **)(code+1))) = ((Variable *)(args[1]))->getValue();
-		(*((void **)(code+7))) = BuiltInRoutines::double2int;
-		(*((void **)(code+21))) = pushIntVal;
+		(*((void **)(code+1))) = (void *)(((char *)((Variable *)(args[1]))->getAddress()) - ((char *)Interpreter::memory->SFB));        // offset
+		(*((void **)(code+6))) = &(Interpreter::memory->SFB);
+		(*((void **)(code+21))) = JITBuiltInRoutines::double2int;
+		(*((void **)(code+35))) = pushIntVal;
 		return code_len;
 	}
 	else if(name->getName() == "str2double")
 	{
-		const int code_len = 30;
-		const char *precompiled = "\xB8????"			//mov eax, args[1] (String *)
+		const int code_len = 44;
+		const char *precompiled = "\xB8????"			//mov eax, offset(args[1])
+								  "\xBB????"			//mov ebx, address(SFB)
+								  "\x03\x03"			//add eax, [ebx]        ; absolute address of arg
+								  "\x8B\x00"			//mov eax, [eax]        ; value of arg
 								  "\x50"				//push eax
-								  "\xB8????"			//mov eax, address(BuiltInRoutines::str2double)
+								  "\xB8????"			//mov eax, address(JITBuiltInRoutines::str2double)
 								  "\xFF\xD0"			//call eax
 								  "\xBB\x00\x00\x00\x00"//mov ebx, 0	; type = NULL
 								  "\x53"				//push ebx
-								  "\x50"				//push eax		; val = return value from str2double (Argument *)
+								  "\x83\xEC\x08"		//sub esp, 8    ; 'alloc' room on system stack for double retval
+								  "\xDD\x1C\x24"		//fstp qword ptr [esp]  ; save retval from FPU stack to the ALU stack as parameter for pushDblVal
 								  "\xB8????"			//mov eax, address(pushDblVal)
 								  "\xFF\xD0"			//call eax		; pushVal(val, type);
-								  "\x83\xC4\x0C";		//add esp, 12	; pop functions arguments from both str2double and pushDblVal
+								  "\x83\xC4\x10";		//add esp, 16	; pop functions arguments from both str2double and pushDblVal
 		memcpy(code, precompiled, code_len);
-		(*((void **)(code+1))) = ((Variable *)(args[1]))->getValue();
-		(*((void **)(code+7))) = BuiltInRoutines::str2double;
-		(*((void **)(code+21))) = pushDblVal;
+		(*((void **)(code+1))) = (void *)(((char *)((Variable *)(args[1]))->getAddress()) - ((char *)Interpreter::memory->SFB));        // offset
+		(*((void **)(code+6))) = &(Interpreter::memory->SFB);
+		(*((void **)(code+16))) = JITBuiltInRoutines::str2double;
+		(*((void **)(code+35))) = pushDblVal;
 		return code_len;
 	}
 	else if(name->getName() == "int2double")
@@ -989,7 +1003,7 @@ int JITCompiler::gen_invoke(char *code, Variable *name, const vector<Argument *>
 								  "\x03\x03"			//add eax, [ebx]	; absolute address of var
 								  "\x8B\x00"			//mov eax, [eax]	; value of var
 								  "\x50"				//push eax
-								  "\xB8????"			//mov eax, address(BuiltInRoutines::int2double)
+								  "\xB8????"			//mov eax, address(JITBuiltInRoutines::int2double)
 								  "\xFF\xD0"			//call eax
 								  "\xBB\x00\x00\x00\x00"//mov ebx, 0	; type = NULL
 								  "\x53"				//push ebx
