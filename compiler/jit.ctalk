@@ -1,30 +1,18 @@
-/*
-	Print text, alloc 32MB (it will exceed the heap and trigger the GC), then print text again for reference update check.
-*/
-struct Text
-{
-	Array<String> text;
-}
-
 void main()
 {
-	Text text = new;
-	text.text = new[4];
-	text.text[0] = "Byl ";
-	text.text[1] = "jsem ";
-	text.text[2] = "tu, ";
-	text.text[3] = "Fantomas.";
-	
-	Array<int> arr;
+	for(int i = 1; i < 10; i++)
+		println(fact(i));
+}
 
-	for(int t = 0; t < 4; t++)
-		print(text.text[t]);
-	println("");
-	//
-	for(int i = 0; i < 8; i++)	// 32MB in total
-		arr = new[1024*1024];	// 8x4MB
-	//
-	for(int t = 0; t < 4; t++)
-		print(text.text[t]);
-	println("");
+String fact(int x)
+{
+	int f = 1;
+	for(int i = 2; i <= x; i++)
+		f *= i;
+	return toString(f);
+}
+
+String toString(int x)
+{
+	return int2str(x);
 }

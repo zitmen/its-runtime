@@ -15,11 +15,10 @@
 // + it would not work, because functions don't pop arguments from the stack
 class BuiltInRoutines
 {
-	private:
+	public:
 		static bool m_first_rand;
 		static time_t m_rand_seed;
 
-	public:
 		static map<string, DataType *> routinesList;	// first is routine name, second is returned datatype
 
 		static void init()

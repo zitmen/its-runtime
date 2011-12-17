@@ -8,6 +8,7 @@
 
 int main()
 {
+/*
 	try
 	{
 		bool ZF;
@@ -88,7 +89,7 @@ int main()
 		std::cerr << e->what() << std::endl;
 		delete e;
 	}
-/*
+*/
 	try
 	{
 		ProgramLoader loader("jit.run");
@@ -98,7 +99,7 @@ int main()
 		interpreter.setOption(Interpreter::Options::HeapSize, 32*1024*1024);	// 32MB
 		interpreter.setOption(Interpreter::Options::StackSize, 32*1024*1024);	// 32MB
 		interpreter.setOption(Interpreter::Options::GarbageCollector, 0.9);	// start GC if 90% of heap is full (set 0% for no GC)
-		interpreter.setOption(Interpreter::Options::JITCompiler, 2);	// compile any function that has been executed at least 10 times (set negative value for no JIT Compiler)
+		interpreter.setOption(Interpreter::Options::JITCompiler, 2);	// compile any function that has been executed at least 10 times (set non-positive value for no JIT Compiler)
 		std::cout << ":: Execution ::\n======================" << std::endl;
 		interpreter.run();
 	}
@@ -107,6 +108,5 @@ int main()
 		std::cerr << e->what() << std::endl;
 		delete e;
 	}
-*/
 	return 0;
 }

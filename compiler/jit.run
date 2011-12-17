@@ -1,49 +1,30 @@
-STRUCTURE Text [ ARRAY<STRING> text ]
-FUNCTION <VOID> main [ ] [ INTEGER var5 INTEGER var6 INTEGER var3 INTEGER var4 ARRAY<INTEGER> var1 INTEGER var2 STRUCTURE<Text> var0 INTEGER var15 INTEGER var14 STRING var13 INTEGER var12 INTEGER var19 STRING var9 STRING var18 INTEGER var8 INTEGER var17 STRING var7 INTEGER var16 STRING var11 INTEGER var10 INTEGER var24 INTEGER var23 STRING var26 INTEGER var25 INTEGER var20 INTEGER var22 INTEGER var21 ] @ 0
+FUNCTION <STRING> fact [ INTEGER var1 ] [ STRING var12 INTEGER var9 INTEGER var3 INTEGER var11 INTEGER var1 INTEGER var10 INTEGER var2 ] @ 11
+FUNCTION <STRING> toString [ INTEGER var4 ] [ STRING var13 INTEGER var4 ] @ 23
+FUNCTION <VOID> main [ ] [ STRING var8 INTEGER var7 INTEGER var5 INTEGER var6 INTEGER var0 ] @ 0
 CODE
 000: LDCI var5 1
-001: NEW var0 var5
-002: LDCI var6 4
-003: NEW var0 [ @text ] var6
-004: LDCS var7 "Byl "
-005: LDCI var8 0
-006: ST var0 [ @text var8 ] var7
-007: LDCS var9 "jsem "
-008: LDCI var10 1
-009: ST var0 [ @text var10 ] var9
-010: LDCS var11 "tu, "
-011: LDCI var12 2
-012: ST var0 [ @text var12 ] var11
-013: LDCS var13 "Fantomas."
-014: LDCI var14 3
-015: ST var0 [ @text var14 ] var13
-016: LDCI var15 0
-017: ST var2 var15
-018: LDCI var16 4
-019: LT var17 var2 var16
-020: JZ 24
-021: INVOKE print var0 [ @text var2 ]
-022: INC var2
-023: JMP 18
-024: LDCS var18 ""
-025: INVOKE println var18
-026: LDCI var19 0
-027: ST var3 var19
-028: LDCI var20 8
-029: LT var21 var3 var20
-030: JZ 35
-031: LDCI var22 1048576
-032: NEW var1 var22
-033: INC var3
-034: JMP 28
-035: LDCI var23 0
-036: ST var4 var23
-037: LDCI var24 4
-038: LT var25 var4 var24
-039: JZ 43
-040: INVOKE print var0 [ @text var4 ]
-041: INC var4
-042: JMP 37
-043: LDCS var26 ""
-044: INVOKE println var26
-045: RET
+001: ST var0 var5
+002: LDCI var6 10
+003: LT var7 var0 var6
+004: JZ 10
+005: CALL fact var0
+006: POP var8
+007: INVOKE println var8
+008: INC var0
+009: JMP 2
+010: RET
+011: LDCI var9 1
+012: ST var2 var9
+013: LDCI var10 2
+014: ST var3 var10
+015: LTE var11 var3 var1
+016: JZ 20
+017: MUL var2 var2 var3
+018: INC var3
+019: JMP 15
+020: CALL toString var2
+021: POP var12
+022: RETV var12
+023: INVOKE int2str var4
+024: POP var13
+025: RETV var13

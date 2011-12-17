@@ -1,5 +1,6 @@
 #include "JITCompiler.h"
 #include "Interpreter.h"
+#include "JITBuiltInRoutines.h"
 #include <cstdarg>
 
 void divByZeroEx()
@@ -27,49 +28,70 @@ void pushVal(Argument *val, DataType *type)
 	Interpreter::memory->push(val, type);
 }
 
-stack<FunctionSignature *> JITCompiler::call_stack;
-
-void JITCompiler::callFn(FunctionSignature *fn, int argc, ...)
+void pushIntVal(int val, DataType *type)
 {
-	// 0. push signature to call stack
-	call_stack.push(fn);
-	// 1. push IP
-	//memory->push(new Integer(IP + 1));
-	// 2. set new IP
-	//IP = fn->pointer;
-	// 3. push SFB
-	Interpreter::memory->push(new Reference(Interpreter::memory->SFB));
-	// 4. set new SFB
-	Interpreter::memory->SFB = Interpreter::memory->SP;
-	// 5. get arguments values from the stack before variables addresses will be changed
-	vector<Argument *> values;
-	va_list args;
-	va_start(args, argc);
-	Variable *var;
-	for(int i = 0; i < argc; i++)
-	{
-		var = va_arg(args, Variable*);
-		values.push_back(var->getValue());
-	}
-	va_end(args);
-	// 6. setup the stack - 1st come parameters, 2nd declared variables; set SP
-    for(map<string, Variable *>::iterator it = fn->variables.begin(); it != fn->variables.end(); ++it)
-		it->second->setAddress(Interpreter::memory->reserve(it->second));
-	// 7. set values of arguments on the stack
-	for(size_t i = 0, im = values.size(); i < im; i++)
-        fn->variables[fn->arguments_ordering[i]]->setValue(values[i]);
+	Interpreter::memory->push(new Integer(val), type);
 }
 
-void JITCompiler::retFromFn()
+void pushDblVal(double val, DataType *type)
+{
+	Interpreter::memory->push(new Double(val), type);
+}
+
+void pushBoolVal(bool val, DataType *type)
+{
+	Interpreter::memory->push(new Boolean(val), type);
+}
+
+void pushStrVal(char *val, DataType *type)
+{
+	Interpreter::memory->push(new String(val), type);
+}
+
+void pushPtrVal(void *val, DataType *type)
+{
+	Interpreter::memory->push(new Reference(val), type);
+}
+
+void callFn(JITCompiler *jitc, FunctionSignature *fn, int argc, ...)
+{
+	// 0. push signature to call stack
+	jitc->call_stack->push(fn);
+	// 1. push IP
+	Interpreter::memory->push(new Integer(0));	// this is useles...it's just for compatibility with interpreter's calls
+	// 2. push SFB
+	Interpreter::memory->push(new Reference(Interpreter::memory->SFB));
+	// 3. set new SFB
+	Interpreter::memory->SFB = Interpreter::memory->SP;
+	// 4. setup the stack - 1st come parameters, 2nd declared variables; set SP
+    for(map<string, Variable *>::iterator it = fn->variables.begin(); it != fn->variables.end(); ++it)
+		it->second->setAddress(Interpreter::memory->reserve(it->second));
+	// 5. set values of arguments on the stack
+	va_list args;
+	va_start(args, argc);
+	void *valPtr;
+	for(int i = 0; i < argc; i++)
+	{
+		valPtr = va_arg(args, void*);
+		fn->variables[fn->arguments_ordering[i]]->setValue(valPtr);
+	}
+	va_end(args);
+	//
+	// compile the called function first (unless it is a recursive call or it is already compiled)
+	if(jitc->compiled_functions[fn->name] == NULL)
+		jitc->compile(fn->name);
+}
+
+void retFromFn(stack<FunctionSignature *> *call_stack)
 {
 	// 0. pop signature from call stack
-	FunctionSignature *fn = call_stack.top(); call_stack.pop();
+	FunctionSignature *fn = call_stack->top(); call_stack->pop();
 	// 1. restore SP to the state before call -- top was at SFB (there is still old SFB and IP - next steps)
 	Interpreter::memory->SP = Interpreter::memory->SFB;
 	// 2. restore SFB of previous stack fram
 	Interpreter::memory->SFB = (*((void **)(Interpreter::memory->popAndGetTopValAddr(DataType::REFERENCE))));
 	// 3. restore IP
-	//IP = (*((int *)(memory->popAndGetTopValAddr(DataType::INTEGER))));
+	int IP = (*((int *)(Interpreter::memory->popAndGetTopValAddr(DataType::INTEGER))));	// this is useles...it's just for compatibility with interpreter's calls
 	// 4. restore local variables
 	int offset = 0;
 	map<string, Variable *>::iterator it = fn->variables.end();
@@ -110,16 +132,18 @@ int JITCompiler::gen_call(char *code, FunctionSignature *fn, const vector<Argume
 	const char *args_precompiled = "\xB8????"	//mov eax, address(args[?]) ; take address, because it is all Variables; no constant there
 								   "\x50";		//push eax
 	//
-	const int code_len = 29;
+	const int code_len = 35;
 	const char *precompiled = "\xB8????"	//mov eax, value(args.size()-1) ; 0th argument is name of the called function
 							  "\x50"		//push eax
 							  "\xB8????"	//mov eax, address(fn)
 							  "\x50"		//push eax
-							  "\xB8????"	//mov eax, address(JITCompiler::callFn)
+							  "\xB8????"	//mov eax, address(this) ; (JITCompiler *)
+							  "\x50"		//push eax
+							  "\xB8????"	//mov eax, address(callFn)
 							  "\xFF\xD0"	//call eax
 							  "\xB8????"	//mov eax, address(called_function)	; compiled_functions[fn->name]
 							  "\xFF\xD0"	//call eax
-							  "\x83\xC4?";	//add esp, ?	; pop all (args.size()-1)+2 arguments
+							  "\x83\xC4?";	//add esp, ?	; pop all (args.size()-1)+3 arguments
 	//
 	int len = 0;
 	// function arguments
@@ -131,44 +155,82 @@ int JITCompiler::gen_call(char *code, FunctionSignature *fn, const vector<Argume
 	}
 	// the rest of the code
 	memcpy(code+len, precompiled, code_len);
-	(*((size_t *)(code+len+1))) = args.size()-1;
+	(*((int *)(code+len+1))) = int(args.size())-1;
 	(*((void **)(code+len+7))) = fn;
-	(*((void **)(code+len+13))) = JITCompiler::callFn;
-	(*((void **)(code+len+20))) = compiled_functions[fn->name];
-	(*((char *)(code+len+28))) = (char)(args.size()+1);
-	len += code_len;
+	(*((void **)(code+len+13))) = this;
+	(*((void **)(code+len+19))) = callFn;
+	(*((void **)(code+len+26))) = compiled_functions[fn->name];
+	(*((char *)(code+len+34))) = (char)((args.size()+2)*4);
 	//
+	if(compiled_functions[fn->name] == NULL)
+		fillCalls[fn->name].push_back(code+len+26);
+	//
+	len += code_len;
 	return len;
 }
 
 int JITCompiler::gen_ret(char *code)
 {
-	const int code_len = 8;
-	const char *precompiled = "\xB8????"	//mov eax, address(retFromFn)
+	const int code_len = 17;
+	const char *precompiled = "\xB8????"	//mov eax, address(call_stack)
+							  "\x50"		//push eax
+							  "\xB8????"	//mov eax, address(retFromFn)
 							  "\xFF\xD0"	//call eax
+							  "\x83\xC4\x04"//add esp, 4	; pop function argument
 							  "\xC3";		//ret
 	memcpy(code, precompiled, code_len);
-	(*((void **)(code+1))) = JITCompiler::retFromFn;
+	(*((void **)(code+1))) = call_stack;
+	(*((void **)(code+7))) = retFromFn;
 	return code_len;
 }
 
 int JITCompiler::gen_retv(char *code, const Variable *var)
 {
-	const int code_len = 30;
-	const char *precompiled = "\xB8\x00\x00\x00\x00"	//mov eax, 0 ; NULL (DataType *)
-							  "\x50"					//push eax
-							  "\xB8????"				//mov eax, value(var)	; return value (Argument *)
-							  "\x50"					//push eax
-							  "\xB8????"				//mov eax, address(retFromFn) ; does take no arguments so it still lays on the stack prepared for pushVal call
-							  "\xFF\xD0"				//call eax
-							  "\xB8????"				//mov eax, address(pushVal)
-							  "\xFF\xD0"				//call eax
-							  "\x83\xC4\x08"			//add esp, 8	; pop pushVal arguments
-							  "\xC3";					//ret
+	const int code_len = 41;
+	const char *precompiled = "\xB8????"		//mov eax, [type] ; (DataType *)
+							  "\x50"			//push eax
+							  "\xB8????"		//mov eax, address(var)	; points to a return value
+							  "\x8B\x00"		//mov eax, [eax]	; get value rather then pointer -- co DOUBLE!!!!!??? zasobnik FPU?
+							  "\x50"			//push eax
+							  "\xB8????"		//mov eax, address(call_stack)
+							  "\x50"			//push eax
+							  "\xB8????"		//mov eax, address(retFromFn) ; take only 1 argument so others still lays on the stack prepared for pushXXXVal call
+							  "\xFF\xD0"		//call eax
+							  "\x83\xC4\x04"	//add esp, 4	; pop retFromFn argument
+							  "\xB8????"		//mov eax, address(pushXXXVal)
+							  "\xFF\xD0"		//call eax
+							  "\x83\xC4\x08"	//add esp, 8	; pop pushXXXVal arguments
+							  "\xC3";			//ret
 	memcpy(code, precompiled, code_len);
-	(*((void **)(code+7))) = var->getValue();
-	(*((void **)(code+13))) = JITCompiler::retFromFn;
-	(*((void **)(code+20))) = pushVal;
+	(*((void **)(code+7))) = var->getAddress();
+	(*((void **)(code+15))) = call_stack;
+	(*((void **)(code+21))) = retFromFn;
+	// of what type is the retval?
+	if(var->getDataType()->type == DataType::INTEGER)
+	{
+		(*((void **)(code+1))) = NULL;
+		(*((void **)(code+31))) = pushIntVal;
+	}
+	else if(var->getDataType()->type == DataType::BOOLEAN)
+	{
+		(*((void **)(code+1))) = NULL;
+		(*((void **)(code+31))) = pushBoolVal;
+	}
+	else if(var->getDataType()->type == DataType::DOUBLE)
+	{
+		(*((void **)(code+1))) = NULL;
+		(*((void **)(code+31))) = pushDblVal;
+	}
+	else if(var->getDataType()->type == DataType::STRING)
+	{
+		(*((void **)(code+1))) = NULL;
+		(*((void **)(code+31))) = pushStrVal;
+	}
+	else	// REFERENCE: ARRAY or STRUCTURE
+	{
+		(*((void **)(code+1))) = var->getDataType();
+		(*((void **)(code+31))) = pushPtrVal;
+	}
 	return code_len;
 }
 
@@ -782,24 +844,28 @@ int JITCompiler::gen_invoke(char *code, Variable *name, const vector<Argument *>
 	}
 	else if(name->getName() == "int2str")
 	{
-		const int code_len = 36;
-		const char *precompiled = "\xB8????"			//mov eax, args[2] (Integer *)
+		const int code_len = 43+8;
+		const char *precompiled = "\xB8????"			//mov eax, offset(args[1])
+								  "\xBB????"			//mov ebx, address(SFB)
+								  "\x03\x03"			//add eax, [ebx]
 								  "\x50"				//push eax
-								  "\xB8????"			//mov eax, args[1] (MemoryManager *)
+								  "\xB8????"			//mov eax, (MemoryManager *)
 								  "\x50"				//push eax
-								  "\xB8????"			//mov eax, address(BuiltInRoutines::int2str)
+								  "\xB8????"			//mov eax, address(JITBuiltInRoutines::int2str)
 								  "\xFF\xD0"			//call eax
 								  "\xBB\x00\x00\x00\x00"//mov ebx, 0	; type = NULL
 								  "\x53"				//push ebx
 								  "\x50"				//push eax		; val = return value from int2str (Argument *)
 								  "\xB8????"			//mov eax, address(pushVal)
 								  "\xFF\xD0"			//call eax		; pushVal(val, type);
-								  "\x83\xC4\x10";		//add esp, 16	; pop functions arguments from both int2str and pushVal
+								  "\x83\xC4\x10"		//add esp, 16	; pop functions arguments from both int2str and pushStrVal
+								  "\x90\x90\x90\x90\x90\x90\x90\x90";
 		memcpy(code, precompiled, code_len);
-		(*((void **)(code+1))) = Interpreter::memory;
-		(*((void **)(code+7))) = ((Variable *)(args[1]))->getValue();
-		(*((void **)(code+13))) = BuiltInRoutines::int2str;
-		(*((void **)(code+27))) = pushVal;
+		(*((void **)(code+1))) = (void *)(((char *)((Variable *)(args[1]))->getAddress()) - ((char *)Interpreter::memory->SFB));	// offset
+		(*((void **)(code+6))) = &(Interpreter::memory->SFB);
+		(*((void **)(code+14))) = Interpreter::memory;
+		(*((void **)(code+20))) = JITBuiltInRoutines::int2str;
+		(*((void **)(code+34))) = pushStrVal;
 		return code_len;
 	}
 	else if(name->getName() == "double2str")
@@ -818,8 +884,8 @@ int JITCompiler::gen_invoke(char *code, Variable *name, const vector<Argument *>
 								  "\xFF\xD0"			//call eax		; pushVal(val, type);
 								  "\x83\xC4\x10";		//add esp, 16	; pop functions arguments from both double2str and pushVal
 		memcpy(code, precompiled, code_len);
-		(*((void **)(code+1))) = Interpreter::memory;
-		(*((void **)(code+7))) = ((Variable *)(args[1]))->getValue();
+		(*((void **)(code+1))) = ((Variable *)(args[1]))->getValue();
+		(*((void **)(code+7))) = Interpreter::memory;
 		(*((void **)(code+13))) = BuiltInRoutines::double2str;
 		(*((void **)(code+27))) = pushVal;
 		return code_len;
@@ -913,7 +979,7 @@ int JITCompiler::gen_jz(char *code, const Integer *to)
 	memcpy(code, precompiled, code_len);
 	(*((void **)(code+1))) = pZF;
 	(*((int *)(code+9))) = (char)(to->getValue());
-	hlp_jump_loc.push_back(code+9);
+	(*(hlp_jump_loc.top())).push_back(code+9);
 	return code_len;
 }
 
@@ -926,7 +992,7 @@ int JITCompiler::gen_jnz(char *code, const Integer *to)
 	memcpy(code, precompiled, code_len);
 	(*((void **)(code+1))) = pZF;
 	(*((int *)(code+9))) = (char)(to->getValue());
-	hlp_jump_loc.push_back(code+9);
+	(*(hlp_jump_loc.top())).push_back(code+9);
 	return code_len;
 }
 
@@ -936,7 +1002,7 @@ int JITCompiler::gen_jmp(char *code, const Integer *to)
 	const char *precompiled = "\xEB?";	//jmp value(to)
 	memcpy(code, precompiled, code_len);
 	(*((int *)(code+1))) = (char)(to->getValue());
-	hlp_jump_loc.push_back(code+1);
+	(*(hlp_jump_loc.top())).push_back(code+1);
 	return code_len;
 }
 

@@ -9,7 +9,7 @@ void Interpreter::_call(FunctionSignature *fn, const vector<Argument *> &args)
 	// 1. push IP
 	memory->push(new Integer(IP + 1));
 	// 2. set new IP
-	IP = fn->pointer;
+	int tmp_IP = fn->pointer;	// don't set IP definitely -> set it after the check for JIT Compilation
 	// 3. push SFB
 	memory->push(new Reference(memory->SFB));
 	// 4. set new SFB
@@ -26,17 +26,19 @@ void Interpreter::_call(FunctionSignature *fn, const vector<Argument *> &args)
         fn->variables[fn->arguments_ordering[i]]->setValue(values[i]);
 	//
 	// JIT Compiler
-	if(options[Options::JITCompiler] >= 0)
+	if(options[Options::JITCompiler] > 0)
 	{
 		fn_calls[fn->name]++;
 		if(fn_calls[fn->name] > options[Options::JITCompiler])
 		{
-			//printf("JIT Compiler: running compiled function '%s'.\n", fn->name.c_str());
-			jitc->run(fn->name);
-			// TODO: RET(V) --> IP/ZF nastavovat v zkompilovanym programu!
-			IP += fn->length - 1;
+//printf("JIT Compiler: running compiled function '%s'.\n", fn->name.c_str());
+			jitc->run(fn->name);	// compile & call the function
+			IP++;	// after the function is finished, continue by the next instruction as if it was the interpreter call and function has finished
+			return;	// jump over the rest of the method; IP is set properly now
 		}
 	}
+	// now it's safe to set IP
+	IP = tmp_IP;
 }
 
 void Interpreter::_ret()
