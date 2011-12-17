@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import mi.run.bytecode.Code;
 import mi.run.bytecode.Instruction;
+import mi.run.bytecode.JumpInstr;
 import mi.run.semantic.Functions;
 import mi.run.semantic.Structures;
 
@@ -82,12 +83,14 @@ public class Program extends Node
     
     private Instruction removeNoOps(Instruction instr)
     {
+        Instruction start = instr;
         if(instr == null) return instr;
         //
         while(true)
         {
             if(instr.code == Code.NOOP) // if NOOP, delete it
             {
+                resolveJumps(start, instr);
                 if(instr.prev != null) instr.prev.next = instr.next;
                 if(instr.next != null) instr.next.prev = instr.prev;
             }
@@ -147,5 +150,25 @@ public class Program extends Node
         //
         for(int i = 0, im = functions.size(); i < im; i++)
             stream.println(functions.get(i).getSignature());
+    }
+
+    private void resolveJumps(Instruction program, Instruction target)
+    {
+        if(program == null) return;
+        //
+        Instruction instr = program;
+        while(true)
+        {
+            if(instr instanceof JumpInstr)  // jump?
+            {
+                if(target == ((JumpInstr)instr).address)    // jumps to the target?
+                {   // shift target
+                    ((JumpInstr)instr).address = target.next;
+                }
+            }
+            if(instr.next == null) break;
+            instr = instr.next;
+            
+        }
     }
 }

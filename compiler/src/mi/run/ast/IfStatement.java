@@ -4,7 +4,6 @@ import mi.run.bytecode.Code;
 import mi.run.bytecode.Instruction;
 import mi.run.bytecode.JumpInstr;
 import mi.run.semantic.SymbolTable;
-import mi.run.semantic.TypeCast;
 
 public class IfStatement extends Statement
 {
