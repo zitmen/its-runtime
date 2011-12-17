@@ -3,6 +3,18 @@
 #include "JITBuiltInRoutines.h"
 #include <cstdarg>
 
+/*
+
+004A4374 E8 16 78 FA FF       call        getVal (44BB8Fh)		// zavolam funkci, ktera vraci double - vraci ho pomoci pushnuti na FPU zasobnik -- fld qword ptr [adresa]
+004A4379 DD 5D E0             fstp        qword ptr [ebp-20h]  // ulozi navratovou hodnotu do lokalni promenne
+    25: 	setVal(d);	// ted jdu volat funkci, kam double predavam jako parameter
+004A437C 83 EC 08             sub         esp,8					// uvolnim misto na zasobniku
+004A437F DD 45 E0             fld         qword ptr [ebp-20h]	// loadnu hodnotu z lokalni promenne na FPU zasobnik
+004A4382 DD 1C 24             fstp        qword ptr [esp]		// vyzvednu hodnotu z FPU zasobniku a vlozim na ALU zasobnik do uvolneneho prostoru
+004A4385 E8 E9 5C FA FF       call        setVal (44A073h)		// funkce si pak hodnotu z klasickeho zasobniku vyzvedne stejne jako z lokalni promenne
+
+*/
+
 void divByZeroEx()
 {
 	throw new std::exception("Runtime exception: Division by zero!");
@@ -21,11 +33,6 @@ void * heapAlloc(int size)
 void * popAndGetTopValAddr(int type)
 {
 	return Interpreter::memory->popAndGetTopValAddr(type);
-}
-
-void pushVal(Argument *val, DataType *type)
-{
-	Interpreter::memory->push(val, type);
 }
 
 void pushIntVal(int val, DataType *type)
@@ -303,15 +310,15 @@ int JITCompiler::gen_invoke(char *code, Variable *name, const vector<Argument *>
 								  "\xBB????"		//mov ebx, address(var->data_type)
 								  "\x53"			//push ebx
 								  "\x50"			//push eax		; val = return value from cloneArray (Argument *)
-								  "\xB8????"		//mov eax, address(pushVal)
-								  "\xFF\xD0"		//call eax		; pushVal(val, type);
-								  "\x83\xC4\x0C";	//add esp, 12	; pop functions arguments from both cloneArray and pushVal
+								  "\xB8????"		//mov eax, address(pushPtrVal)
+								  "\xFF\xD0"		//call eax		; pushPtrVal(val, type);
+								  "\x83\xC4\x0C";	//add esp, 12	; pop functions arguments from both cloneArray and pushPtrVal
 		memcpy(code, precompiled, code_len);
 		(*((void **)(code+1))) = ((Variable *)(args[1]))->getValue();
 		(*((void **)(code+7))) = Interpreter::memory;
 		(*((void **)(code+13))) = BuiltInRoutines::cloneArray;
 		(*((void **)(code+20))) = ((Variable *)(args[1]))->getDataType();
-		(*((void **)(code+27))) = pushVal;
+		(*((void **)(code+27))) = pushPtrVal;
 		return code_len;
 	}
 	else if(name->getName() == "clearArray")
@@ -321,7 +328,7 @@ int JITCompiler::gen_invoke(char *code, Variable *name, const vector<Argument *>
 								  "\x50"				//push eax
 								  "\xB8????"			//mov eax, address(BuiltInRoutines::clearArray)
 								  "\xFF\xD0"			//call eax
-								  "\x83\xC4\x04";		//add esp, 4	; pop functions arguments from pushVal
+								  "\x83\xC4\x04";		//add esp, 4	; pop functions arguments from clearArray
 		memcpy(code, precompiled, code_len);
 		(*((void **)(code+1))) = ((Variable *)(args[1]))->getValue();
 		(*((void **)(code+7))) = BuiltInRoutines::clearArray;
@@ -337,13 +344,13 @@ int JITCompiler::gen_invoke(char *code, Variable *name, const vector<Argument *>
 								  "\xBB\x00\x00\x00\x00"//mov ebx, 0	; type = NULL
 								  "\x53"				//push ebx
 								  "\x50"				//push eax		; val = return value from length (Argument *)
-								  "\xB8????"			//mov eax, address(pushVal)
-								  "\xFF\xD0"			//call eax		; pushVal(val, type);
-								  "\x83\xC4\x0C";		//add esp, 12	; pop functions arguments from both length and pushVal
+								  "\xB8????"			//mov eax, address(pushIntVal)
+								  "\xFF\xD0"			//call eax		; pushIntVal(val, type);
+								  "\x83\xC4\x0C";		//add esp, 12	; pop functions arguments from both length and pushIntVal
 		memcpy(code, precompiled, code_len);
 		(*((void **)(code+1))) = ((Variable *)(args[1]))->getValue();
 		(*((void **)(code+7))) = BuiltInRoutines::length;
-		(*((void **)(code+21))) = pushVal;
+		(*((void **)(code+21))) = pushIntVal;
 		return code_len;
 	}
 	else if(name->getName() == "openRFile")
@@ -356,13 +363,13 @@ int JITCompiler::gen_invoke(char *code, Variable *name, const vector<Argument *>
 								  "\xBB\x00\x00\x00\x00"//mov ebx, 0	; type = NULL
 								  "\x53"				//push ebx
 								  "\x50"				//push eax		; val = return value from openRFile (Argument *)
-								  "\xB8????"			//mov eax, address(pushVal)
-								  "\xFF\xD0"			//call eax		; pushVal(val, type);
-								  "\x83\xC4\x0C";		//add esp, 12	; pop functions arguments from both openRFile and pushVal
+								  "\xB8????"			//mov eax, address(pushPtrVal)
+								  "\xFF\xD0"			//call eax		; pushPtrVal(val, type);
+								  "\x83\xC4\x0C";		//add esp, 12	; pop functions arguments from both openRFile and pushPtrVal
 		memcpy(code, precompiled, code_len);
 		(*((void **)(code+1))) = ((Variable *)(args[1]))->getValue();
 		(*((void **)(code+7))) = BuiltInRoutines::openRFile;
-		(*((void **)(code+21))) = pushVal;
+		(*((void **)(code+21))) = pushPtrVal;
 		return code_len;
 	}
 	else if(name->getName() == "openWFile")
@@ -377,14 +384,14 @@ int JITCompiler::gen_invoke(char *code, Variable *name, const vector<Argument *>
 								  "\xBB\x00\x00\x00\x00"//mov ebx, 0	; type = NULL
 								  "\x53"				//push ebx
 								  "\x50"				//push eax		; val = return value from openWFile (Argument *)
-								  "\xB8????"			//mov eax, address(pushVal)
-								  "\xFF\xD0"			//call eax		; pushVal(val, type);
-								  "\x83\xC4\x10";		//add esp, 16	; pop functions arguments from both openWFile and pushVal
+								  "\xB8????"			//mov eax, address(pushPtrVal)
+								  "\xFF\xD0"			//call eax		; pushPtrVal(val, type);
+								  "\x83\xC4\x10";		//add esp, 16	; pop functions arguments from both openWFile and pushPtrVal
 		memcpy(code, precompiled, code_len);
 		(*((void **)(code+1))) = ((Variable *)(args[2]))->getValue();
 		(*((void **)(code+7))) = ((Variable *)(args[1]))->getValue();
 		(*((void **)(code+13))) = BuiltInRoutines::openWFile;
-		(*((void **)(code+27))) = pushVal;
+		(*((void **)(code+27))) = pushPtrVal;
 		return code_len;
 	}
 	else if(name->getName() == "closeFile")
@@ -394,7 +401,7 @@ int JITCompiler::gen_invoke(char *code, Variable *name, const vector<Argument *>
 								  "\x50"				//push eax
 								  "\xB8????"			//mov eax, address(BuiltInRoutines::closeFile)
 								  "\xFF\xD0"			//call eax
-								  "\x83\xC4\x04";		//add esp, 4	; pop functions arguments from pushVal
+								  "\x83\xC4\x04";		//add esp, 4	; pop functions arguments from flushFile
 		memcpy(code, precompiled, code_len);
 		(*((void **)(code+1))) = ((Variable *)(args[1]))->getValue();
 		(*((void **)(code+7))) = BuiltInRoutines::closeFile;
@@ -407,7 +414,7 @@ int JITCompiler::gen_invoke(char *code, Variable *name, const vector<Argument *>
 								  "\x50"				//push eax
 								  "\xB8????"			//mov eax, address(BuiltInRoutines::flushFile)
 								  "\xFF\xD0"			//call eax
-								  "\x83\xC4\x04";		//add esp, 4	; pop functions arguments from pushVal
+								  "\x83\xC4\x04";		//add esp, 4	; pop functions arguments from flushFile
 		memcpy(code, precompiled, code_len);
 		(*((void **)(code+1))) = ((Variable *)(args[1]))->getValue();
 		(*((void **)(code+7))) = BuiltInRoutines::flushFile;
@@ -422,7 +429,7 @@ int JITCompiler::gen_invoke(char *code, Variable *name, const vector<Argument *>
 								  "\x50"				//push eax
 								  "\xB8????"			//mov eax, address(BuiltInRoutines::printlnFile)
 								  "\xFF\xD0"			//call eax
-								  "\x83\xC4\x08";		//add esp, 8	; pop functions arguments from pushVal
+								  "\x83\xC4\x08";		//add esp, 8	; pop functions arguments from printlnFile
 		memcpy(code, precompiled, code_len);
 		(*((void **)(code+1))) = ((Variable *)(args[2]))->getValue();
 		(*((void **)(code+7))) = ((Variable *)(args[1]))->getValue();
@@ -438,7 +445,7 @@ int JITCompiler::gen_invoke(char *code, Variable *name, const vector<Argument *>
 								  "\x50"				//push eax
 								  "\xB8????"			//mov eax, address(BuiltInRoutines::printFile)
 								  "\xFF\xD0"			//call eax
-								  "\x83\xC4\x08";		//add esp, 8	; pop functions arguments from pushVal
+								  "\x83\xC4\x08";		//add esp, 8	; pop functions arguments from printFile
 		memcpy(code, precompiled, code_len);
 		(*((void **)(code+1))) = ((Variable *)(args[2]))->getValue();
 		(*((void **)(code+7))) = ((Variable *)(args[1]))->getValue();
@@ -452,7 +459,7 @@ int JITCompiler::gen_invoke(char *code, Variable *name, const vector<Argument *>
 								  "\x50"				//push eax
 								  "\xB8????"			//mov eax, address(BuiltInRoutines::println)
 								  "\xFF\xD0"			//call eax
-								  "\x83\xC4\x04";		//add esp, 4	; pop functions arguments from pushVal
+								  "\x83\xC4\x04";		//add esp, 4	; pop functions arguments from println
 		memcpy(code, precompiled, code_len);
 		(*((void **)(code+1))) = ((Variable *)(args[1]))->getValue();
 		(*((void **)(code+7))) = BuiltInRoutines::println;
@@ -465,7 +472,7 @@ int JITCompiler::gen_invoke(char *code, Variable *name, const vector<Argument *>
 								  "\x50"				//push eax
 								  "\xB8????"			//mov eax, address(BuiltInRoutines::print)
 								  "\xFF\xD0"			//call eax
-								  "\x83\xC4\x04";		//add esp, 4	; pop functions arguments from pushVal
+								  "\x83\xC4\x04";		//add esp, 4	; pop functions arguments from print
 		memcpy(code, precompiled, code_len);
 		(*((void **)(code+1))) = ((Variable *)(args[1]))->getValue();
 		(*((void **)(code+7))) = BuiltInRoutines::print;
@@ -483,14 +490,14 @@ int JITCompiler::gen_invoke(char *code, Variable *name, const vector<Argument *>
 								  "\xBB\x00\x00\x00\x00"//mov ebx, 0	; type = NULL
 								  "\x53"				//push ebx
 								  "\x50"				//push eax		; val = return value from inputFile (Argument *)
-								  "\xB8????"			//mov eax, address(pushVal)
-								  "\xFF\xD0"			//call eax		; pushVal(val, type);
-								  "\x83\xC4\x10";		//add esp, 16	; pop functions arguments from both inputFile and pushVal
+								  "\xB8????"			//mov eax, address(pushStrVal)
+								  "\xFF\xD0"			//call eax		; pushStrVal(val, type);
+								  "\x83\xC4\x10";		//add esp, 16	; pop functions arguments from both inputFile and pushStrVal
 		memcpy(code, precompiled, code_len);
 		(*((void **)(code+1))) = Interpreter::memory;
 		(*((void **)(code+7))) = ((Variable *)(args[1]))->getValue();
 		(*((void **)(code+13))) = BuiltInRoutines::pow;
-		(*((void **)(code+27))) = pushVal;
+		(*((void **)(code+27))) = pushStrVal;
 	}
 	else if(name->getName() == "input")
 	{
@@ -502,13 +509,13 @@ int JITCompiler::gen_invoke(char *code, Variable *name, const vector<Argument *>
 								  "\xBB\x00\x00\x00\x00"//mov ebx, 0	; type = NULL
 								  "\x53"				//push ebx
 								  "\x50"				//push eax		; val = return value (Argument *)
-								  "\xB8????"			//mov eax, address(pushVal)
-								  "\xFF\xD0"			//call eax		; pushVal(val, type);
-								  "\x83\xC4\x0C";		//add esp, 12	; pop functions arguments from both input and pushVal
+								  "\xB8????"			//mov eax, address(pushStrVal)
+								  "\xFF\xD0"			//call eax		; pushStrVal(val, type);
+								  "\x83\xC4\x0C";		//add esp, 12	; pop functions arguments from both input and pushStrVal
 		memcpy(code, precompiled, code_len);
 		(*((void **)(code+1))) = Interpreter::memory;
 		(*((void **)(code+7))) = BuiltInRoutines::input;
-		(*((void **)(code+21))) = pushVal;
+		(*((void **)(code+21))) = pushStrVal;
 		return code_len;
 	}
 	else if(name->getName() == "eof")
@@ -521,13 +528,13 @@ int JITCompiler::gen_invoke(char *code, Variable *name, const vector<Argument *>
 								  "\xBB\x00\x00\x00\x00"//mov ebx, 0	; type = NULL
 								  "\x53"				//push ebx
 								  "\x50"				//push eax		; val = return value from eof (Argument *)
-								  "\xB8????"			//mov eax, address(pushVal)
-								  "\xFF\xD0"			//call eax		; pushVal(val, type);
-								  "\x83\xC4\x0C";		//add esp, 12	; pop functions arguments from both eof and pushVal
+								  "\xB8????"			//mov eax, address(pushBoolVal)
+								  "\xFF\xD0"			//call eax		; pushBoolVal(val, type);
+								  "\x83\xC4\x0C";		//add esp, 12	; pop functions arguments from both eof and pushBoolVal
 		memcpy(code, precompiled, code_len);
 		(*((void **)(code+1))) = ((Variable *)(args[1]))->getValue();
 		(*((void **)(code+7))) = BuiltInRoutines::eof;
-		(*((void **)(code+21))) = pushVal;
+		(*((void **)(code+21))) = pushBoolVal;
 		return code_len;
 	}
 	else if(name->getName() == "eoi")
@@ -538,12 +545,12 @@ int JITCompiler::gen_invoke(char *code, Variable *name, const vector<Argument *>
 								  "\xBB\x00\x00\x00\x00"//mov ebx, 0	; type = NULL
 								  "\x53"				//push ebx
 								  "\x50"				//push eax		; val = return value from eoi (Argument *)
-								  "\xB8????"			//mov eax, address(pushVal)
+								  "\xB8????"			//mov eax, address(pushBoolVal)
 								  "\xFF\xD0"			//call eax		; pushVal(val, type);
-								  "\x83\xC4\x0C";		//add esp, 12	; pop functions arguments from both eoi and pushVal
+								  "\x83\xC4\x0C";		//add esp, 12	; pop functions arguments from both eoi and pushBoolVal
 		memcpy(code, precompiled, code_len);
 		(*((void **)(code+1))) = BuiltInRoutines::eoi;
-		(*((void **)(code+15))) = pushVal;
+		(*((void **)(code+15))) = pushBoolVal;
 		return code_len;
 	}
 	else if(name->getName() == "pow")
@@ -558,14 +565,14 @@ int JITCompiler::gen_invoke(char *code, Variable *name, const vector<Argument *>
 								  "\xBB\x00\x00\x00\x00"//mov ebx, 0	; type = NULL
 								  "\x53"				//push ebx
 								  "\x50"				//push eax		; val = return value from pow (Argument *)
-								  "\xB8????"			//mov eax, address(pushVal)
-								  "\xFF\xD0"			//call eax		; pushVal(val, type);
-								  "\x83\xC4\x10";		//add esp, 16	; pop functions arguments from both pow and pushVal
+								  "\xB8????"			//mov eax, address(pushDblVal)
+								  "\xFF\xD0"			//call eax		; pushDblVal(val, type);
+								  "\x83\xC4\x10";		//add esp, 16	; pop functions arguments from both pow and pushDblVal
 		memcpy(code, precompiled, code_len);
 		(*((void **)(code+1))) = ((Variable *)(args[2]))->getValue();
 		(*((void **)(code+7))) = ((Variable *)(args[1]))->getValue();
 		(*((void **)(code+13))) = BuiltInRoutines::pow;
-		(*((void **)(code+27))) = pushVal;
+		(*((void **)(code+27))) = pushDblVal;
 		return code_len;
 	}
 	else if(name->getName() == "sqrt")
@@ -578,13 +585,13 @@ int JITCompiler::gen_invoke(char *code, Variable *name, const vector<Argument *>
 								  "\xBB\x00\x00\x00\x00"//mov ebx, 0	; type = NULL
 								  "\x53"				//push ebx
 								  "\x50"				//push eax		; val = return value from sqrt (Argument *)
-								  "\xB8????"			//mov eax, address(pushVal)
-								  "\xFF\xD0"			//call eax		; pushVal(val, type);
-								  "\x83\xC4\x0C";		//add esp, 12	; pop functions arguments from both sqrt and pushVal
+								  "\xB8????"			//mov eax, address(pushDblVal)
+								  "\xFF\xD0"			//call eax		; pushDblVal(val, type);
+								  "\x83\xC4\x0C";		//add esp, 12	; pop functions arguments from both sqrt and pushDblVal
 		memcpy(code, precompiled, code_len);
 		(*((void **)(code+1))) = ((Variable *)(args[1]))->getValue();
 		(*((void **)(code+7))) = BuiltInRoutines::sqrt;
-		(*((void **)(code+21))) = pushVal;
+		(*((void **)(code+21))) = pushDblVal;
 		return code_len;
 	}
 	else if(name->getName() == "log")
@@ -597,13 +604,13 @@ int JITCompiler::gen_invoke(char *code, Variable *name, const vector<Argument *>
 								  "\xBB\x00\x00\x00\x00"//mov ebx, 0	; type = NULL
 								  "\x53"				//push ebx
 								  "\x50"				//push eax		; val = return value from log (Argument *)
-								  "\xB8????"			//mov eax, address(pushVal)
+								  "\xB8????"			//mov eax, address(pushDblVal)
 								  "\xFF\xD0"			//call eax		; pushVal(val, type);
-								  "\x83\xC4\x0C";		//add esp, 12	; pop functions arguments from both log and pushVal
+								  "\x83\xC4\x0C";		//add esp, 12	; pop functions arguments from both log and pushDblVal
 		memcpy(code, precompiled, code_len);
 		(*((void **)(code+1))) = ((Variable *)(args[1]))->getValue();
 		(*((void **)(code+7))) = BuiltInRoutines::log;
-		(*((void **)(code+21))) = pushVal;
+		(*((void **)(code+21))) = pushDblVal;
 		return code_len;
 	}
 	else if(name->getName() == "rand")
@@ -616,13 +623,13 @@ int JITCompiler::gen_invoke(char *code, Variable *name, const vector<Argument *>
 								  "\xBB\x00\x00\x00\x00"//mov ebx, 0	; type = NULL
 								  "\x53"				//push ebx
 								  "\x50"				//push eax		; val = return value from rand (Argument *)
-								  "\xB8????"			//mov eax, address(pushVal)
-								  "\xFF\xD0"			//call eax		; pushVal(val, type);
-								  "\x83\xC4\x0C";		//add esp, 12	; pop functions arguments from both rand and pushVal
+								  "\xB8????"			//mov eax, address(pushIntVal)
+								  "\xFF\xD0"			//call eax		; pushIntVal(val, type);
+								  "\x83\xC4\x0C";		//add esp, 12	; pop functions arguments from both rand and pushIntVal
 		memcpy(code, precompiled, code_len);
 		(*((void **)(code+1))) = ((Variable *)(args[1]))->getValue();
 		(*((void **)(code+7))) = BuiltInRoutines::rand;
-		(*((void **)(code+21))) = pushVal;
+		(*((void **)(code+21))) = pushIntVal;
 		return code_len;
 	}
 	else if(name->getName() == "indexOf")
@@ -637,14 +644,14 @@ int JITCompiler::gen_invoke(char *code, Variable *name, const vector<Argument *>
 								  "\xBB\x00\x00\x00\x00"//mov ebx, 0	; type = NULL
 								  "\x53"				//push ebx
 								  "\x50"				//push eax		; val = return value from indexOf (Argument *)
-								  "\xB8????"			//mov eax, address(pushVal)
-								  "\xFF\xD0"			//call eax		; pushVal(val, type);
-								  "\x83\xC4\x10";		//add esp, 16	; pop functions arguments from both indexOf and pushVal
+								  "\xB8????"			//mov eax, address(pushIntVal)
+								  "\xFF\xD0"			//call eax		; pushIntVal(val, type);
+								  "\x83\xC4\x10";		//add esp, 16	; pop functions arguments from both indexOf and pushIntVal
 		memcpy(code, precompiled, code_len);
 		(*((void **)(code+1))) = ((Variable *)(args[2]))->getValue();
 		(*((void **)(code+7))) = ((Variable *)(args[1]))->getValue();
 		(*((void **)(code+13))) = BuiltInRoutines::indexOf;
-		(*((void **)(code+27))) = pushVal;
+		(*((void **)(code+27))) = pushIntVal;
 		return code_len;
 	}
 	else if(name->getName() == "lastIndexOf")
@@ -659,14 +666,14 @@ int JITCompiler::gen_invoke(char *code, Variable *name, const vector<Argument *>
 								  "\xBB\x00\x00\x00\x00"//mov ebx, 0	; type = NULL
 								  "\x53"				//push ebx
 								  "\x50"				//push eax		; val = return value from lastIndexOf (Argument *)
-								  "\xB8????"			//mov eax, address(pushVal)
-								  "\xFF\xD0"			//call eax		; pushVal(val, type);
-								  "\x83\xC4\x10";		//add esp, 16	; pop functions arguments from both lastIndexOf and pushVal
+								  "\xB8????"			//mov eax, address(pushIntVal)
+								  "\xFF\xD0"			//call eax		; pushIntVal(val, type);
+								  "\x83\xC4\x10";		//add esp, 16	; pop functions arguments from both lastIndexOf and pushIntVal
 		memcpy(code, precompiled, code_len);
 		(*((void **)(code+1))) = ((Variable *)(args[2]))->getValue();
 		(*((void **)(code+7))) = ((Variable *)(args[1]))->getValue();
 		(*((void **)(code+13))) = BuiltInRoutines::lastIndexOf;
-		(*((void **)(code+27))) = pushVal;
+		(*((void **)(code+27))) = pushIntVal;
 		return code_len;
 	}
 	else if(name->getName() == "substring")
@@ -685,16 +692,16 @@ int JITCompiler::gen_invoke(char *code, Variable *name, const vector<Argument *>
 								  "\xBB\x00\x00\x00\x00"//mov ebx, 0	; type = NULL
 								  "\x53"				//push ebx
 								  "\x50"				//push eax		; val = return value from substring (Argument *)
-								  "\xB8????"			//mov eax, address(pushVal)
-								  "\xFF\xD0"			//call eax		; pushVal(val, type);
-								  "\x83\xC4\x18";		//add esp, 24	; pop functions arguments from both substring and pushVal
+								  "\xB8????"			//mov eax, address(pushStrVal)
+								  "\xFF\xD0"			//call eax		; pushStrVal(val, type);
+								  "\x83\xC4\x18";		//add esp, 24	; pop functions arguments from both substring and pushStrVal
 		memcpy(code, precompiled, code_len);
 		(*((void **)(code+1))) = ((Variable *)(args[3]))->getValue();
 		(*((void **)(code+7))) = ((Variable *)(args[2]))->getValue();
 		(*((void **)(code+13))) = ((Variable *)(args[1]))->getValue();
 		(*((void **)(code+19))) = Interpreter::memory;
 		(*((void **)(code+25))) = BuiltInRoutines::substring;
-		(*((void **)(code+39))) = pushVal;
+		(*((void **)(code+39))) = pushStrVal;
 		return code_len;
 	}
 	else if(name->getName() == "toLower")
@@ -707,13 +714,13 @@ int JITCompiler::gen_invoke(char *code, Variable *name, const vector<Argument *>
 								  "\xBB\x00\x00\x00\x00"//mov ebx, 0	; type = NULL
 								  "\x53"				//push ebx
 								  "\x50"				//push eax		; val = return value from toLower (Argument *)
-								  "\xB8????"			//mov eax, address(pushVal)
-								  "\xFF\xD0"			//call eax		; pushVal(val, type);
-								  "\x83\xC4\x0C";		//add esp, 12	; pop functions arguments from both toLower and pushVal
+								  "\xB8????"			//mov eax, address(pushStrVal)
+								  "\xFF\xD0"			//call eax		; pushStrVal(val, type);
+								  "\x83\xC4\x0C";		//add esp, 12	; pop functions arguments from both toLower and pushStrVal
 		memcpy(code, precompiled, code_len);
 		(*((void **)(code+1))) = ((Variable *)(args[1]))->getValue();
 		(*((void **)(code+7))) = BuiltInRoutines::toLower;
-		(*((void **)(code+21))) = pushVal;
+		(*((void **)(code+21))) = pushStrVal;
 		return code_len;
 	}
 	else if(name->getName() == "toUpper")
@@ -726,13 +733,13 @@ int JITCompiler::gen_invoke(char *code, Variable *name, const vector<Argument *>
 								  "\xBB\x00\x00\x00\x00"//mov ebx, 0	; type = NULL
 								  "\x53"				//push ebx
 								  "\x50"				//push eax		; val = return value from toUpper (Argument *)
-								  "\xB8????"			//mov eax, address(pushVal)
-								  "\xFF\xD0"			//call eax		; pushVal(val, type);
-								  "\x83\xC4\x0C";		//add esp, 12	; pop functions arguments from both toUpper and pushVal
+								  "\xB8????"			//mov eax, address(pushStrVal)
+								  "\xFF\xD0"			//call eax		; pushStrVal(val, type);
+								  "\x83\xC4\x0C";		//add esp, 12	; pop functions arguments from both toUpper and pushStrVal
 		memcpy(code, precompiled, code_len);
 		(*((void **)(code+1))) = ((Variable *)(args[1]))->getValue();
 		(*((void **)(code+7))) = BuiltInRoutines::toUpper;
-		(*((void **)(code+21))) = pushVal;
+		(*((void **)(code+21))) = pushStrVal;
 		return code_len;
 	}
 	else if(name->getName() == "trim")
@@ -745,13 +752,13 @@ int JITCompiler::gen_invoke(char *code, Variable *name, const vector<Argument *>
 								  "\xBB\x00\x00\x00\x00"//mov ebx, 0	; type = NULL
 								  "\x53"				//push ebx
 								  "\x50"				//push eax		; val = return value from trim (Argument *)
-								  "\xB8????"			//mov eax, address(pushVal)
-								  "\xFF\xD0"			//call eax		; pushVal(val, type);
-								  "\x83\xC4\x0C";		//add esp, 12	; pop functions arguments from both trim and pushVal
+								  "\xB8????"			//mov eax, address(pushStrVal)
+								  "\xFF\xD0"			//call eax		; pushStrVal(val, type);
+								  "\x83\xC4\x0C";		//add esp, 12	; pop functions arguments from both trim and pushStrVal
 		memcpy(code, precompiled, code_len);
 		(*((void **)(code+1))) = ((Variable *)(args[1]))->getValue();
 		(*((void **)(code+7))) = BuiltInRoutines::trim;
-		(*((void **)(code+21))) = pushVal;
+		(*((void **)(code+21))) = pushStrVal;
 		return code_len;
 	}
 	else if(name->getName() == "startsWith")
@@ -766,14 +773,14 @@ int JITCompiler::gen_invoke(char *code, Variable *name, const vector<Argument *>
 								  "\xBB\x00\x00\x00\x00"//mov ebx, 0	; type = NULL
 								  "\x53"				//push ebx
 								  "\x50"				//push eax		; val = return value from startsWith (Argument *)
-								  "\xB8????"			//mov eax, address(pushVal)
-								  "\xFF\xD0"			//call eax		; pushVal(val, type);
-								  "\x83\xC4\x10";		//add esp, 16	; pop functions arguments from both startsWith and pushVal
+								  "\xB8????"			//mov eax, address(pushBoolVal)
+								  "\xFF\xD0"			//call eax		; pushBoolVal(val, type);
+								  "\x83\xC4\x10";		//add esp, 16	; pop functions arguments from both startsWith and pushBoolVal
 		memcpy(code, precompiled, code_len);
 		(*((void **)(code+1))) = ((Variable *)(args[2]))->getValue();
 		(*((void **)(code+7))) = ((Variable *)(args[1]))->getValue();
 		(*((void **)(code+13))) = BuiltInRoutines::startsWith;
-		(*((void **)(code+27))) = pushVal;
+		(*((void **)(code+27))) = pushBoolVal;
 		return code_len;
 	}
 	else if(name->getName() == "endsWith")
@@ -788,14 +795,14 @@ int JITCompiler::gen_invoke(char *code, Variable *name, const vector<Argument *>
 								  "\xBB\x00\x00\x00\x00"//mov ebx, 0	; type = NULL
 								  "\x53"				//push ebx
 								  "\x50"				//push eax		; val = return value from endsWith (Argument *)
-								  "\xB8????"			//mov eax, address(pushVal)
-								  "\xFF\xD0"			//call eax		; pushVal(val, type);
-								  "\x83\xC4\x10";		//add esp, 16	; pop functions arguments from both endsWith and pushVal
+								  "\xB8????"			//mov eax, address(pushBoolVal)
+								  "\xFF\xD0"			//call eax		; pushBoolVal(val, type);
+								  "\x83\xC4\x10";		//add esp, 16	; pop functions arguments from both endsWith and pushBoolVal
 		memcpy(code, precompiled, code_len);
 		(*((void **)(code+1))) = ((Variable *)(args[2]))->getValue();
 		(*((void **)(code+7))) = ((Variable *)(args[1]))->getValue();
 		(*((void **)(code+13))) = BuiltInRoutines::endsWith;
-		(*((void **)(code+27))) = pushVal;
+		(*((void **)(code+27))) = pushBoolVal;
 		return code_len;
 	}
 	else if(name->getName() == "concat")
@@ -812,15 +819,15 @@ int JITCompiler::gen_invoke(char *code, Variable *name, const vector<Argument *>
 								  "\xBB\x00\x00\x00\x00"//mov ebx, 0	; type = NULL
 								  "\x53"				//push ebx
 								  "\x50"				//push eax		; val = return value from concat (Argument *)
-								  "\xB8????"			//mov eax, address(pushVal)
-								  "\xFF\xD0"			//call eax		; pushVal(val, type);
-								  "\x83\xC4\x14";		//add esp, 20	; pop functions arguments from both concat and pushVal
+								  "\xB8????"			//mov eax, address(pushStrVal)
+								  "\xFF\xD0"			//call eax		; pushStrVal(val, type);
+								  "\x83\xC4\x14";		//add esp, 20	; pop functions arguments from both concat and pushStrVal
 		memcpy(code, precompiled, code_len);
 		(*((void **)(code+1))) = ((Variable *)(args[2]))->getValue();
 		(*((void **)(code+7))) = ((Variable *)(args[1]))->getValue();
 		(*((void **)(code+13))) = Interpreter::memory;
 		(*((void **)(code+19))) = BuiltInRoutines::concat;
-		(*((void **)(code+33))) = pushVal;
+		(*((void **)(code+33))) = pushStrVal;
 		return code_len;
 	}
 	else if(name->getName() == "strlen")
@@ -833,21 +840,22 @@ int JITCompiler::gen_invoke(char *code, Variable *name, const vector<Argument *>
 								  "\xBB\x00\x00\x00\x00"//mov ebx, 0	; type = NULL
 								  "\x53"				//push ebx
 								  "\x50"				//push eax		; val = return value from strlen (Argument *)
-								  "\xB8????"			//mov eax, address(pushVal)
+								  "\xB8????"			//mov eax, address(pushIntVal)
 								  "\xFF\xD0"			//call eax		; pushVal(val, type);
-								  "\x83\xC4\x0C";		//add esp, 12	; pop functions arguments from both strlen and pushVal
+								  "\x83\xC4\x0C";		//add esp, 12	; pop functions arguments from both strlen and pushIntVal
 		memcpy(code, precompiled, code_len);
 		(*((void **)(code+1))) = ((Variable *)(args[1]))->getValue();
 		(*((void **)(code+7))) = BuiltInRoutines::strlen;
-		(*((void **)(code+21))) = pushVal;
+		(*((void **)(code+21))) = pushIntVal;
 		return code_len;
 	}
 	else if(name->getName() == "int2str")
 	{
-		const int code_len = 43+8;
+		const int code_len = 45;
 		const char *precompiled = "\xB8????"			//mov eax, offset(args[1])
 								  "\xBB????"			//mov ebx, address(SFB)
-								  "\x03\x03"			//add eax, [ebx]
+								  "\x03\x03"			//add eax, [ebx]	; absolute address of var
+								  "\x8B\x00"			//mov eax, [eax]	; value of var
 								  "\x50"				//push eax
 								  "\xB8????"			//mov eax, (MemoryManager *)
 								  "\x50"				//push eax
@@ -858,21 +866,24 @@ int JITCompiler::gen_invoke(char *code, Variable *name, const vector<Argument *>
 								  "\x50"				//push eax		; val = return value from int2str (Argument *)
 								  "\xB8????"			//mov eax, address(pushVal)
 								  "\xFF\xD0"			//call eax		; pushVal(val, type);
-								  "\x83\xC4\x10"		//add esp, 16	; pop functions arguments from both int2str and pushStrVal
-								  "\x90\x90\x90\x90\x90\x90\x90\x90";
+								  "\x83\xC4\x10";		//add esp, 16	; pop functions arguments from both int2str and pushStrVal
 		memcpy(code, precompiled, code_len);
 		(*((void **)(code+1))) = (void *)(((char *)((Variable *)(args[1]))->getAddress()) - ((char *)Interpreter::memory->SFB));	// offset
 		(*((void **)(code+6))) = &(Interpreter::memory->SFB);
-		(*((void **)(code+14))) = Interpreter::memory;
-		(*((void **)(code+20))) = JITBuiltInRoutines::int2str;
-		(*((void **)(code+34))) = pushStrVal;
+		(*((void **)(code+16))) = Interpreter::memory;
+		(*((void **)(code+22))) = JITBuiltInRoutines::int2str;
+		(*((void **)(code+36))) = pushStrVal;
 		return code_len;
 	}
 	else if(name->getName() == "double2str")
 	{
-		const int code_len = 36;
-		const char *precompiled = "\xB8????"			//mov eax, args[2] (Double *)
-								  "\x50"				//push eax
+		const int code_len = 50;
+		const char *precompiled = "\xB8????"			//mov eax, offset(args[1])
+								  "\xBB????"			//mov ebx, address(SFB)
+								  "\x03\x03"			//add eax, [ebx]	; absolute address of var
+								  "\xDD\x00"			//fld qword ptr [eax]	; save argument to the FPU stack (can't move it directly on the ALU stack)
+								  "\x83\xEC\x08"		//sub esp, 8	; 'alloc' room on system stack for argument of type double
+								  "\xDD\x1C\x24"		//fstp qword ptr [esp]	; save retval from FPU stack to the ALU stack as parameter for pushDblVal
 								  "\xB8????"			//mov eax, args[1] (MemoryManager *)
 								  "\x50"				//push eax
 								  "\xB8????"			//mov eax, address(BuiltInRoutines::double2str)
@@ -880,14 +891,15 @@ int JITCompiler::gen_invoke(char *code, Variable *name, const vector<Argument *>
 								  "\xBB\x00\x00\x00\x00"//mov ebx, 0	; type = NULL
 								  "\x53"				//push ebx
 								  "\x50"				//push eax		; val = return value from double2str (Argument *)
-								  "\xB8????"			//mov eax, address(pushVal)
+								  "\xB8????"			//mov eax, address(pushStrVal)
 								  "\xFF\xD0"			//call eax		; pushVal(val, type);
-								  "\x83\xC4\x10";		//add esp, 16	; pop functions arguments from both double2str and pushVal
+								  "\x83\xC4\x14";		//add esp, 20	; pop functions arguments from both double2str and pushStrVal
 		memcpy(code, precompiled, code_len);
-		(*((void **)(code+1))) = ((Variable *)(args[1]))->getValue();
-		(*((void **)(code+7))) = Interpreter::memory;
-		(*((void **)(code+13))) = BuiltInRoutines::double2str;
-		(*((void **)(code+27))) = pushVal;
+		(*((void **)(code+1))) = (void *)(((char *)((Variable *)(args[1]))->getAddress()) - ((char *)Interpreter::memory->SFB));	// offset
+		(*((void **)(code+6))) = &(Interpreter::memory->SFB);
+		(*((void **)(code+21))) = Interpreter::memory;
+		(*((void **)(code+27))) = JITBuiltInRoutines::double2str;
+		(*((void **)(code+41))) = pushStrVal;
 		return code_len;
 	}
 	else if(name->getName() == "str2int")
@@ -900,13 +912,13 @@ int JITCompiler::gen_invoke(char *code, Variable *name, const vector<Argument *>
 								  "\xBB\x00\x00\x00\x00"//mov ebx, 0	; type = NULL
 								  "\x53"				//push ebx
 								  "\x50"				//push eax		; val = return value from str2int (Argument *)
-								  "\xB8????"			//mov eax, address(pushVal)
+								  "\xB8????"			//mov eax, address(pushIntVal)
 								  "\xFF\xD0"			//call eax		; pushVal(val, type);
-								  "\x83\xC4\x0C";		//add esp, 12	; pop functions arguments from both str2int and pushVal
+								  "\x83\xC4\x0C";		//add esp, 12	; pop functions arguments from both str2int and pushIntVal
 		memcpy(code, precompiled, code_len);
 		(*((void **)(code+1))) = ((Variable *)(args[1]))->getValue();
 		(*((void **)(code+7))) = BuiltInRoutines::str2int;
-		(*((void **)(code+21))) = pushVal;
+		(*((void **)(code+21))) = pushIntVal;
 		return code_len;
 	}
 	else if(name->getName() == "double2int")
@@ -919,13 +931,13 @@ int JITCompiler::gen_invoke(char *code, Variable *name, const vector<Argument *>
 								  "\xBB\x00\x00\x00\x00"//mov ebx, 0	; type = NULL
 								  "\x53"				//push ebx
 								  "\x50"				//push eax		; val = return value from double2int (Argument *)
-								  "\xB8????"			//mov eax, address(pushVal)
+								  "\xB8????"			//mov eax, address(pushIntVal)
 								  "\xFF\xD0"			//call eax		; pushVal(val, type);
-								  "\x83\xC4\x0C";		//add esp, 12	; pop functions arguments from both double2int and pushVal
+								  "\x83\xC4\x0C";		//add esp, 12	; pop functions arguments from both double2int and pushIntVal
 		memcpy(code, precompiled, code_len);
 		(*((void **)(code+1))) = ((Variable *)(args[1]))->getValue();
 		(*((void **)(code+7))) = BuiltInRoutines::double2int;
-		(*((void **)(code+21))) = pushVal;
+		(*((void **)(code+21))) = pushIntVal;
 		return code_len;
 	}
 	else if(name->getName() == "str2double")
@@ -938,32 +950,37 @@ int JITCompiler::gen_invoke(char *code, Variable *name, const vector<Argument *>
 								  "\xBB\x00\x00\x00\x00"//mov ebx, 0	; type = NULL
 								  "\x53"				//push ebx
 								  "\x50"				//push eax		; val = return value from str2double (Argument *)
-								  "\xB8????"			//mov eax, address(pushVal)
+								  "\xB8????"			//mov eax, address(pushDblVal)
 								  "\xFF\xD0"			//call eax		; pushVal(val, type);
-								  "\x83\xC4\x0C";		//add esp, 12	; pop functions arguments from both str2double and pushVal
+								  "\x83\xC4\x0C";		//add esp, 12	; pop functions arguments from both str2double and pushDblVal
 		memcpy(code, precompiled, code_len);
 		(*((void **)(code+1))) = ((Variable *)(args[1]))->getValue();
 		(*((void **)(code+7))) = BuiltInRoutines::str2double;
-		(*((void **)(code+21))) = pushVal;
+		(*((void **)(code+21))) = pushDblVal;
 		return code_len;
 	}
 	else if(name->getName() == "int2double")
 	{
-		const int code_len = 30;
-		const char *precompiled = "\xB8????"			//mov eax, args[1] (Integer *)
+		const int code_len = 44;
+		const char *precompiled = "\xB8????"			//mov eax, offset(args[1])
+								  "\xBB????"			//mov ebx, address(SFB)
+								  "\x03\x03"			//add eax, [ebx]	; absolute address of var
+								  "\x8B\x00"			//mov eax, [eax]	; value of var
 								  "\x50"				//push eax
 								  "\xB8????"			//mov eax, address(BuiltInRoutines::int2double)
 								  "\xFF\xD0"			//call eax
 								  "\xBB\x00\x00\x00\x00"//mov ebx, 0	; type = NULL
 								  "\x53"				//push ebx
-								  "\x50"				//push eax		; val = return value from int2double (Argument *)
-								  "\xB8????"			//mov eax, address(pushVal)
-								  "\xFF\xD0"			//call eax		; pushVal(val, type);
-								  "\x83\xC4\x0C";		//add esp, 12	; pop functions arguments from both int2double and pushVal
+								  "\x83\xEC\x08"		//sub esp, 8	; 'alloc' room on system stack for double retval
+								  "\xDD\x1C\x24"		//fstp qword ptr [esp]	; save retval from FPU stack to the ALU stack as parameter for pushDblVal
+								  "\xB8????"			//mov eax, address(pushDblVal)	; value argument is saved on FPU stack!
+								  "\xFF\xD0"			//call eax		; pushDblVal(val, type);
+								  "\x83\xC4\x10";		//add esp, 16	; pop functions arguments from both int2double and pushDblVal
 		memcpy(code, precompiled, code_len);
-		(*((void **)(code+1))) = ((Variable *)(args[1]))->getValue();
-		(*((void **)(code+7))) = BuiltInRoutines::int2double;
-		(*((void **)(code+21))) = pushVal;
+		(*((void **)(code+1))) = (void *)(((char *)((Variable *)(args[1]))->getAddress()) - ((char *)Interpreter::memory->SFB));	// offset
+		(*((void **)(code+6))) = &(Interpreter::memory->SFB);
+		(*((void **)(code+16))) = JITBuiltInRoutines::int2double;
+		(*((void **)(code+35))) = pushDblVal;
 		return code_len;
 	}
 	else

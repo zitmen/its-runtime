@@ -14,5 +14,5 @@ String fact(int x)
 
 String toString(int x)
 {
-	return int2str(x);
+	return double2str(int2double(x));
 }
