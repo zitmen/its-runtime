@@ -582,81 +582,106 @@ int JITCompiler::gen_invoke(char *code, Variable *name, const vector<Argument *>
 	}
 	else if(name->getName() == "pow")
 	{
-		const int code_len = 36;
-		const char *precompiled = "\xB8????"			//mov eax, args[2] (Double *)
-								  "\x50"				//push eax
-								  "\xB8????"			//mov eax, args[1] (Double *)
-								  "\x50"				//push eax
-								  "\xB8????"			//mov eax, address(BuiltInRoutines::pow)
+		const int code_len = 64;
+		const char *precompiled = "\xB9????"			//mov ecx, address(SFB)
+								  "\xB8????"			//mov eax, offset(args[2])
+								  "\x03\x01"			//add eax, [ecx]
+								  "\xDD\x00"			//fld qword ptr [eax]
+								  "\x83\xEC\x08"		//sub esp, 8    ; 'alloc' room on system stack for double arg
+                                  "\xDD\x1C\x24"		//fstp qword ptr [esp]  ; save argument from FPU stack to the ALU stack
+								  "\xB8????"			//mov eax, offset(args[1])
+								  "\x03\x01"			//add eax, [ecx]
+								  "\xDD\x00"			//fld qword ptr [eax]
+								  "\x83\xEC\x08"		//sub esp, 8    ; 'alloc' room on system stack for double arg
+                                  "\xDD\x1C\x24"		//fstp qword ptr [esp]  ; save argument from FPU stack to the ALU stack
+								  "\xB8????"			//mov eax, address(JITBuiltInRoutines::pow)
 								  "\xFF\xD0"			//call eax
 								  "\xBB\x00\x00\x00\x00"//mov ebx, 0	; type = NULL
 								  "\x53"				//push ebx
-								  "\x50"				//push eax		; val = return value from pow (Argument *)
+								  "\x83\xEC\x08"		//sub esp, 8    ; 'alloc' room on system stack for double retval
+								  "\xDD\x1C\x24"		//fstp qword ptr [esp]  ; save retval from FPU stack to the ALU stack as parameter for pushDblVal
 								  "\xB8????"			//mov eax, address(pushDblVal)
 								  "\xFF\xD0"			//call eax		; pushDblVal(val, type);
-								  "\x83\xC4\x10";		//add esp, 16	; pop functions arguments from both pow and pushDblVal
+								  "\x83\xC4\x1C";		//add esp, 28	; pop functions arguments from both pow and pushDblVal
 		memcpy(code, precompiled, code_len);
-		(*((void **)(code+1))) = ((Variable *)(args[2]))->getValue();
-		(*((void **)(code+7))) = ((Variable *)(args[1]))->getValue();
-		(*((void **)(code+13))) = BuiltInRoutines::pow;
-		(*((void **)(code+27))) = pushDblVal;
+		(*((void **)(code+1))) = &(Interpreter::memory->SFB);
+		(*((void **)(code+6))) = (void *)(((char *)((Variable *)(args[2]))->getAddress()) - ((char *)Interpreter::memory->SFB));        // offset
+		(*((void **)(code+21))) = (void *)(((char *)((Variable *)(args[1]))->getAddress()) - ((char *)Interpreter::memory->SFB));        // offset
+		(*((void **)(code+36))) = JITBuiltInRoutines::pow;
+		(*((void **)(code+55))) = pushDblVal;
 		return code_len;
 	}
 	else if(name->getName() == "sqrt")
 	{
-		const int code_len = 30;
-		const char *precompiled = "\xB8????"			//mov eax, args[1] (Double *)
-								  "\x50"				//push eax
-								  "\xB8????"			//mov eax, address(BuiltInRoutines::sqrt)
+		const int code_len = 49;
+		const char *precompiled = "\xB9????"			//mov ecx, address(SFB)
+								  "\xB8????"			//mov eax, offset(args[1])
+								  "\x03\x01"			//add eax, [ecx]
+								  "\xDD\x00"			//fld qword ptr [eax]
+								  "\x83\xEC\x08"		//sub esp, 8    ; 'alloc' room on system stack for double arg
+                                  "\xDD\x1C\x24"		//fstp qword ptr [esp]  ; save argument from FPU stack to the ALU stack
+								  "\xB8????"			//mov eax, address(JITBuiltInRoutines::sqrt)
 								  "\xFF\xD0"			//call eax
 								  "\xBB\x00\x00\x00\x00"//mov ebx, 0	; type = NULL
 								  "\x53"				//push ebx
-								  "\x50"				//push eax		; val = return value from sqrt (Argument *)
+								  "\x83\xEC\x08"		//sub esp, 8    ; 'alloc' room on system stack for double retval
+								  "\xDD\x1C\x24"		//fstp qword ptr [esp]  ; save retval from FPU stack to the ALU stack as parameter for pushDblVal
 								  "\xB8????"			//mov eax, address(pushDblVal)
 								  "\xFF\xD0"			//call eax		; pushDblVal(val, type);
-								  "\x83\xC4\x0C";		//add esp, 12	; pop functions arguments from both sqrt and pushDblVal
+								  "\x83\xC4\x14";		//add esp, 20	; pop functions arguments from both sqrt and pushDblVal
 		memcpy(code, precompiled, code_len);
-		(*((void **)(code+1))) = ((Variable *)(args[1]))->getValue();
-		(*((void **)(code+7))) = BuiltInRoutines::sqrt;
-		(*((void **)(code+21))) = pushDblVal;
+		(*((void **)(code+1))) = &(Interpreter::memory->SFB);
+		(*((void **)(code+6))) = (void *)(((char *)((Variable *)(args[1]))->getAddress()) - ((char *)Interpreter::memory->SFB));        // offset
+		(*((void **)(code+21))) = JITBuiltInRoutines::sqrt;
+		(*((void **)(code+40))) = pushDblVal;
 		return code_len;
 	}
 	else if(name->getName() == "log")
 	{
-		const int code_len = 30;
-		const char *precompiled = "\xB8????"			//mov eax, args[1] (Double *)
-								  "\x50"				//push eax
-								  "\xB8????"			//mov eax, address(BuiltInRoutines::log)
+		const int code_len = 49;
+		const char *precompiled = "\xB9????"			//mov ecx, address(SFB)
+								  "\xB8????"			//mov eax, offset(args[1])
+								  "\x03\x01"			//add eax, [ecx]
+								  "\xDD\x00"			//fld qword ptr [eax]
+								  "\x83\xEC\x08"		//sub esp, 8    ; 'alloc' room on system stack for double arg
+                                  "\xDD\x1C\x24"		//fstp qword ptr [esp]  ; save argument from FPU stack to the ALU stack
+								  "\xB8????"			//mov eax, address(JITBuiltInRoutines::log)
 								  "\xFF\xD0"			//call eax
 								  "\xBB\x00\x00\x00\x00"//mov ebx, 0	; type = NULL
 								  "\x53"				//push ebx
-								  "\x50"				//push eax		; val = return value from log (Argument *)
+								  "\x83\xEC\x08"		//sub esp, 8    ; 'alloc' room on system stack for double retval
+								  "\xDD\x1C\x24"		//fstp qword ptr [esp]  ; save retval from FPU stack to the ALU stack as parameter for pushDblVal
 								  "\xB8????"			//mov eax, address(pushDblVal)
-								  "\xFF\xD0"			//call eax		; pushVal(val, type);
-								  "\x83\xC4\x0C";		//add esp, 12	; pop functions arguments from both log and pushDblVal
+								  "\xFF\xD0"			//call eax		; pushDblVal(val, type);
+								  "\x83\xC4\x14";		//add esp, 20	; pop functions arguments from both log and pushDblVal
 		memcpy(code, precompiled, code_len);
-		(*((void **)(code+1))) = ((Variable *)(args[1]))->getValue();
-		(*((void **)(code+7))) = BuiltInRoutines::log;
-		(*((void **)(code+21))) = pushDblVal;
+		(*((void **)(code+1))) = &(Interpreter::memory->SFB);
+		(*((void **)(code+6))) = (void *)(((char *)((Variable *)(args[1]))->getAddress()) - ((char *)Interpreter::memory->SFB));        // offset
+		(*((void **)(code+21))) = JITBuiltInRoutines::log;
+		(*((void **)(code+40))) = pushDblVal;
 		return code_len;
 	}
 	else if(name->getName() == "rand")
 	{
-		const int code_len = 30;
-		const char *precompiled = "\xB8????"			//mov eax, args[1] (Integer *)
+		const int code_len = 39;
+		const char *precompiled = "\xB9????"			//mov ecx, address(SFB)
+								  "\xB8????"			//mov eax, offset(args[1])
+								  "\x03\x01"			//add eax, [ecx]        ; absolute address of arg
+								  "\x8B\x00"			//mov eax, [eax]        ; value of arg
 								  "\x50"				//push eax
-								  "\xB8????"			//mov eax, address(BuiltInRoutines::rand)
+								  "\xB8????"			//mov eax, address(JITBuiltInRoutines::rand)
 								  "\xFF\xD0"			//call eax
 								  "\xBB\x00\x00\x00\x00"//mov ebx, 0	; type = NULL
 								  "\x53"				//push ebx
-								  "\x50"				//push eax		; val = return value from rand (Argument *)
+								  "\x50"				//push eax		; val = return value from rand
 								  "\xB8????"			//mov eax, address(pushIntVal)
 								  "\xFF\xD0"			//call eax		; pushIntVal(val, type);
 								  "\x83\xC4\x0C";		//add esp, 12	; pop functions arguments from both rand and pushIntVal
 		memcpy(code, precompiled, code_len);
-		(*((void **)(code+1))) = ((Variable *)(args[1]))->getValue();
-		(*((void **)(code+7))) = BuiltInRoutines::rand;
-		(*((void **)(code+21))) = pushIntVal;
+		(*((void **)(code+1))) = &(Interpreter::memory->SFB);
+		(*((void **)(code+6))) = (void *)(((char *)((Variable *)(args[1]))->getAddress()) - ((char *)Interpreter::memory->SFB));        // offset
+		(*((void **)(code+16))) = JITBuiltInRoutines::rand;
+		(*((void **)(code+30))) = pushIntVal;
 		return code_len;
 	}
 	else if(name->getName() == "indexOf")

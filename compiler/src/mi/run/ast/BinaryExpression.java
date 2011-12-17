@@ -57,6 +57,8 @@ public class BinaryExpression extends Expression
         stream = stream.last().append(leftOperand.genByteCode());
         if(Operator.isAssign(operator))
             resultVariable = ((Variable)leftOperand).resultVariable;
+        else if(Operator.isConditional(operator))
+            resultVariable = Variables.addVar(functionName, "tmp", new DataType(DataType.BOOL));
         else
             resultVariable = Variables.addVar(functionName, "tmp", new DataType(leftOperand.exprDataType));
         //

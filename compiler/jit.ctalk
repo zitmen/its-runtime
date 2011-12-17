@@ -1,23 +1,10 @@
 void main()
 {
-	for(int i = 1; i < 10; i++)
-		println(fact(i));
+	for(double i = 1.0; i < 1e10; i *= 10.0)
+		println(fn(0));
 }
 
-String fact(int x)
+String fn(int x)
 {
-	int f = 1;
-	for(int i = 2; i <= x; i++)
-		f *= i;
-	return to(f);
-}
-
-String to(int x)
-{
-	String f = int2str(x);
-	String s = concat(concat(f, ",len="), int2str(strlen(f)));
-	if(endsWith(f, "0") || endsWith(f, "1"))
-		return concat(s, ", true");
-	//else
-		return concat(s, ", false");
+	return int2str(rand(10));
 }

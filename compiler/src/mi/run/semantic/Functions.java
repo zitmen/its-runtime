@@ -173,7 +173,7 @@ public class Functions
         builtInFunctions.put("log", new FunctionDefinition(new DataType(DataType.DOUBLE), "log", params, null));
         //
         params = new ExpressionList();
-        params.expressions.add(new Variable("modul", new DataType(DataType.DOUBLE)));
+        params.expressions.add(new Variable("modul", new DataType(DataType.INTEGER)));
         builtInFunctions.put("rand", new FunctionDefinition(new DataType(DataType.INTEGER), "rand", params, null));
     }
     

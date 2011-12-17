@@ -1,52 +1,22 @@
-FUNCTION <STRING> to [ INTEGER var4 ] [ STRING var5 STRING var6 INTEGER var4 STRING var15 STRING var24 STRING var23 STRING var26 STRING var25 STRING var19 STRING var18 STRING var17 INTEGER var16 STRING var20 BOOL var22 STRING var21 ] @ 11
-FUNCTION <STRING> fact [ INTEGER var1 ] [ STRING var14 INTEGER var13 INTEGER var12 INTEGER var3 INTEGER var11 INTEGER var1 INTEGER var2 ] @ 36
-FUNCTION <VOID> main [ ] [ INTEGER var9 INTEGER var8 INTEGER var7 STRING var10 INTEGER var0 ] @ 0
+FUNCTION <STRING> fn [ INTEGER var1 ] [ INTEGER var9 INTEGER var8 INTEGER var1 STRING var10 ] @ 13
+FUNCTION <VOID> main [ ] [ DOUBLE var7 INTEGER var5 STRING var6 DOUBLE var3 BOOL var4 DOUBLE var2 DOUBLE var0 ] @ 0
 CODE
-000: LDCI var7 1
-001: ST var0 var7
-002: LDCI var8 10
-003: LT var9 var0 var8
-004: JZ 10
-005: CALL fact var0
-006: POP var10
-007: INVOKE println var10
-008: INC var0
-009: JMP 2
-010: RET
-011: INVOKE int2str var4
-012: POP var15
-013: ST var5 var15
-014: INVOKE strlen var5
-015: POP var16
-016: INVOKE int2str var16
-017: POP var17
-018: LDCS var18 ",len="
-019: INVOKE concat var5 var18
-020: POP var19
-021: INVOKE concat var19 var17
-022: POP var20
-023: ST var6 var20
-024: LDCS var21 "0"
-025: INVOKE endsWith var5 var21
-026: POP var22
-027: JZ 32
-028: LDCS var23 ", true"
-029: INVOKE concat var6 var23
-030: POP var24
-031: RETV var24
-032: LDCS var25 ", false"
-033: INVOKE concat var6 var25
-034: POP var26
-035: RETV var26
-036: LDCI var11 1
-037: ST var2 var11
-038: LDCI var12 2
-039: ST var3 var12
-040: LTE var13 var3 var1
-041: JZ 45
-042: MUL var2 var2 var3
-043: INC var3
-044: JMP 40
-045: CALL to var2
-046: POP var14
-047: RETV var14
+000: LDCR var2 1.0
+001: ST var0 var2
+002: LDCR var3 1.0E10
+003: LT var4 var0 var3
+004: JZ 12
+005: LDCI var5 0
+006: CALL fn var5
+007: POP var6
+008: INVOKE println var6
+009: LDCR var7 10.0
+010: MUL var0 var0 var7
+011: JMP 2
+012: RET
+013: LDCI var8 10
+014: INVOKE rand var8
+015: POP var9
+016: INVOKE int2str var9
+017: POP var10
+018: RETV var10
