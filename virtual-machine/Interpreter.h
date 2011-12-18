@@ -94,7 +94,7 @@ class Interpreter
 			options[Options::HeapSize] = 32*1024*1024;	// 32MB
 			options[Options::StackSize] = 32*1024*1024;	// 32MB
 			options[Options::GarbageCollector] = 0.9;	// 90% of heap is full
-			options[Options::JITCompiler] = 10;	// 10 iterations over 1 function
+			options[Options::JITCompiler] = 0;	// 0 = off; xx iterations over 1 function
 			jitc = new JITCompiler(program, functions, &call_stack, &ZF);
 		}
 

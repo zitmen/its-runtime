@@ -1,0 +1,27 @@
+/*
+This example shows how JIT compilation and trace-based compilation work.
++ how it works fine with garbage collector.
+JIT uses methods for memory managging from the built-in memory manager.
+
+Run:
+./compiler jit_gc.ctalk jit_gc.run
+./virtual-machine -heap=10k -jit=2 jit.run
+*/
+struct S
+{
+	int x;
+	int y;
+}
+
+void main()
+{
+	S s;
+	for(int i = 1; i < 10000; i++)
+		foo(s);
+}
+
+void foo(S s)
+{
+	for(int x = 0; x < 100; x++)
+		s = new;
+}

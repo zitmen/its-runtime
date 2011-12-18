@@ -1,0 +1,39 @@
+/*
+This is just another example that uses arrays and structures.
+
+Run:
+./compiler arr_struct.ctalk arr_struct.run
+./virtual-machine arr_struct.run
+
+*/
+struct Rectangle
+{
+	int a;
+	int b;
+}
+
+void main()
+{
+	println("---- Array of rectangles ----");
+	Array<Rectangle> arr_r = new[10];
+	for(int i = 0; i < 10; i++)
+	{
+		arr_r[i] = new;
+		arr_r[i].a = i+1;
+		arr_r[i].b = i+3;
+		println(concat(concat(concat(concat(concat(concat("Rectangle [a=", int2str(arr_r[i].a)), ",b="), int2str(arr_r[i].b)),",S="), int2str(getArea(arr_r[i].a, arr_r[i].b))),"]"));
+	}
+	println("---- Array of doubles ----");
+	Array<double> arr_d = new[10];
+	for(int i = 0; i < 10; i++)
+	{
+		arr_d[i] = int2double(i + 1);
+		print(concat(double2str(arr_d[i]), " "));
+	}
+	println("Bye.");
+}
+
+int getArea(int x, int y)
+{
+	return x*y;
+}

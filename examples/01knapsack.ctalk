@@ -1,3 +1,17 @@
+/*
+This is recursive version of 01 knapsack problem solver (bruteforce by DFS).
+
+Run:
+./compiler 01knapsack.ctalk 01knapsack.run
+./virtual-machine 01knapsack.run
+
+You will be asked for input/output files. Input is at file 01knapsack-in.txt.
+Format of the file is
+number_of_items item1_weight item1_cost ... itemn_weight itemn_cost
+
+The solution is in file 01knapsack-out.txt, so use f.e. out.txt if you are asked for a output file,
+so you can compare results.
+*/
 struct Stuff
 {
 	int cost;
@@ -46,10 +60,9 @@ int main()
 int weight(int n, Array<Stuff> stuff, Array<int> conf)
 {
 	int w = 0;
-	//for(int i = 0; i < n; i++)
-		//if(conf[i] == 1)
-			//w += 1;//stuff[i].weight;
-	println(int2str(conf[0]));
+	for(int i = 0; i < n; i++)
+		if(conf[i] == 1)
+			w += stuff[i].weight;
 	return w;
 }
 
@@ -70,7 +83,7 @@ Result computeSolution(int n, int M, Array<Stuff> stuff, Array<int> conf)
 	Result retval = new;
 	//
 	if(weight(n, stuff, conf) <= M)
-		//if((cur_cost = cost(n, stuff, conf)) > max_cost)
+		if((cur_cost = cost(n, stuff, conf)) > max_cost)
 			max_cost = cur_cost;
 	retval.cost = max_cost;
 	retval.conf = solution;
@@ -80,7 +93,7 @@ Result computeSolution(int n, int M, Array<Stuff> stuff, Array<int> conf)
 	{
 		if(conf[i] == 0)
 		{
-			Array<int> _conf = conf;//cloneArray(conf);
+			Array<int> _conf = cloneArray(conf);
 			_conf[i] = 1;
 			_retval = computeSolution(n, M, stuff, _conf);
 			if(_retval.cost > retval.cost)

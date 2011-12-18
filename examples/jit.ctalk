@@ -1,0 +1,22 @@
+/*
+This example shows how JIT compilation and trace-based compilation work.
+
+Compile:
+./compiler jit.ctalk jit.run
+
+Run:
+./virtual-machine jit.run
+./virtual-machine -jit=2 jit.run
+*/
+void main()
+{
+	for(int i = 1; i < 10000; i++)
+		foo();
+}
+
+void foo()
+{
+	int i = 0;
+	for(int x = 0; x < 100; x++)
+		i++;
+}
