@@ -2,7 +2,7 @@
 This is just another example that uses arrays and structures.
 
 Run:
-./compiler arr_struct.ctalk arr_struct.run
+java -jar compiler.jar arr_struct.ctalk arr_struct.run
 ./virtual-machine arr_struct.run
 
 */

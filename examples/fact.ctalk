@@ -2,13 +2,13 @@
 This is example of a recursive call.
 
 Run:
-./compiler fact.ctalk fact.run
+java -jar compiler.jar fact.ctalk fact.run
 ./virtual-machine fact.run
 
 */
 void main()
 {
-	for(int i = 1; i < 10)
+	for(int i = 1; i < 10; i++)
 		println(int2str(fact(i)));
 }
 

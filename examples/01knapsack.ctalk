@@ -2,7 +2,7 @@
 This is recursive version of 01 knapsack problem solver (bruteforce by DFS).
 
 Run:
-./compiler 01knapsack.ctalk 01knapsack.run
+java -jar compiler.jar 01knapsack.ctalk 01knapsack.run
 ./virtual-machine 01knapsack.run
 
 You will be asked for input/output files. Input is at file 01knapsack-in.txt.

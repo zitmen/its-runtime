@@ -2,7 +2,7 @@
 This example shows how JIT compilation and trace-based compilation work.
 
 Compile:
-./compiler jit.ctalk jit.run
+java -jar compiler.jar jit.ctalk jit.run
 
 Run:
 ./virtual-machine jit.run

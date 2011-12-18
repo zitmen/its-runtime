@@ -3,7 +3,7 @@ This is example that show runtime error: Null pointer exception.
 -- arr_r is array od Rectangles, but they havent been allocated by operator new --> error!
 
 Run:
-./compiler arr_struct_nullptr_exception.ctalk arr_struct_nullptr_exception.run
+java -jar compiler.jar arr_struct_nullptr_exception.ctalk arr_struct_nullptr_exception.run
 ./virtual-machine arr_struct_nullptr_exception.run
 
 */

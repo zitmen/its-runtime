@@ -4,7 +4,7 @@ Print text, alloc 32MB (it will exceed the heap and trigger the GC), then print 
 The text is placed inside of structure and array for a purpose - to demonstrate that reference updating works fine.
 
 Run:
-./compiler garbage_collector.ctalk garbage_collector.run
+java -jar compiler.jar garbage_collector.ctalk garbage_collector.run
 ./virtual-machine -heap=32M -gc=0.9 garbage_collector.run
 
 */

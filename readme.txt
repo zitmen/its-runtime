@@ -62,11 +62,18 @@ Sestaveni
 =========
 Pro kompilaci byte-code compileru je potreba JDK. ANTL potreba neni, protoze dodavam i vygenerovany Java kod pro gramatiku jazyka.
 
+Prikaz k sestaveni:
+ant
+
 Virtual machine case projektu je nutne sestavovat na platforme 32b Windows. Testovano to bylo pouze na WindowsXP Professiona SP3 (32b).
 To je potreba dodrzet, protoze jak je jasne z popisu projektu, tak je funkcnost VM zavisla na aritmetice 32b ukaztelu a JIT compiler
 pracuje s instrukcemi o 32b operandech (vyjma FPU operaci).
+Dale je nutne kompilovat projekt nastroji VisualStudia, protoze pouzivam vkladany assembler a syntaxe VS se diametralne lisi od gcc syntaxe.
 
-V obou podadresarich jsou souboru Makefile.
+Prikaz k sestaveni (to je jediny zpusob, o kterem vim, jak to zkompilovat z cmd line; nmake jsem rozchodit nedokazal, bohuzel):
+devenv virtual-machine.sln /build Release
+nebo nacist soubory do Visual Studia a dat Build. V projektu nejsou zadne zavislosti, takze se nemusi nikde nic nastavovat.
+
 
 Pro pripad, ze by nebylo mozne preklad na pozadovane platforme provest, je mozne si ze stranek projektu stahnout i balicek s binarkami.
 Zde: http://code.google.com/p/its-runtime/downloads/list

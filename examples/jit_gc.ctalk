@@ -4,7 +4,7 @@ This example shows how JIT compilation and trace-based compilation work.
 JIT uses methods for memory managging from the built-in memory manager.
 
 Run:
-./compiler jit_gc.ctalk jit_gc.run
+java -jar compiler.jar jit_gc.ctalk jit_gc.run
 ./virtual-machine -heap=10k -jit=2 jit.run
 */
 struct S
@@ -15,13 +15,13 @@ struct S
 
 void main()
 {
-	S s;
-	for(int i = 1; i < 10000; i++)
+	Array<S> s;
+	for(int i = 1; i < 10; i++)
 		foo(s);
 }
 
-void foo(S s)
+void foo(Array<S> s)
 {
 	for(int x = 0; x < 100; x++)
-		s = new;
+		s = new[100];
 }
