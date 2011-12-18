@@ -346,57 +346,69 @@ int JITCompiler::gen_invoke(char *code, Variable *name, const vector<Argument *>
 {
 	if(name->getName() == "cloneArray")
 	{
-		const int code_len = 36;
-		const char *precompiled = "\xB8????"		//mov eax, args[1] (Array *)
+		const int code_len = 45;
+		const char *precompiled = "\xB9????"		//mov ecx, address(SFB)
+								  "\xB8????"		//mov eax, offset(args[1])
+								  "\x03\x01"		//add eax, [ecx]        ; absolute address of arg
+								  "\x8B\x00"		//mov eax, [eax]        ; value of arg
 								  "\x50"			//push eax
 								  "\xB8????"		//mov eax, (MemoryManager *)
 								  "\x50"			//push eax
-								  "\xB8????"		//mov eax, address(BuiltInRoutines::cloneArray)
+								  "\xB8????"		//mov eax, address(JITBuiltInRoutines::cloneArray)
 								  "\xFF\xD0"		//call eax
 								  "\xBB????"		//mov ebx, address(var->data_type)
 								  "\x53"			//push ebx
-								  "\x50"			//push eax		; val = return value from cloneArray (Argument *)
+								  "\x50"			//push eax		; val = return value from cloneArray
 								  "\xB8????"		//mov eax, address(pushPtrVal)
 								  "\xFF\xD0"		//call eax		; pushPtrVal(val, type);
 								  "\x83\xC4\x0C";	//add esp, 12	; pop functions arguments from both cloneArray and pushPtrVal
 		memcpy(code, precompiled, code_len);
-		(*((void **)(code+1))) = ((Variable *)(args[1]))->getValue();
-		(*((void **)(code+7))) = Interpreter::memory;
-		(*((void **)(code+13))) = BuiltInRoutines::cloneArray;
-		(*((void **)(code+20))) = ((Variable *)(args[1]))->getDataType();
-		(*((void **)(code+27))) = pushPtrVal;
+		(*((void **)(code+1))) = &(Interpreter::memory->SFB);
+		(*((void **)(code+6))) = (void *)(((char *)((Variable *)(args[1]))->getAddress()) - ((char *)Interpreter::memory->SFB));        // offset
+		(*((void **)(code+16))) = Interpreter::memory;
+		(*((void **)(code+22))) = JITBuiltInRoutines::cloneArray;
+		(*((void **)(code+29))) = ((Variable *)(args[1]))->getDataType();
+		(*((void **)(code+36))) = pushPtrVal;
 		return code_len;
 	}
 	else if(name->getName() == "clearArray")
 	{
-		const int code_len = 16;
-		const char *precompiled = "\xB8????"			//mov eax, args[1] (Array *)
-								  "\x50"				//push eax
-								  "\xB8????"			//mov eax, address(BuiltInRoutines::clearArray)
-								  "\xFF\xD0"			//call eax
-								  "\x83\xC4\x04";		//add esp, 4	; pop functions arguments from clearArray
+		const int code_len = 25;
+		const char *precompiled = "\xB9????"		//mov ecx, address(SFB)
+								  "\xB8????"		//mov eax, offset(args[1])
+								  "\x03\x01"		//add eax, [ecx]        ; absolute address of arg
+								  "\x8B\x00"		//mov eax, [eax]        ; value of arg
+								  "\x50"			//push eax
+								  "\xB8????"		//mov eax, address(JITBuiltInRoutines::clearArray)
+								  "\xFF\xD0"		//call eax
+								  "\x83\xC4\x04";	//add esp, 4	; pop functions arguments from clearArray
 		memcpy(code, precompiled, code_len);
-		(*((void **)(code+1))) = ((Variable *)(args[1]))->getValue();
-		(*((void **)(code+7))) = BuiltInRoutines::clearArray;
+		(*((void **)(code+1))) = &(Interpreter::memory->SFB);
+		(*((void **)(code+6))) = (void *)(((char *)((Variable *)(args[1]))->getAddress()) - ((char *)Interpreter::memory->SFB));        // offset
+		(*((void **)(code+16))) = JITBuiltInRoutines::clearArray;
 		return code_len;
 	}
 	else if(name->getName() == "length")
 	{
-		const int code_len = 30;
-		const char *precompiled = "\xB8????"			//mov eax, args[1] (Array *)
+		const int code_len = 39;
+		const char *precompiled = "\xB9????"			//mov ecx, address(SFB)
+								  "\xB8????"			//mov eax, offset(args[1])
+								  "\x03\x01"			//add eax, [ecx]        ; absolute address of arg
+								  "\x8B\x00"			//mov eax, [eax]        ; value of arg
 								  "\x50"				//push eax
-								  "\xB8????"			//mov eax, address(BuiltInRoutines::length)
+								  "\xB8????"			//mov eax, address(JITBuiltInRoutines::length)
 								  "\xFF\xD0"			//call eax
 								  "\xBB\x00\x00\x00\x00"//mov ebx, 0	; type = NULL
 								  "\x53"				//push ebx
-								  "\x50"				//push eax		; val = return value from length (Argument *)
+								  "\x50"				//push eax		; val = return value from length
 								  "\xB8????"			//mov eax, address(pushIntVal)
 								  "\xFF\xD0"			//call eax		; pushIntVal(val, type);
 								  "\x83\xC4\x0C";		//add esp, 12	; pop functions arguments from both length and pushIntVal
 		memcpy(code, precompiled, code_len);
-		(*((void **)(code+1))) = ((Variable *)(args[1]))->getValue();
-		(*((void **)(code+7))) = BuiltInRoutines::length;
-		(*((void **)(code+21))) = pushIntVal;
+		(*((void **)(code+1))) = &(Interpreter::memory->SFB);
+		(*((void **)(code+6))) = (void *)(((char *)((Variable *)(args[1]))->getAddress()) - ((char *)Interpreter::memory->SFB));        // offset
+		(*((void **)(code+16))) = JITBuiltInRoutines::length;
+		(*((void **)(code+30))) = pushIntVal;
 		return code_len;
 	}
 	else if(name->getName() == "openRFile")
