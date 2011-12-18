@@ -42,14 +42,18 @@ public class ExpressionStatement extends Statement
     @Override
     public Node optimize() throws Exception
     {
-        //
+        // f.e.: x; 3+5; i+y; 5; ~x; --> those kind of 'statements' are useless
         expression = (Expression)expression.optimize();
         if((expression instanceof StringAtom ) || (expression instanceof RealAtom) ||
            (expression instanceof IntegerAtom) || (expression instanceof BooleanAtom) ||
-           (expression instanceof UnaryExpression) ||
            (expression instanceof Variable) ||
            ((expression instanceof BinaryExpression) && !isAssign(((BinaryExpression)expression).operator)))
-        {   // f.e.: x; 3+5; i+y; 5; ~x; --> those kind of 'statements' are useless
+        {
+            return null;
+        }
+        if((expression instanceof UnaryExpression) &&
+            (((UnaryExpression)expression).operator != Operator.INC) && (((UnaryExpression)expression).operator != Operator.DEC))
+        {
             return null;
         }
         return this;
