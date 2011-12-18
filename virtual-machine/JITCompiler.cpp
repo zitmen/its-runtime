@@ -1878,18 +1878,22 @@ int JITCompiler::gen_new(char *code, Variable *var, const Variable *size)
 {
 	if(var->getItemType() == DataType::ARRAY)
 	{
-		const int code_len = 45;
+		const int code_len = 59;
 		const char *precompiled = // ; x = heapAlloc(sizeof(var))
 								  "\xB8????"		//mov eax, value(var->item_size)
-								  "\xB9????"		//mov ecx, address(size)
+								  "\xBB????"		//mov ebx, address(SFB)
+								  "\xB9????"		//mov ecx, offset(size)
+								  "\x03\x0B"		//add ecx, [ebx]	; absolute address of size
 								  "\x8B\x09"		//mov ecx, [ecx]
 								  "\xF7\xE1"		//mul ecx
-								  "\x83\xC0\x08"	//add eax, 8
+								  "\x83\xC0\x08"	//add eax, 8	; 2*sizeof(int) for length and data type id
 								  "\x50"			//push eax
 								  "\xB8????"		//mov eax, address(heapAlloc)
 								  "\xFF\xD0"		//call eax
-								  "\x83\xC6\x04"	//add esi, 4	; pop function argument
-								  "\xBB????"		//mov ebx, address(var)
+								  "\x83\xC4\x04"	//add esp, 4	; pop function argument
+								  "\xBA????"		//mov edx, address(SFB)
+								  "\xBB????"		//mov ebx, offset(var)
+								  "\x03\x1A"		//add ebx, [edx]	; absolute address of var
 								  "\x89\x03"		//mov [ebx], eax	; save ptr into var
 								  // ; x->length = len
 								  // ; x->item_type = item_type
@@ -1898,26 +1902,31 @@ int JITCompiler::gen_new(char *code, Variable *var, const Variable *size)
 								  "\x89\x58\x04";	//mov [eax+4], ebx
 		memcpy(code, precompiled, code_len);
 		(*((int *)(code+1))) = var->getItemTypeSize();
-		(*((void **)(code+6))) = size->getAddress();
-		(*((void **)(code+19))) = heapAlloc;
-		(*((void **)(code+29))) = var->getAddress();
-		(*((int *)(code+38))) = var->getItemDataType()->subtype->type;
+		(*((void **)(code+6))) = &(Interpreter::memory->SFB);
+		(*((void **)(code+11))) = (void *)(((char *)(size->getAddress())) - ((char *)Interpreter::memory->SFB));        // offset
+		(*((void **)(code+26))) = heapAlloc;
+		(*((void **)(code+36))) = &(Interpreter::memory->SFB);
+		(*((void **)(code+41))) = (void *)(((char *)(var->getAddress())) - ((char *)Interpreter::memory->SFB));        // offset
+		(*((int *)(code+52))) = var->getItemDataType()->subtype->type;
 		return code_len;
 	}
 	else	// structure
 	{
-		const int code_len = 45;
+		const int code_len = 30;
 		const char *precompiled = "\xB8????"		//mov eax, value(var->item_size)
 								  "\x50"			//push eax
 								  "\xB8????"		//mov eax, address(heapAlloc)
 								  "\xFF\xD0"		//call eax
 								  "\x83\xC6\x04"	//add esi, 4	; pop function argument
-								  "\xBB????"		//mov ebx, address(var)
+								  "\xBA????"		//mov edx, address(SFB)
+								  "\xBB????"		//mov ebx, offset(var)
+								  "\x03\x1A"		//add ebx, [edx]	; absolute address of var
 								  "\x89\x03";		//mov [ebx], eax	; save ptr into var
 		memcpy(code, precompiled, code_len);
 		(*((int *)(code+1))) = var->getItemTypeSize();
 		(*((void **)(code+7))) = heapAlloc;
-		(*((void **)(code+17))) = var->getAddress();
+		(*((void **)(code+17))) = &(Interpreter::memory->SFB);
+		(*((void **)(code+22))) = (void *)(((char *)(var->getAddress())) - ((char *)Interpreter::memory->SFB));        // offset
 		return code_len;
 	}
 }

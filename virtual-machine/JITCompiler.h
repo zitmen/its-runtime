@@ -158,6 +158,8 @@ class JITCompiler
 
 		void compile(const string &fnName)
 		{
+			printf("Just-In-Time Compiler: compiling function '%s'.\n", fnName.c_str());
+			//
 			int capacity = 4096, limit = 4000;	// 4kiB, 4kB
 			char *code = new char[capacity];
 			int length = 0;

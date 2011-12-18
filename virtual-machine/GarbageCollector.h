@@ -34,6 +34,8 @@ class GarbageCollector
 
 		void cleanUp(void **heap_ptr, void **HB, void **HP, int heap_size)
 		{
+			printf("Garbage Collector: cleaning the heap.\n");
+			//
 			interchange.clear();
 			//
 			char *heap_old = (*((char **)heap_ptr));

@@ -31,7 +31,6 @@ void Interpreter::_call(FunctionSignature *fn, const vector<Argument *> &args)
 		fn_calls[fn->name]++;
 		if(fn_calls[fn->name] > options[Options::JITCompiler])
 		{
-//printf("JIT Compiler: running compiled function '%s'.\n", fn->name.c_str());
 			jitc->run(fn->name);	// compile & call the function
 			IP++;	// after the function is finished, continue by the next instruction as if it was the interpreter call and function has finished
 			return;	// jump over the rest of the method; IP is set properly now
