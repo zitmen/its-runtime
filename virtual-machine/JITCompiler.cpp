@@ -1941,10 +1941,13 @@ int JITCompiler::gen_lt(char *code, Variable *dest, const Variable *op1, const V
 	}
 	else if(op1->getItemType() == DataType::DOUBLE)
 	{
-		const int code_len = 46;
-		const char *precompiled = "\xB8????"			//				mov eax, address(op2)
+		const int code_len = 57;
+		const char *precompiled = "\xB9????"			//				mov ecx, address(SFB)
+								  "\xB8????"			//				mov eax, offset(op2)
+								  "\x03\x01"			//				add eax, [ecx]	; absolute address of op2
 								  "\xDD\x00"			//				fld qword ptr [eax]
-								  "\xB8????"			//				mov eax, address(op1)
+								  "\xB8????"			//				mov eax, offset(op1)
+								  "\x03\x01"			//				add eax, [ecx]	; absolute address of op1
 								  "\xDD\x00"			//				fld qword ptr [eax]
 								  "\xDE\xD9"			//				fcompp
 								  "\xDF\xE0"			//				fnstsw ax	; copy flags to AX
@@ -1953,17 +1956,19 @@ int JITCompiler::gen_lt(char *code, Variable *dest, const Variable *op1, const V
 								  "\xB0\x00"			//				mov al, 0
 								  "\xEB\x02"			//				jmp _continue
 								  "\xB0\x01"			//_less:		mov al, 1
-								  "\xBB????"			//_continue:	mov ebx, address(dest)
+								  "\xBB????"			//_continue:	mov ebx, offset(dest)
+								  "\x03\x19"			//				add ebx, [ecx]	; absolute address of dest
 								  "\x88\x03"			//				mov byte ptr [ebx], al
 								  // save ZF
 								  "\x34\x01"			//				xor al,1	; negate LSB (al is 1 if comparison was successful - for ZF, I need the exact opposite)
 								  "\xBB????"			//				mov ebx, address(ZF)
 								  "\x88\x03";			//				mov byte ptr [ebx], al
 		memcpy(code, precompiled, code_len);
-		(*((void **)(code+1))) = op2->getAddress();
-		(*((void **)(code+8))) = op1->getAddress();
-		(*((void **)(code+31))) = dest->getAddress();
-		(*((void **)(code+40))) = pZF;
+		(*((void **)(code+1))) = &(Interpreter::memory->SFB);
+		(*((void **)(code+6))) = (void *)(((char *)(op2->getAddress())) - ((char *)Interpreter::memory->SFB));  // offset
+		(*((void **)(code+15))) = (void *)(((char *)(op1->getAddress())) - ((char *)Interpreter::memory->SFB)); // offset
+		(*((void **)(code+40))) = (void *)(((char *)(dest->getAddress())) - ((char *)Interpreter::memory->SFB));        // offset
+		(*((void **)(code+51))) = pZF;
 		return code_len;
 	}
 	else
@@ -1988,7 +1993,7 @@ int JITCompiler::gen_gt(char *code, Variable *dest, const Variable *op1, const V
 								  "\xEB\x02"	//		jmp _cont
 								  "\xB0\x01"	//_gt:	mov al, 1
 								  "\xBB????"	//_cont:mov ebx, offset(dest)
-								  "\x03\x01"    //		add eax, [ecx]	; absolute address of dest
+								  "\x03\x19"    //		add ebx, [ecx]	; absolute address of dest
 								  "\x88\x03"	//		mov byte ptr [ebx], al
 								  // save ZF
 								  "\x34\x01"	//		xor al,1	; negate LSB (al is 1 if comparison was successful - for ZF, I need the exact opposite)
@@ -2004,10 +2009,13 @@ int JITCompiler::gen_gt(char *code, Variable *dest, const Variable *op1, const V
 	}
 	else if(op1->getItemType() == DataType::DOUBLE)
 	{
-		const int code_len = 46;
-		const char *precompiled = "\xB8????"			//				mov eax, address(op2)
+		const int code_len = 57;
+		const char *precompiled = "\xB9????"			//				mov ecx, address(SFB)
+								  "\xB8????"			//				mov eax, offset(op2)
+								  "\x03\x01"			//				add eax, [ecx]	; absolute address of op2
 								  "\xDD\x00"			//				fld qword ptr [eax]
-								  "\xB8????"			//				mov eax, address(op1)
+								  "\xB8????"			//				mov eax, offset(op1)
+								  "\x03\x01"			//				add eax, [ecx]	; absolute address of op1
 								  "\xDD\x00"			//				fld qword ptr [eax]
 								  "\xDE\xD9"			//				fcompp
 								  "\xDF\xE0"			//				fnstsw ax	; copy flags to AX
@@ -2016,17 +2024,19 @@ int JITCompiler::gen_gt(char *code, Variable *dest, const Variable *op1, const V
 								  "\xB0\x00"			//				mov al, 0
 								  "\xEB\x02"			//				jmp _continue
 								  "\xB0\x01"			//_greater:		mov al, 1
-								  "\xBB????"			//_continue:	mov ebx, address(dest)
+								  "\xBB????"			//_continue:	mov ebx, offset(dest)
+								  "\x03\x19"			//				add ebx, [ecx]	; absolute address of dest
 								  "\x88\x03"			//				mov byte ptr [ebx], al
 								  // save ZF
 								  "\x34\x01"			//				xor al,1	; negate LSB (al is 1 if comparison was successful - for ZF, I need the exact opposite)
 								  "\xBB????"			//				mov ebx, address(ZF)
 								  "\x88\x03";			//				mov byte ptr [ebx], al
 		memcpy(code, precompiled, code_len);
-		(*((void **)(code+1))) = op2->getAddress();
-		(*((void **)(code+8))) = op1->getAddress();
-		(*((void **)(code+31))) = dest->getAddress();
-		(*((void **)(code+40))) = pZF;
+		(*((void **)(code+1))) = &(Interpreter::memory->SFB);
+		(*((void **)(code+6))) = (void *)(((char *)(op2->getAddress())) - ((char *)Interpreter::memory->SFB));  // offset
+		(*((void **)(code+15))) = (void *)(((char *)(op1->getAddress())) - ((char *)Interpreter::memory->SFB)); // offset
+		(*((void **)(code+40))) = (void *)(((char *)(dest->getAddress())) - ((char *)Interpreter::memory->SFB));        // offset
+		(*((void **)(code+51))) = pZF;
 		return code_len;
 	}
 	else
@@ -2067,10 +2077,13 @@ int JITCompiler::gen_lte(char *code, Variable *dest, const Variable *op1, const 
 	}
 	else if(op1->getItemType() == DataType::DOUBLE)
 	{
-		const int code_len = 46;
-		const char *precompiled = "\xB8????"			//				mov eax, address(op2)
+		const int code_len = 57;
+		const char *precompiled = "\xB9????"			//				mov ecx, address(SFB)
+								  "\xB8????"			//				mov eax, offset(op2)
+								  "\x03\x01"			//				add eax, [ecx]	; absolute address of op2
 								  "\xDD\x00"			//				fld qword ptr [eax]
-								  "\xB8????"			//				mov eax, address(op1)
+								  "\xB8????"			//				mov eax, offset(op1)
+								  "\x03\x01"			//				add eax, [ecx]	; absolute address of op1
 								  "\xDD\x00"			//				fld qword ptr [eax]
 								  "\xDE\xD9"			//				fcompp
 								  "\xDF\xE0"			//				fnstsw ax	; copy flags to AX
@@ -2079,17 +2092,19 @@ int JITCompiler::gen_lte(char *code, Variable *dest, const Variable *op1, const 
 								  "\xB0\x00"			//				mov al, 0
 								  "\xEB\x02"			//				jmp _continue
 								  "\xB0\x01"			//_greater:		mov al, 1
-								  "\xBB????"			//_continue:	mov ebx, address(dest)
+								  "\xBB????"			//_continue:	mov ebx, offset(dest)
+								  "\x03\x19"			//				add ebx, [ecx]	; absolute address of dest
 								  "\x88\x03";			//				mov byte ptr [ebx], al
 								  // save ZF
 								  "\x34\x01"			//				xor al,1	; negate LSB (al is 1 if comparison was successful - for ZF, I need the exact opposite)
 								  "\xBB????"			//				mov ebx, address(ZF)
 								  "\x88\x03";			//				mov byte ptr [ebx], al
 		memcpy(code, precompiled, code_len);
-		(*((void **)(code+1))) = op2->getAddress();
-		(*((void **)(code+8))) = op1->getAddress();
-		(*((void **)(code+31))) = dest->getAddress();
-		(*((void **)(code+40))) = pZF;
+		(*((void **)(code+1))) = &(Interpreter::memory->SFB);
+		(*((void **)(code+6))) = (void *)(((char *)(op2->getAddress())) - ((char *)Interpreter::memory->SFB));  // offset
+		(*((void **)(code+15))) = (void *)(((char *)(op1->getAddress())) - ((char *)Interpreter::memory->SFB)); // offset
+		(*((void **)(code+40))) = (void *)(((char *)(dest->getAddress())) - ((char *)Interpreter::memory->SFB));        // offset
+		(*((void **)(code+51))) = pZF;
 		return code_len;
 	}
 	else
@@ -2130,10 +2145,13 @@ int JITCompiler::gen_gte(char *code, Variable *dest, const Variable *op1, const 
 	}
 	else if(op1->getItemType() == DataType::DOUBLE)
 	{
-		const int code_len = 46;
-		const char *precompiled = "\xB8????"			//				mov eax, address(op2)
+		const int code_len = 57;
+		const char *precompiled = "\xB9????"			//				mov ecx, address(SFB)
+								  "\xB8????"			//				mov eax, offset(op2)
+								  "\x03\x01"			//				add eax, [ecx]	; absolute address of op2
 								  "\xDD\x00"			//				fld qword ptr [eax]
-								  "\xB8????"			//				mov eax, address(op1)
+								  "\xB8????"			//				mov eax, offset(op1)
+								  "\x03\x01"			//				add eax, [ecx]	; absolute address of op1
 								  "\xDD\x00"			//				fld qword ptr [eax]
 								  "\xDE\xD9"			//				fcompp
 								  "\xDF\xE0"			//				fnstsw ax	; copy flags to AX
@@ -2142,17 +2160,19 @@ int JITCompiler::gen_gte(char *code, Variable *dest, const Variable *op1, const 
 								  "\xB0\x00"			//				mov al, 0
 								  "\xEB\x02"			//				jmp _continue
 								  "\xB0\x01"			//_less:		mov al, 1
-								  "\xBB????"			//_continue:	mov ebx, address(dest)
+								  "\xBB????"			//_continue:	mov ebx, offset(dest)
+								  "\x03\x19"			//				add ebx, [ecx]	; absolute address of dest
 								  "\x88\x03"			//				mov byte ptr [ebx], al
 								  // save ZF
 								  "\x34\x01"			//				xor al,1	; negate LSB (al is 1 if comparison was successful - for ZF, I need the exact opposite)
 								  "\xBB????"			//				mov ebx, address(ZF)
 								  "\x88\x03";			//				mov byte ptr [ebx], al
 		memcpy(code, precompiled, code_len);
-		(*((void **)(code+1))) = op2->getAddress();
-		(*((void **)(code+8))) = op1->getAddress();
-		(*((void **)(code+31))) = dest->getAddress();
-		(*((void **)(code+40))) = pZF;
+		(*((void **)(code+1))) = &(Interpreter::memory->SFB);
+		(*((void **)(code+6))) = (void *)(((char *)(op2->getAddress())) - ((char *)Interpreter::memory->SFB));  // offset
+		(*((void **)(code+15))) = (void *)(((char *)(op1->getAddress())) - ((char *)Interpreter::memory->SFB)); // offset
+		(*((void **)(code+40))) = (void *)(((char *)(dest->getAddress())) - ((char *)Interpreter::memory->SFB));        // offset
+		(*((void **)(code+51))) = pZF;
 		return code_len;
 	}
 	else
