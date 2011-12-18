@@ -64,10 +64,15 @@ public class FunctionCall extends Expression
             isDefined = true;
         }
         // check arguments count
-        if((nParams = parameters.expressions.size()) != function.parameters.expressions.size())
+        nParams = 0;
+        if((parameters.expressions == null) && (function.parameters.expressions != null))
+            throw new Exception("SEMANTIC ERROR: the function '" + functionName + "' doesn't take 0 argument(s)!");
+        else if((parameters.expressions != null) && (function.parameters.expressions == null))
+            throw new Exception("SEMANTIC ERROR: the function '" + functionName + "' doesn't take " + (parameters.expressions.size()) + " argument(s)!");
+        else if((nParams = parameters.expressions.size()) != function.parameters.expressions.size())
             throw new Exception("SEMANTIC ERROR: the function '" + functionName + "' doesn't take " + nParams + " argument(s)!");
         // check arguments types
-        for(int i = 0, im = parameters.expressions.size(); i < im; i++)
+        for(int i = 0; i < nParams; i++)
         {
             if(parameters.expressions.get(i).evalDatatype() != function.parameters.expressions.get(i).evalDatatype())
                 throw new Exception("SEMANTIC ERROR: the function '" + functionName + "' doesn't take " + (i+1) + ". argument of type that was used!");

@@ -1,10 +1,18 @@
 void main()
 {
-	for(double i = 1.0; i < 1e10; i *= 10.0)
-		println(fn(0));
+	for(double i = 1.0; i <= 10.0; i += 1.0)
+		println(fn(i));
 }
 
-String fn(int x)
+String fn(double x)
 {
-	return int2str(rand(10));
+	if(f1(x))
+		return "true";
+	else
+		return "false";
+}
+
+bool f1(double x)
+{
+	return startsWith(double2str(x), "5");
 }

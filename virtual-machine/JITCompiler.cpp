@@ -3,18 +3,6 @@
 #include "JITBuiltInRoutines.h"
 #include <cstdarg>
 
-/*
-
-004A4374 E8 16 78 FA FF       call        getVal (44BB8Fh)		// zavolam funkci, ktera vraci double - vraci ho pomoci pushnuti na FPU zasobnik -- fld qword ptr [adresa]
-004A4379 DD 5D E0             fstp        qword ptr [ebp-20h]  // ulozi navratovou hodnotu do lokalni promenne
-    25: 	setVal(d);	// ted jdu volat funkci, kam double predavam jako parameter
-004A437C 83 EC 08             sub         esp,8					// uvolnim misto na zasobniku
-004A437F DD 45 E0             fld         qword ptr [ebp-20h]	// loadnu hodnotu z lokalni promenne na FPU zasobnik
-004A4382 DD 1C 24             fstp        qword ptr [esp]		// vyzvednu hodnotu z FPU zasobniku a vlozim na ALU zasobnik do uvolneneho prostoru
-004A4385 E8 E9 5C FA FF       call        setVal (44A073h)		// funkce si pak hodnotu z klasickeho zasobniku vyzvedne stejne jako z lokalni promenne
-
-*/
-
 void divByZeroEx()
 {
 	throw new std::exception("Runtime exception: Division by zero!");
@@ -121,6 +109,10 @@ void retFromFn(stack<FunctionSignature *> *call_stack)
 // jnz _label         --> doesn't work! --> use `jne`
 // jne _label         --> 75 ?? --> 0x75 is opcode of `jnz`, but it still translates as `jne`...wtf?!
 // --> if any argument is pointer without specification it is `dword ptr` --> 32b platform
+// long jump:
+//   mov eax, ????
+//   jmp eax
+// --conditional jumps can't do that, so use near jump to a jmp eax
 // ============================================================
 
 int JITCompiler::gen_prolog(char *code)
@@ -202,56 +194,83 @@ int JITCompiler::gen_ret(char *code)
 }
 
 int JITCompiler::gen_retv(char *code, const Variable *var)
-{
-	const int code_len = 48;
-	const char *precompiled = "\xB8????"		//mov eax, [type] ; (DataType *)
-							  "\x50"			//push eax
-							  "\xBB????"		//mov ebx, address(SFB)
-							  "\xB8????"		//mov eax, offset(var)	; points to a return value
-							  "\x03\x03"		//add eax, [ebx]	; absolute address of var
-							  "\x8B\x00"		//mov eax, [eax]	; get value rather then pointer -- co DOUBLE!!!!!??? zasobnik FPU? nevraci se tady neco jinyho nez v invoke?
-							  "\x50"			//push eax
-							  "\xB8????"		//mov eax, address(call_stack)
-							  "\x50"			//push eax
-							  "\xB8????"		//mov eax, address(retFromFn) ; take only 1 argument so others still lays on the stack prepared for pushXXXVal call
-							  "\xFF\xD0"		//call eax
-							  "\x83\xC4\x04"	//add esp, 4	; pop retFromFn argument
-							  "\xB8????"		//mov eax, address(pushXXXVal)
-							  "\xFF\xD0"		//call eax
-							  "\x83\xC4\x08"	//add esp, 8	; pop pushXXXVal arguments
-							  "\xC3";			//ret
-	memcpy(code, precompiled, code_len);
-	(*((void **)(code+7))) = &(Interpreter::memory->SFB);
-	(*((void **)(code+12))) = (void *)((char *)(var->getAddress()) - ((char *)Interpreter::memory->SFB));	// offset
-	(*((void **)(code+22))) = call_stack;
-	(*((void **)(code+28))) = retFromFn;
-	// of what type is the retval?
-	if(var->getDataType()->type == DataType::INTEGER)
+{	// of what type is the retval?
+	if(var->getDataType()->type == DataType::DOUBLE)	// 8B - DOUBLE
 	{
+		const int code_len = 53;
+		const char *precompiled = "\xB8????"		//mov eax, [type] ; (DataType *)
+								  "\x50"			//push eax
+								  "\xBB????"		//mov ebx, address(SFB)
+								  "\xB8????"		//mov eax, offset(var)	; points to a return value
+								  "\x03\x03"		//add eax, [ebx]	; absolute address of var
+								  "\xDD\x00"        //fld qword ptr [eax]	; push value to the FPU stack
+								  "\x83\xEC\x08"	//sub esp, 8    ; 'alloc' room on system stack for double arg
+								  "\xDD\x1C\x24"	//fstp qword ptr [esp]  ; save retval from FPU stack to the ALU stack as parameter for pushDblVal
+								  "\xB8????"		//mov eax, address(call_stack)
+								  "\x50"			//push eax
+								  "\xB8????"		//mov eax, address(retFromFn) ; take only 1 argument so others still lays on the stack prepared for pushXXXVal call
+								  "\xFF\xD0"		//call eax
+								  "\x83\xC4\x04"	//add esp, 4	; pop retFromFn argument
+								  "\xB8????"		//mov eax, address(pushDblVal)
+								  "\xFF\xD0"		//call eax
+								  "\x83\xC4\x0C"	//add esp, 12	; pop pushDblVal arguments
+								  "\xC3";			//ret
+		memcpy(code, precompiled, code_len);
 		(*((void **)(code+1))) = NULL;
-		(*((void **)(code+38))) = pushIntVal;
+		(*((void **)(code+7))) = &(Interpreter::memory->SFB);
+		(*((void **)(code+12))) = (void *)((char *)(var->getAddress()) - ((char *)Interpreter::memory->SFB));	// offset
+		(*((void **)(code+27))) = call_stack;
+		(*((void **)(code+33))) = retFromFn;
+		(*((void **)(code+43))) = pushDblVal;
+		return code_len;
 	}
-	else if(var->getDataType()->type == DataType::BOOLEAN)
+	else	// 4B - INTEGER, STRING, ARRAY, STRUCTURE or 1B - BOOLEAN (it's necesary to push eax and called function does not pop the value, only reads low byte, so it works fine)
 	{
-		(*((void **)(code+1))) = NULL;
-		(*((void **)(code+38))) = pushBoolVal;
+		const int code_len = 48;
+		const char *precompiled = "\xB8????"		//mov eax, [type] ; (DataType *)
+								  "\x50"			//push eax
+								  "\xBB????"		//mov ebx, address(SFB)
+								  "\xB8????"		//mov eax, offset(var)	; points to a return value
+								  "\x03\x03"		//add eax, [ebx]	; absolute address of var
+								  "\x8B\x00"		//mov eax, [eax]	; get value rather then pointer
+								  "\x50"			//push eax
+								  "\xB8????"		//mov eax, address(call_stack)
+								  "\x50"			//push eax
+								  "\xB8????"		//mov eax, address(retFromFn) ; take only 1 argument so others still lays on the stack prepared for pushXXXVal call
+								  "\xFF\xD0"		//call eax
+								  "\x83\xC4\x04"	//add esp, 4	; pop retFromFn argument
+								  "\xB8????"		//mov eax, address(pushXXXVal)
+								  "\xFF\xD0"		//call eax
+								  "\x83\xC4\x08"	//add esp, 8	; pop pushXXXVal arguments
+								  "\xC3";			//ret
+		memcpy(code, precompiled, code_len);
+		(*((void **)(code+7))) = &(Interpreter::memory->SFB);
+		(*((void **)(code+12))) = (void *)((char *)(var->getAddress()) - ((char *)Interpreter::memory->SFB));	// offset
+		(*((void **)(code+22))) = call_stack;
+		(*((void **)(code+28))) = retFromFn;
+		//
+		if(var->getDataType()->type == DataType::BOOLEAN)
+		{
+			(*((void **)(code+1))) = NULL;
+			(*((void **)(code+38))) = pushBoolVal;
+		}
+		else if(var->getDataType()->type == DataType::INTEGER)
+		{
+			(*((void **)(code+1))) = NULL;
+			(*((void **)(code+38))) = pushIntVal;
+		}
+		else if(var->getDataType()->type == DataType::STRING)
+		{
+			(*((void **)(code+1))) = NULL;
+			(*((void **)(code+38))) = pushStrVal;
+		}
+		else	// REFERENCE: ARRAY or STRUCTURE
+		{
+			(*((void **)(code+1))) = var->getDataType();
+			(*((void **)(code+38))) = pushPtrVal;
+		}
+		return code_len;
 	}
-	else if(var->getDataType()->type == DataType::DOUBLE)
-	{
-		(*((void **)(code+1))) = NULL;
-		(*((void **)(code+38))) = pushDblVal;
-	}
-	else if(var->getDataType()->type == DataType::STRING)
-	{
-		(*((void **)(code+1))) = NULL;
-		(*((void **)(code+38))) = pushStrVal;
-	}
-	else	// REFERENCE: ARRAY or STRUCTURE
-	{
-		(*((void **)(code+1))) = var->getDataType();
-		(*((void **)(code+38))) = pushPtrVal;
-	}
-	return code_len;
 }
 
 int JITCompiler::gen_pop(char *code, Variable *dest)

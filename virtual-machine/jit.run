@@ -1,22 +1,30 @@
-FUNCTION <INTEGER> fn [ INTEGER var1 ] [ INTEGER var9 INTEGER var1 INTEGER var10 ] @ 15
-FUNCTION <VOID> main [ ] [ DOUBLE var8 STRING var7 INTEGER var5 INTEGER var6 DOUBLE var3 BOOL var4 DOUBLE var2 DOUBLE var0 ] @ 0
+FUNCTION <BOOL> f1 [ DOUBLE var2 ] [ BOOL var13 STRING var12 STRING var11 DOUBLE var2 ] @ 12
+FUNCTION <STRING> fn [ DOUBLE var1 ] [ STRING var9 BOOL var8 DOUBLE var1 STRING var10 ] @ 18
+FUNCTION <VOID> main [ ] [ DOUBLE var7 BOOL var5 STRING var6 DOUBLE var3 DOUBLE var4 DOUBLE var0 ] @ 0
 CODE
-000: LDCR var2 1.0
-001: ST var0 var2
-002: LDCR var3 1.0E10
-003: LT var4 var0 var3
-004: JZ 14
-005: LDCI var5 0
-006: CALL fn var5
-007: POP var6
-008: INVOKE int2str var6
-009: POP var7
-010: INVOKE println var7
-011: LDCR var8 10.0
-012: MUL var0 var0 var8
-013: JMP 2
-014: RET
-015: LDCI var9 10
-016: INVOKE rand var9
-017: POP var10
-018: RETV var10
+000: LDCR var3 1.0
+001: ST var0 var3
+002: LDCR var4 10.0
+003: LTE var5 var0 var4
+004: JZ 11
+005: CALL fn var0
+006: POP var6
+007: INVOKE println var6
+008: LDCR var7 1.0
+009: ADD var0 var0 var7
+010: JMP 2
+011: RET
+012: LDCS var11 "5"
+013: INVOKE double2str var2
+014: POP var12
+015: INVOKE startsWith var12 var11
+016: POP var13
+017: RETV var13
+018: CALL f1 var1
+019: POP var8
+020: JZ 24
+021: LDCS var9 "true"
+022: RETV var9
+023: JMP 26
+024: LDCS var10 "false"
+025: RETV var10

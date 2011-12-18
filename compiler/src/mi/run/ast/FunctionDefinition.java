@@ -30,12 +30,12 @@ public class FunctionDefinition extends Node
         this.name = name;
         this.parameters = parameters;
         this.body = body;
+        removeNulls();
     }
 
     @Override
     public String toString()
     {
-        removeNulls();
         return "(FunctionDefinition " + type + " " + name + " " + parameters + " " + body.toString() + ")";
     }
     
@@ -65,7 +65,6 @@ public class FunctionDefinition extends Node
     @Override
     public Node optimize() throws Exception
     {
-        removeNulls();
         parameters = (ExpressionList)parameters.optimize();
         body = (BlockStatement)body.optimize();
         return this;
@@ -74,7 +73,6 @@ public class FunctionDefinition extends Node
     @Override
     public Instruction genByteCode()
     {
-        removeNulls();
         Instruction stream = new Instruction(Code.NOOP);   // helper
         Instruction first = stream.first();
         // body
@@ -90,7 +88,6 @@ public class FunctionDefinition extends Node
     @Override
     public void semanticCheck() throws Exception
     {
-        removeNulls();
         Functions.actualFunction = name;
         SymbolTable.stepIn();
         parameters.semanticCheck();
