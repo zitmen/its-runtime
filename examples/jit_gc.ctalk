@@ -5,7 +5,7 @@ JIT uses methods for memory managging from the built-in memory manager.
 
 Run:
 java -jar compiler.jar jit_gc.ctalk jit_gc.run
-./virtual-machine -heap=10k -jit=2 jit.run
+./virtual-machine -heap=1M -jit=2 jit_gc.run
 */
 struct S
 {
@@ -16,7 +16,7 @@ struct S
 void main()
 {
 	Array<S> s;
-	for(int i = 1; i < 10; i++)
+	for(int i = 1; i < 1000; i++)
 		foo(s);
 }
 

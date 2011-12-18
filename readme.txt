@@ -65,9 +65,9 @@ Pro kompilaci byte-code compileru je potreba JDK. ANTL potreba neni, protoze dod
 Prikaz k sestaveni:
 ant
 
-Virtual machine case projektu je nutne sestavovat na platforme 32b Windows. Testovano to bylo pouze na WindowsXP Professiona SP3 (32b).
+Virtual machine cast projektu je nutne sestavovat na platforme 32b Windows. Testovano to bylo pouze na WindowsXP Professiona SP3 (32b).
 To je potreba dodrzet, protoze jak je jasne z popisu projektu, tak je funkcnost VM zavisla na aritmetice 32b ukaztelu a JIT compiler
-pracuje s instrukcemi o 32b operandech (vyjma FPU operaci).
+pracuje s instrukcemi o 32b operandech (vyjma FPU operaci). Je mozne nechat bezet VM na 64b platformne, ale pokud zapnete JIT, tak VM spadne.
 Dale je nutne kompilovat projekt nastroji VisualStudia, protoze pouzivam vkladany assembler a syntaxe VS se diametralne lisi od gcc syntaxe.
 
 Prikaz k sestaveni (to je jediny zpusob, o kterem vim, jak to zkompilovat z cmd line; nmake jsem rozchodit nedokazal, bohuzel):

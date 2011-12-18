@@ -1,22 +1,29 @@
 /*
 This example shows how JIT compilation and trace-based compilation work.
+Output of this one is a junk - it's just for knowing, that `JITed` function was executed, so you can redirect it to file.
 
 Compile:
 java -jar compiler.jar jit.ctalk jit.run
 
-Run:
-./virtual-machine jit.run
-./virtual-machine -jit=2 jit.run
+Run (for cygwin users):
+time `./virtual-machine jit.run > /dev/null`
+time `./virtual-machine -jit=2 jit.run > /dev/null`
+
+First  one I got time 3.744s.
+Second one I got time 0.725s.
 */
 void main()
 {
 	for(int i = 1; i < 10000; i++)
-		foo();
+	{
+		print(int2str(foo()));
+	}
 }
 
-void foo()
+int foo()
 {
 	int i = 0;
 	for(int x = 0; x < 100; x++)
 		i++;
+	return i;
 }
