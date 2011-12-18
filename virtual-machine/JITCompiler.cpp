@@ -115,6 +115,67 @@ void retFromFn(stack<FunctionSignature *> *call_stack)
 // --conditional jumps can't do that, so use near jump to a jmp eax
 // ============================================================
 
+int JITCompiler::gen_operand(char *code, Variable *var, bool load_SFB)
+{
+	int length = 0;
+	char *addr = (char *)var->getVarAddress();
+	DataType *type = var->getDataType();
+	//
+	if(load_SFB)
+	{
+		memcpy(code+length, "\xB9????", 5);	//mov ecx, address(SFB)
+		(*((void **)(code+length+1))) = &(Interpreter::memory->SFB);
+		length += 5;
+	}
+	const int init_code_len = 7;
+	const char *init_code =	"\xB8????"	//mov eax, offset(var)
+							"\x03\x01";	//add eax, [ecx]  ; absolute address of var
+	memcpy(code+length, init_code, init_code_len);
+    (*((void **)(code+length+1))) = (void *)(((char *)(var->getVarAddress())) - ((char *)Interpreter::memory->SFB));  // offset
+	length += init_code_len;
+	//
+	// indexing for arrays and structures
+	for(size_t i = 0, im = var->m_index.size(); i < im; i++)
+	{
+		memcpy(code+length, "\x8B\x00", 2);	// mov eax, [eax]
+		length += 2;
+		//
+		int offset = 0;
+		if(var->m_index[i]->getType() == DataType::INTEGER)	// Array
+		{	// it's always Variable
+			//                     size of the data type * offset
+			int ith = ((Integer *)((Variable *)var->m_index[i])->getValue())->getValue();
+			type = type->subtype;
+			offset = (2 * sizeof(int)) + (DataType::getTypeSize(type->type) * ith);
+		}
+		else if(var->m_index[i]->getType() == DataType::STRING)	// Structure
+		{	// it's always String
+			StructureSignature *ssig = Interpreter::getStructureSignatures()->find(type->name)->second;
+			// go through items and all items before the one, that i'm indexing, skip (=add offset for each skipped item)
+			for(size_t m = 0, mm = ssig->items_ordering.size(); m < mm; m++)
+			{
+				if(ssig->items_ordering[m] == ((String *)var->m_index[i])->getValue())
+				{
+					type = ssig->items[ssig->items_ordering[m]];
+					break;
+				}
+				offset += DataType::getTypeSize(ssig->items[ssig->items_ordering[m]]->type);
+			}
+		}
+		else
+			throw new std::exception("JITCompiler::gen_operand: unknown index type!");
+		//
+		memcpy(code+length, "\x05????", 5);	// add eax, offset
+		(*((int *)(code+length+1))) = offset;
+		length += 5;
+	}
+	//
+	memcpy(code+length, "\x50", 1);	//push eax	; store operand address on the system stack
+	length += 1;
+	//
+	return length;
+}
+
 int JITCompiler::gen_prolog(char *code)
 {	// i don't need it, at least for now
 	return 0;
@@ -159,7 +220,7 @@ int JITCompiler::gen_call(char *code, FunctionSignature *fn, const vector<Argume
 	for(size_t a = 1, am = args.size(); a < am; a++)
 	{
 		memcpy(code+len, args_precompiled, args_len);
-		(*((void **)(code+len+1))) = (void *)((char *)(((Variable *)(args[a]))->getAddress()) - ((char *)Interpreter::memory->SFB));	// offset
+		(*((void **)(code+len+1))) = (void *)((char *)(((Variable *)(args[a]))->getVarAddress()) - ((char *)Interpreter::memory->SFB));	// offset
 		len += args_len;
 	}
 	// the rest of the code
@@ -218,7 +279,7 @@ int JITCompiler::gen_retv(char *code, const Variable *var)
 		memcpy(code, precompiled, code_len);
 		(*((void **)(code+1))) = NULL;
 		(*((void **)(code+7))) = &(Interpreter::memory->SFB);
-		(*((void **)(code+12))) = (void *)((char *)(var->getAddress()) - ((char *)Interpreter::memory->SFB));	// offset
+		(*((void **)(code+12))) = (void *)((char *)(var->getVarAddress()) - ((char *)Interpreter::memory->SFB));	// offset
 		(*((void **)(code+27))) = call_stack;
 		(*((void **)(code+33))) = retFromFn;
 		(*((void **)(code+43))) = pushDblVal;
@@ -245,7 +306,7 @@ int JITCompiler::gen_retv(char *code, const Variable *var)
 								  "\xC3";			//ret
 		memcpy(code, precompiled, code_len);
 		(*((void **)(code+7))) = &(Interpreter::memory->SFB);
-		(*((void **)(code+12))) = (void *)((char *)(var->getAddress()) - ((char *)Interpreter::memory->SFB));	// offset
+		(*((void **)(code+12))) = (void *)((char *)(var->getVarAddress()) - ((char *)Interpreter::memory->SFB));	// offset
 		(*((void **)(code+22))) = call_stack;
 		(*((void **)(code+28))) = retFromFn;
 		//
@@ -296,7 +357,7 @@ int JITCompiler::gen_pop(char *code, Variable *dest)
 		(*((int *)(code+1))) = dest->getItemType();
 		(*((void **)(code+7))) = popAndGetTopValAddr;
 		(*((void **)(code+19))) = &(Interpreter::memory->SFB);
-		(*((void **)(code+24))) = (void *)(((char *)(dest->getAddress())) - ((char *)Interpreter::memory->SFB));	// offset
+		(*((void **)(code+24))) = (void *)(((char *)(dest->getVarAddress())) - ((char *)Interpreter::memory->SFB));	// offset
 		(*((void **)(code+35))) = pZF;
 		return code_len;
 	}
@@ -307,7 +368,7 @@ int JITCompiler::gen_pop(char *code, Variable *dest)
 								  "\x50"			//push eax
 								  "\xB8????"		//mov eax, address(popAndGetTopValAddr)
 								  "\xFF\xD0"		//call eax
-								  "\x83\xC4\x04"	//add esi, 4	; pop function argument
+								  "\x83\xC4\x04"	//add esp, 4	; pop function argument
 								  "\xDD\x00"		//fld qword ptr[eax]
 								  "\xBB????"		//mov ebx, address(SFB)
 								  "\xB8????"		//mov eax, offset(dest)
@@ -317,7 +378,7 @@ int JITCompiler::gen_pop(char *code, Variable *dest)
 		(*((int *)(code+1))) = dest->getItemType();
 		(*((void **)(code+7))) = popAndGetTopValAddr;
 		(*((void **)(code+19))) = &(Interpreter::memory->SFB);
-		(*((void **)(code+24))) = (void *)(((char *)(dest->getAddress())) - ((char *)Interpreter::memory->SFB));	// offset
+		(*((void **)(code+24))) = (void *)(((char *)(dest->getVarAddress())) - ((char *)Interpreter::memory->SFB));	// offset
 		return code_len;
 	}
 	else	// 4B -- INTEGER, REFERENCE, ARRAY, STRUCTURE
@@ -327,7 +388,7 @@ int JITCompiler::gen_pop(char *code, Variable *dest)
 								  "\x50"			//push eax
 								  "\xB8????"		//mov eax, address(popAndGetTopValAddr)
 								  "\xFF\xD0"		//call eax
-								  "\x83\xC4\x04"	//add esi, 4	; pop function argument
+								  "\x83\xC4\x04"	//add esp, 4	; pop function argument
 								  "\x8B\x00"		//mov eax, [eax]
 								  "\xB9????"		//mov ecx, address(SFB)
 								  "\xBB????"		//mov ebx, offset(dest)
@@ -337,7 +398,7 @@ int JITCompiler::gen_pop(char *code, Variable *dest)
 		(*((int *)(code+1))) = dest->getItemType();
 		(*((void **)(code+7))) = popAndGetTopValAddr;
 		(*((void **)(code+19))) = &(Interpreter::memory->SFB);
-		(*((void **)(code+24))) = (void *)(((char *)(dest->getAddress())) - ((char *)Interpreter::memory->SFB));	// offset
+		(*((void **)(code+24))) = (void *)(((char *)(dest->getVarAddress())) - ((char *)Interpreter::memory->SFB));	// offset
 		return code_len;
 	}
 }
@@ -364,7 +425,7 @@ int JITCompiler::gen_invoke(char *code, Variable *name, const vector<Argument *>
 								  "\x83\xC4\x0C";	//add esp, 12	; pop functions arguments from both cloneArray and pushPtrVal
 		memcpy(code, precompiled, code_len);
 		(*((void **)(code+1))) = &(Interpreter::memory->SFB);
-		(*((void **)(code+6))) = (void *)(((char *)((Variable *)(args[1]))->getAddress()) - ((char *)Interpreter::memory->SFB));        // offset
+		(*((void **)(code+6))) = (void *)(((char *)((Variable *)(args[1]))->getVarAddress()) - ((char *)Interpreter::memory->SFB));        // offset
 		(*((void **)(code+16))) = Interpreter::memory;
 		(*((void **)(code+22))) = JITBuiltInRoutines::cloneArray;
 		(*((void **)(code+29))) = ((Variable *)(args[1]))->getDataType();
@@ -384,7 +445,7 @@ int JITCompiler::gen_invoke(char *code, Variable *name, const vector<Argument *>
 								  "\x83\xC4\x04";	//add esp, 4	; pop functions arguments from clearArray
 		memcpy(code, precompiled, code_len);
 		(*((void **)(code+1))) = &(Interpreter::memory->SFB);
-		(*((void **)(code+6))) = (void *)(((char *)((Variable *)(args[1]))->getAddress()) - ((char *)Interpreter::memory->SFB));        // offset
+		(*((void **)(code+6))) = (void *)(((char *)((Variable *)(args[1]))->getVarAddress()) - ((char *)Interpreter::memory->SFB));        // offset
 		(*((void **)(code+16))) = JITBuiltInRoutines::clearArray;
 		return code_len;
 	}
@@ -406,7 +467,7 @@ int JITCompiler::gen_invoke(char *code, Variable *name, const vector<Argument *>
 								  "\x83\xC4\x0C";		//add esp, 12	; pop functions arguments from both length and pushIntVal
 		memcpy(code, precompiled, code_len);
 		(*((void **)(code+1))) = &(Interpreter::memory->SFB);
-		(*((void **)(code+6))) = (void *)(((char *)((Variable *)(args[1]))->getAddress()) - ((char *)Interpreter::memory->SFB));        // offset
+		(*((void **)(code+6))) = (void *)(((char *)((Variable *)(args[1]))->getVarAddress()) - ((char *)Interpreter::memory->SFB));        // offset
 		(*((void **)(code+16))) = JITBuiltInRoutines::length;
 		(*((void **)(code+30))) = pushIntVal;
 		return code_len;
@@ -429,7 +490,7 @@ int JITCompiler::gen_invoke(char *code, Variable *name, const vector<Argument *>
 								  "\x83\xC4\x0C";		//add esp, 12	; pop functions arguments from both openRFile and pushPtrVal
 		memcpy(code, precompiled, code_len);
 		(*((void **)(code+1))) = &(Interpreter::memory->SFB);
-		(*((void **)(code+6))) = (void *)(((char *)((Variable *)(args[1]))->getAddress()) - ((char *)Interpreter::memory->SFB));        // offset
+		(*((void **)(code+6))) = (void *)(((char *)((Variable *)(args[1]))->getVarAddress()) - ((char *)Interpreter::memory->SFB));        // offset
 		(*((void **)(code+16))) = JITBuiltInRoutines::openRFile;
 		(*((void **)(code+30))) = pushPtrVal;
 		return code_len;
@@ -456,8 +517,8 @@ int JITCompiler::gen_invoke(char *code, Variable *name, const vector<Argument *>
 								  "\x83\xC4\x10";		//add esp, 16	; pop functions arguments from both openWFile and pushPtrVal
 		memcpy(code, precompiled, code_len);
 		(*((void **)(code+1))) = &(Interpreter::memory->SFB);
-		(*((void **)(code+6))) = (void *)(((char *)((Variable *)(args[2]))->getAddress()) - ((char *)Interpreter::memory->SFB));        // offset
-		(*((void **)(code+17))) = (void *)(((char *)((Variable *)(args[1]))->getAddress()) - ((char *)Interpreter::memory->SFB));        // offset
+		(*((void **)(code+6))) = (void *)(((char *)((Variable *)(args[2]))->getVarAddress()) - ((char *)Interpreter::memory->SFB));        // offset
+		(*((void **)(code+17))) = (void *)(((char *)((Variable *)(args[1]))->getVarAddress()) - ((char *)Interpreter::memory->SFB));        // offset
 		(*((void **)(code+27))) = JITBuiltInRoutines::openWFile;
 		(*((void **)(code+41))) = pushPtrVal;
 		return code_len;
@@ -475,7 +536,7 @@ int JITCompiler::gen_invoke(char *code, Variable *name, const vector<Argument *>
 								  "\x83\xC4\x04";		//add esp, 4	; pop functions arguments from flushFile
 		memcpy(code, precompiled, code_len);
 		(*((void **)(code+1))) = &(Interpreter::memory->SFB);
-		(*((void **)(code+6))) = (void *)(((char *)((Variable *)(args[1]))->getAddress()) - ((char *)Interpreter::memory->SFB));        // offset
+		(*((void **)(code+6))) = (void *)(((char *)((Variable *)(args[1]))->getVarAddress()) - ((char *)Interpreter::memory->SFB));        // offset
 		(*((void **)(code+16))) = JITBuiltInRoutines::closeFile;
 		return code_len;
 	}
@@ -492,7 +553,7 @@ int JITCompiler::gen_invoke(char *code, Variable *name, const vector<Argument *>
 								  "\x83\xC4\x04";		//add esp, 4	; pop functions arguments from flushFile
 		memcpy(code, precompiled, code_len);
 		(*((void **)(code+1))) = &(Interpreter::memory->SFB);
-		(*((void **)(code+6))) = (void *)(((char *)((Variable *)(args[1]))->getAddress()) - ((char *)Interpreter::memory->SFB));        // offset
+		(*((void **)(code+6))) = (void *)(((char *)((Variable *)(args[1]))->getVarAddress()) - ((char *)Interpreter::memory->SFB));        // offset
 		(*((void **)(code+16))) = JITBuiltInRoutines::flushFile;
 		return code_len;
 	}
@@ -513,8 +574,8 @@ int JITCompiler::gen_invoke(char *code, Variable *name, const vector<Argument *>
 								  "\x83\xC4\x08";		//add esp, 8	; pop functions arguments from printlnFile
 		memcpy(code, precompiled, code_len);
 		(*((void **)(code+1))) = &(Interpreter::memory->SFB);
-		(*((void **)(code+6))) = (void *)(((char *)((Variable *)(args[2]))->getAddress()) - ((char *)Interpreter::memory->SFB));        // offset
-		(*((void **)(code+16))) = (void *)(((char *)((Variable *)(args[1]))->getAddress()) - ((char *)Interpreter::memory->SFB));        // offset
+		(*((void **)(code+6))) = (void *)(((char *)((Variable *)(args[2]))->getVarAddress()) - ((char *)Interpreter::memory->SFB));        // offset
+		(*((void **)(code+16))) = (void *)(((char *)((Variable *)(args[1]))->getVarAddress()) - ((char *)Interpreter::memory->SFB));        // offset
 		(*((void **)(code+26))) = JITBuiltInRoutines::printlnFile;
 		return code_len;
 	}
@@ -535,8 +596,8 @@ int JITCompiler::gen_invoke(char *code, Variable *name, const vector<Argument *>
 								  "\x83\xC4\x08";		//add esp, 8	; pop functions arguments from printFile
 		memcpy(code, precompiled, code_len);
 		(*((void **)(code+1))) = &(Interpreter::memory->SFB);
-		(*((void **)(code+6))) = (void *)(((char *)((Variable *)(args[2]))->getAddress()) - ((char *)Interpreter::memory->SFB));        // offset
-		(*((void **)(code+16))) = (void *)(((char *)((Variable *)(args[1]))->getAddress()) - ((char *)Interpreter::memory->SFB));        // offset
+		(*((void **)(code+6))) = (void *)(((char *)((Variable *)(args[2]))->getVarAddress()) - ((char *)Interpreter::memory->SFB));        // offset
+		(*((void **)(code+16))) = (void *)(((char *)((Variable *)(args[1]))->getVarAddress()) - ((char *)Interpreter::memory->SFB));        // offset
 		(*((void **)(code+26))) = JITBuiltInRoutines::printFile;
 		return code_len;
 	}
@@ -553,7 +614,7 @@ int JITCompiler::gen_invoke(char *code, Variable *name, const vector<Argument *>
 								  "\x83\xC4\x04";		//add esp, 4	; pop functions arguments from println
 		memcpy(code, precompiled, code_len);
 		(*((void **)(code+1))) = &(Interpreter::memory->SFB);
-		(*((void **)(code+6))) = (void *)(((char *)((Variable *)(args[1]))->getAddress()) - ((char *)Interpreter::memory->SFB));        // offset
+		(*((void **)(code+6))) = (void *)(((char *)((Variable *)(args[1]))->getVarAddress()) - ((char *)Interpreter::memory->SFB));        // offset
 		(*((void **)(code+16))) = JITBuiltInRoutines::println;
 		return code_len;
 	}
@@ -570,7 +631,7 @@ int JITCompiler::gen_invoke(char *code, Variable *name, const vector<Argument *>
 								  "\x83\xC4\x04";		//add esp, 4	; pop functions arguments from print
 		memcpy(code, precompiled, code_len);
 		(*((void **)(code+1))) = &(Interpreter::memory->SFB);
-		(*((void **)(code+6))) = (void *)(((char *)((Variable *)(args[1]))->getAddress()) - ((char *)Interpreter::memory->SFB));        // offset
+		(*((void **)(code+6))) = (void *)(((char *)((Variable *)(args[1]))->getVarAddress()) - ((char *)Interpreter::memory->SFB));        // offset
 		(*((void **)(code+16))) = JITBuiltInRoutines::print;
 		return code_len;
 	}
@@ -594,7 +655,7 @@ int JITCompiler::gen_invoke(char *code, Variable *name, const vector<Argument *>
 								  "\x83\xC4\x10";		//add esp, 16	; pop functions arguments from both inputFile and pushStrVal
 		memcpy(code, precompiled, code_len);
 		(*((void **)(code+1))) = &(Interpreter::memory->SFB);
-		(*((void **)(code+6))) = (void *)(((char *)((Variable *)(args[2]))->getAddress()) - ((char *)Interpreter::memory->SFB));        // offset
+		(*((void **)(code+6))) = (void *)(((char *)((Variable *)(args[2]))->getVarAddress()) - ((char *)Interpreter::memory->SFB));        // offset
 		(*((void **)(code+16))) = Interpreter::memory;
 		(*((void **)(code+7))) = ((Variable *)(args[1]))->getValue();
 		(*((void **)(code+22))) = JITBuiltInRoutines::inputFile;
@@ -637,7 +698,7 @@ int JITCompiler::gen_invoke(char *code, Variable *name, const vector<Argument *>
 								  "\x83\xC4\x0C";		//add esp, 12	; pop functions arguments from both eof and pushBoolVal
 		memcpy(code, precompiled, code_len);
 		(*((void **)(code+1))) = &(Interpreter::memory->SFB);
-		(*((void **)(code+6))) = (void *)(((char *)((Variable *)(args[1]))->getAddress()) - ((char *)Interpreter::memory->SFB));        // offset
+		(*((void **)(code+6))) = (void *)(((char *)((Variable *)(args[1]))->getVarAddress()) - ((char *)Interpreter::memory->SFB));        // offset
 		(*((void **)(code+16))) = JITBuiltInRoutines::eof;
 		(*((void **)(code+30))) = pushBoolVal;
 		return code_len;
@@ -683,8 +744,8 @@ int JITCompiler::gen_invoke(char *code, Variable *name, const vector<Argument *>
 								  "\x83\xC4\x1C";		//add esp, 28	; pop functions arguments from both pow and pushDblVal
 		memcpy(code, precompiled, code_len);
 		(*((void **)(code+1))) = &(Interpreter::memory->SFB);
-		(*((void **)(code+6))) = (void *)(((char *)((Variable *)(args[2]))->getAddress()) - ((char *)Interpreter::memory->SFB));        // offset
-		(*((void **)(code+21))) = (void *)(((char *)((Variable *)(args[1]))->getAddress()) - ((char *)Interpreter::memory->SFB));        // offset
+		(*((void **)(code+6))) = (void *)(((char *)((Variable *)(args[2]))->getVarAddress()) - ((char *)Interpreter::memory->SFB));        // offset
+		(*((void **)(code+21))) = (void *)(((char *)((Variable *)(args[1]))->getVarAddress()) - ((char *)Interpreter::memory->SFB));        // offset
 		(*((void **)(code+36))) = JITBuiltInRoutines::pow;
 		(*((void **)(code+55))) = pushDblVal;
 		return code_len;
@@ -709,7 +770,7 @@ int JITCompiler::gen_invoke(char *code, Variable *name, const vector<Argument *>
 								  "\x83\xC4\x14";		//add esp, 20	; pop functions arguments from both sqrt and pushDblVal
 		memcpy(code, precompiled, code_len);
 		(*((void **)(code+1))) = &(Interpreter::memory->SFB);
-		(*((void **)(code+6))) = (void *)(((char *)((Variable *)(args[1]))->getAddress()) - ((char *)Interpreter::memory->SFB));        // offset
+		(*((void **)(code+6))) = (void *)(((char *)((Variable *)(args[1]))->getVarAddress()) - ((char *)Interpreter::memory->SFB));        // offset
 		(*((void **)(code+21))) = JITBuiltInRoutines::sqrt;
 		(*((void **)(code+40))) = pushDblVal;
 		return code_len;
@@ -734,7 +795,7 @@ int JITCompiler::gen_invoke(char *code, Variable *name, const vector<Argument *>
 								  "\x83\xC4\x14";		//add esp, 20	; pop functions arguments from both log and pushDblVal
 		memcpy(code, precompiled, code_len);
 		(*((void **)(code+1))) = &(Interpreter::memory->SFB);
-		(*((void **)(code+6))) = (void *)(((char *)((Variable *)(args[1]))->getAddress()) - ((char *)Interpreter::memory->SFB));        // offset
+		(*((void **)(code+6))) = (void *)(((char *)((Variable *)(args[1]))->getVarAddress()) - ((char *)Interpreter::memory->SFB));        // offset
 		(*((void **)(code+21))) = JITBuiltInRoutines::log;
 		(*((void **)(code+40))) = pushDblVal;
 		return code_len;
@@ -757,7 +818,7 @@ int JITCompiler::gen_invoke(char *code, Variable *name, const vector<Argument *>
 								  "\x83\xC4\x0C";		//add esp, 12	; pop functions arguments from both rand and pushIntVal
 		memcpy(code, precompiled, code_len);
 		(*((void **)(code+1))) = &(Interpreter::memory->SFB);
-		(*((void **)(code+6))) = (void *)(((char *)((Variable *)(args[1]))->getAddress()) - ((char *)Interpreter::memory->SFB));        // offset
+		(*((void **)(code+6))) = (void *)(((char *)((Variable *)(args[1]))->getVarAddress()) - ((char *)Interpreter::memory->SFB));        // offset
 		(*((void **)(code+16))) = JITBuiltInRoutines::rand;
 		(*((void **)(code+30))) = pushIntVal;
 		return code_len;
@@ -913,8 +974,8 @@ int JITCompiler::gen_invoke(char *code, Variable *name, const vector<Argument *>
 								  "\x83\xC4\x10";		//add esp, 16	; pop functions arguments from both startsWith and pushBoolVal
 		memcpy(code, precompiled, code_len);
 		(*((void **)(code+1))) = &(Interpreter::memory->SFB);
-		(*((void **)(code+6))) = (void *)(((char *)((Variable *)(args[2]))->getAddress()) - ((char *)Interpreter::memory->SFB));        // offset
-		(*((void **)(code+16))) = (void *)(((char *)((Variable *)(args[1]))->getAddress()) - ((char *)Interpreter::memory->SFB));        // offset
+		(*((void **)(code+6))) = (void *)(((char *)((Variable *)(args[2]))->getVarAddress()) - ((char *)Interpreter::memory->SFB));        // offset
+		(*((void **)(code+16))) = (void *)(((char *)((Variable *)(args[1]))->getVarAddress()) - ((char *)Interpreter::memory->SFB));        // offset
 		(*((void **)(code+26))) = JITBuiltInRoutines::startsWith;
 		(*((void **)(code+40))) = pushBoolVal;
 		return code_len;
@@ -941,8 +1002,8 @@ int JITCompiler::gen_invoke(char *code, Variable *name, const vector<Argument *>
 								  "\x83\xC4\x10";		//add esp, 16	; pop functions arguments from both endsWith and pushBoolVal
 		memcpy(code, precompiled, code_len);
 		(*((void **)(code+1))) = &(Interpreter::memory->SFB);
-		(*((void **)(code+6))) = (void *)(((char *)((Variable *)(args[2]))->getAddress()) - ((char *)Interpreter::memory->SFB));        // offset
-		(*((void **)(code+16))) = (void *)(((char *)((Variable *)(args[1]))->getAddress()) - ((char *)Interpreter::memory->SFB));        // offset
+		(*((void **)(code+6))) = (void *)(((char *)((Variable *)(args[2]))->getVarAddress()) - ((char *)Interpreter::memory->SFB));        // offset
+		(*((void **)(code+16))) = (void *)(((char *)((Variable *)(args[1]))->getVarAddress()) - ((char *)Interpreter::memory->SFB));        // offset
 		(*((void **)(code+26))) = JITBuiltInRoutines::endsWith;
 		(*((void **)(code+40))) = pushBoolVal;
 		return code_len;
@@ -971,8 +1032,8 @@ int JITCompiler::gen_invoke(char *code, Variable *name, const vector<Argument *>
 								  "\x83\xC4\x14";		//add esp, 20	; pop functions arguments from both concat and pushStrVal
 		memcpy(code, precompiled, code_len);
 		(*((void **)(code+1))) = &(Interpreter::memory->SFB);
-		(*((void **)(code+6))) = (void *)(((char *)((Variable *)(args[2]))->getAddress()) - ((char *)Interpreter::memory->SFB));        // offset
-		(*((void **)(code+16))) = (void *)(((char *)((Variable *)(args[1]))->getAddress()) - ((char *)Interpreter::memory->SFB));        // offset
+		(*((void **)(code+6))) = (void *)(((char *)((Variable *)(args[2]))->getVarAddress()) - ((char *)Interpreter::memory->SFB));        // offset
+		(*((void **)(code+16))) = (void *)(((char *)((Variable *)(args[1]))->getVarAddress()) - ((char *)Interpreter::memory->SFB));        // offset
 		(*((void **)(code+26))) = Interpreter::memory;
 		(*((void **)(code+32))) = JITBuiltInRoutines::concat;
 		(*((void **)(code+46))) = pushStrVal;
@@ -996,7 +1057,7 @@ int JITCompiler::gen_invoke(char *code, Variable *name, const vector<Argument *>
 								  "\x83\xC4\x0C";		//add esp, 12	; pop functions arguments from both strlen and pushIntVal
 		memcpy(code, precompiled, code_len);
 		(*((void **)(code+1))) = &(Interpreter::memory->SFB);
-		(*((void **)(code+6))) = (void *)(((char *)((Variable *)(args[1]))->getAddress()) - ((char *)Interpreter::memory->SFB));        // offset
+		(*((void **)(code+6))) = (void *)(((char *)((Variable *)(args[1]))->getVarAddress()) - ((char *)Interpreter::memory->SFB));        // offset
 		(*((void **)(code+16))) = JITBuiltInRoutines::strlen;
 		(*((void **)(code+30))) = pushIntVal;
 		return code_len;
@@ -1020,7 +1081,7 @@ int JITCompiler::gen_invoke(char *code, Variable *name, const vector<Argument *>
 								  "\xFF\xD0"			//call eax		; pushVal(val, type);
 								  "\x83\xC4\x10";		//add esp, 16	; pop functions arguments from both int2str and pushStrVal
 		memcpy(code, precompiled, code_len);
-		(*((void **)(code+1))) = (void *)(((char *)((Variable *)(args[1]))->getAddress()) - ((char *)Interpreter::memory->SFB));	// offset
+		(*((void **)(code+1))) = (void *)(((char *)((Variable *)(args[1]))->getVarAddress()) - ((char *)Interpreter::memory->SFB));	// offset
 		(*((void **)(code+6))) = &(Interpreter::memory->SFB);
 		(*((void **)(code+16))) = Interpreter::memory;
 		(*((void **)(code+22))) = JITBuiltInRoutines::int2str;
@@ -1047,7 +1108,7 @@ int JITCompiler::gen_invoke(char *code, Variable *name, const vector<Argument *>
 								  "\xFF\xD0"			//call eax		; pushVal(val, type);
 								  "\x83\xC4\x14";		//add esp, 20	; pop functions arguments from both double2str and pushStrVal
 		memcpy(code, precompiled, code_len);
-		(*((void **)(code+1))) = (void *)(((char *)((Variable *)(args[1]))->getAddress()) - ((char *)Interpreter::memory->SFB));	// offset
+		(*((void **)(code+1))) = (void *)(((char *)((Variable *)(args[1]))->getVarAddress()) - ((char *)Interpreter::memory->SFB));	// offset
 		(*((void **)(code+6))) = &(Interpreter::memory->SFB);
 		(*((void **)(code+21))) = Interpreter::memory;
 		(*((void **)(code+27))) = JITBuiltInRoutines::double2str;
@@ -1071,7 +1132,7 @@ int JITCompiler::gen_invoke(char *code, Variable *name, const vector<Argument *>
 								  "\xFF\xD0"			//call eax		; pushVal(val, type);
 								  "\x83\xC4\x0C";		//add esp, 12	; pop functions arguments from both str2int and pushIntVal
 		memcpy(code, precompiled, code_len);
-		(*((void **)(code+1))) = (void *)(((char *)((Variable *)(args[1]))->getAddress()) - ((char *)Interpreter::memory->SFB));        // offset
+		(*((void **)(code+1))) = (void *)(((char *)((Variable *)(args[1]))->getVarAddress()) - ((char *)Interpreter::memory->SFB));        // offset
 		(*((void **)(code+6))) = &(Interpreter::memory->SFB);
 		(*((void **)(code+16))) = JITBuiltInRoutines::str2int;
 		(*((void **)(code+30))) = pushIntVal;
@@ -1095,7 +1156,7 @@ int JITCompiler::gen_invoke(char *code, Variable *name, const vector<Argument *>
 								  "\xFF\xD0"			//call eax		; pushVal(val, type);
 								  "\x83\xC4\x10";		//add esp, 16	; pop functions arguments from both double2int and pushIntVal
 		memcpy(code, precompiled, code_len);
-		(*((void **)(code+1))) = (void *)(((char *)((Variable *)(args[1]))->getAddress()) - ((char *)Interpreter::memory->SFB));        // offset
+		(*((void **)(code+1))) = (void *)(((char *)((Variable *)(args[1]))->getVarAddress()) - ((char *)Interpreter::memory->SFB));        // offset
 		(*((void **)(code+6))) = &(Interpreter::memory->SFB);
 		(*((void **)(code+21))) = JITBuiltInRoutines::double2int;
 		(*((void **)(code+35))) = pushIntVal;
@@ -1119,7 +1180,7 @@ int JITCompiler::gen_invoke(char *code, Variable *name, const vector<Argument *>
 								  "\xFF\xD0"			//call eax		; pushVal(val, type);
 								  "\x83\xC4\x10";		//add esp, 16	; pop functions arguments from both str2double and pushDblVal
 		memcpy(code, precompiled, code_len);
-		(*((void **)(code+1))) = (void *)(((char *)((Variable *)(args[1]))->getAddress()) - ((char *)Interpreter::memory->SFB));        // offset
+		(*((void **)(code+1))) = (void *)(((char *)((Variable *)(args[1]))->getVarAddress()) - ((char *)Interpreter::memory->SFB));        // offset
 		(*((void **)(code+6))) = &(Interpreter::memory->SFB);
 		(*((void **)(code+16))) = JITBuiltInRoutines::str2double;
 		(*((void **)(code+35))) = pushDblVal;
@@ -1143,7 +1204,7 @@ int JITCompiler::gen_invoke(char *code, Variable *name, const vector<Argument *>
 								  "\xFF\xD0"			//call eax		; pushDblVal(val, type);
 								  "\x83\xC4\x10";		//add esp, 16	; pop functions arguments from both int2double and pushDblVal
 		memcpy(code, precompiled, code_len);
-		(*((void **)(code+1))) = (void *)(((char *)((Variable *)(args[1]))->getAddress()) - ((char *)Interpreter::memory->SFB));	// offset
+		(*((void **)(code+1))) = (void *)(((char *)((Variable *)(args[1]))->getVarAddress()) - ((char *)Interpreter::memory->SFB));	// offset
 		(*((void **)(code+6))) = &(Interpreter::memory->SFB);
 		(*((void **)(code+16))) = JITBuiltInRoutines::int2double;
 		(*((void **)(code+35))) = pushDblVal;
@@ -1210,8 +1271,8 @@ int JITCompiler::gen_st(char *code, Variable *dest, Variable *src)
 								  "\xDD\x1B";	//fstp qword ptr [ebx]
 		memcpy(code, precompiled, code_len);
 		(*((void **)(code+1))) = &(Interpreter::memory->SFB);
-		(*((void **)(code+6))) = (void *)(((char *)(src->getAddress())) - ((char *)Interpreter::memory->SFB));  // offset
-		(*((void **)(code+15))) = (void *)(((char *)(dest->getAddress())) - ((char *)Interpreter::memory->SFB));  // offset
+		(*((void **)(code+6))) = (void *)(((char *)(src->getVarAddress())) - ((char *)Interpreter::memory->SFB));  // offset
+		(*((void **)(code+15))) = (void *)(((char *)(dest->getVarAddress())) - ((char *)Interpreter::memory->SFB));  // offset
 		return code_len;
 	}
 	else if(src->getItemType() == DataType::BOOLEAN)	// 1B, ALU
@@ -1226,25 +1287,50 @@ int JITCompiler::gen_st(char *code, Variable *dest, Variable *src)
 								  "\x88\x03";	//mov byte ptr [ebx], al
 		memcpy(code, precompiled, code_len);
 		(*((void **)(code+1))) = &(Interpreter::memory->SFB);
-		(*((void **)(code+6))) = (void *)(((char *)(src->getAddress())) - ((char *)Interpreter::memory->SFB));  // offset
-		(*((void **)(code+15))) = (void *)(((char *)(dest->getAddress())) - ((char *)Interpreter::memory->SFB));  // offset
+		(*((void **)(code+6))) = (void *)(((char *)(src->getVarAddress())) - ((char *)Interpreter::memory->SFB));  // offset
+		(*((void **)(code+15))) = (void *)(((char *)(dest->getVarAddress())) - ((char *)Interpreter::memory->SFB));  // offset
 		return code_len;
 	}
 	else	// INTEGER, REFERENCE, ARRAY, STRUCTURE, STRING -- 4B, ALU
 	{
+		int len = 0;
+		const int code_len = 6;
+		const char *precompiled =	"\x58"		//pop eax	; src
+									"\x8B\x00"	//mov eax, dword ptr [eax]
+									"\x5B"		//pop ebx	; dest
+									"\x89\x03";	//mov [ebx], eax
+		//
+		len += gen_operand(code+len, dest, true);
+		len += gen_operand(code+len, src, false);
+		memcpy(code+len, precompiled, code_len);
+		return len+code_len;
+/*
 		const int code_len = 23;
 		const char *precompiled = "\xB9????"	//mov ecx, address(SFB)
 								  "\xB8????"	//mov eax, offset(src)
 								  "\x03\x01"	//add eax, [ecx]  ; absolute address of src
+						// SEM VLOZIT TEN KOD PRO ZISKANI PRVKU
 								  "\x8B\x00"	//mov eax, dword ptr [eax]
 								  "\xBB????"	//mov ebx, offset(dest)
 								  "\x03\x19"	//add ebx, [ecx]  ; absolute address of dest
+						// SEM VLOZIT TEN KOD PRO ZISKANI PRVKU
 								  "\x89\x03";	//mov [ebx], eax
-		memcpy(code, precompiled, code_len);
-		(*((void **)(code+1))) = &(Interpreter::memory->SFB);
-		(*((void **)(code+6))) = (void *)(((char *)(src->getAddress())) - ((char *)Interpreter::memory->SFB));  // offset
-		(*((void **)(code+15))) = (void *)(((char *)(dest->getAddress())) - ((char *)Interpreter::memory->SFB));  // offset
-		return code_len;
+		//
+		int len = 0;
+		memcpy(code+len, precompiled, 12);
+		(*((void **)(code+len+1))) = &(Interpreter::memory->SFB);
+		(*((void **)(code+len+6))) = (void *)(((char *)(src->getVarAddress())) - ((char *)Interpreter::memory->SFB));  // offset
+		len += 12;
+		len += gen_address(code+len, Register::EAX, src);
+		memcpy(code+len, precompiled+12, 9);
+		(*((void **)(code+len+3))) = (void *)(((char *)(dest->getVarAddress())) - ((char *)Interpreter::memory->SFB));  // offset
+		len += 9;
+		len += gen_address(code+len, Register::EBX, dest);
+		memcpy(code+len, precompiled+21, 2);
+		len += 2;
+		//
+		//return len;
+*/
 	}
 }
 
@@ -1267,7 +1353,7 @@ int JITCompiler::gen_ldzf_alu(char *code, Variable *dest)
 							  "\x88\x18";			//mov byte ptr [eax], bl
 	memcpy(code, precompiled, code_len);
 	(*((void **)(code+16))) = &(Interpreter::memory->SFB);
-	(*((void **)(code+21))) = (void *)(((char *)(dest->getAddress())) - ((char *)Interpreter::memory->SFB));  // offset
+	(*((void **)(code+21))) = (void *)(((char *)(dest->getVarAddress())) - ((char *)Interpreter::memory->SFB));  // offset
 	return code_len;
 }
 
@@ -1301,9 +1387,9 @@ int JITCompiler::gen_add(char *code, Variable *dest, const Variable *op1, const 
 								  "\x89\x18";	//mov [eax], ebx
 		memcpy(code, precompiled, code_len);
 		(*((void **)(code+1))) = &(Interpreter::memory->SFB);
-        (*((void **)(code+6))) = (void *)(((char *)(op1->getAddress())) - ((char *)Interpreter::memory->SFB));  // offset
-        (*((void **)(code+15))) = (void *)(((char *)(op2->getAddress())) - ((char *)Interpreter::memory->SFB)); // offset
-        (*((void **)(code+26))) = (void *)(((char *)(dest->getAddress())) - ((char *)Interpreter::memory->SFB));        // offset
+        (*((void **)(code+6))) = (void *)(((char *)(op1->getVarAddress())) - ((char *)Interpreter::memory->SFB));  // offset
+        (*((void **)(code+15))) = (void *)(((char *)(op2->getVarAddress())) - ((char *)Interpreter::memory->SFB)); // offset
+        (*((void **)(code+26))) = (void *)(((char *)(dest->getVarAddress())) - ((char *)Interpreter::memory->SFB));        // offset
 		return code_len;
 	}
 	else if(op1->getItemType() == DataType::DOUBLE)
@@ -1322,9 +1408,9 @@ int JITCompiler::gen_add(char *code, Variable *dest, const Variable *op1, const 
 								  "\xDD\x18";	//fstp qword ptr [eax]
 		memcpy(code, precompiled, code_len);
 		(*((void **)(code+1))) = &(Interpreter::memory->SFB);
-        (*((void **)(code+6))) = (void *)(((char *)(op1->getAddress())) - ((char *)Interpreter::memory->SFB));  // offset
-        (*((void **)(code+15))) = (void *)(((char *)(op2->getAddress())) - ((char *)Interpreter::memory->SFB)); // offset
-        (*((void **)(code+26))) = (void *)(((char *)(dest->getAddress())) - ((char *)Interpreter::memory->SFB));        // offset
+        (*((void **)(code+6))) = (void *)(((char *)(op1->getVarAddress())) - ((char *)Interpreter::memory->SFB));  // offset
+        (*((void **)(code+15))) = (void *)(((char *)(op2->getVarAddress())) - ((char *)Interpreter::memory->SFB)); // offset
+        (*((void **)(code+26))) = (void *)(((char *)(dest->getVarAddress())) - ((char *)Interpreter::memory->SFB));        // offset
 		return code_len;
 	}
 	else
@@ -1349,9 +1435,9 @@ int JITCompiler::gen_sub(char *code, Variable *dest, const Variable *op1, const 
 								  "\x89\x03";	//mov [ebx], eax
 		memcpy(code, precompiled, code_len);
 		(*((void **)(code+1))) = &(Interpreter::memory->SFB);
-		(*((void **)(code+6))) = (void *)(((char *)(op1->getAddress())) - ((char *)Interpreter::memory->SFB));	// offset
-		(*((void **)(code+15))) = (void *)(((char *)(op2->getAddress())) - ((char *)Interpreter::memory->SFB));	// offset
-		(*((void **)(code+26))) = (void *)(((char *)(dest->getAddress())) - ((char *)Interpreter::memory->SFB));	// offset
+		(*((void **)(code+6))) = (void *)(((char *)(op1->getVarAddress())) - ((char *)Interpreter::memory->SFB));	// offset
+		(*((void **)(code+15))) = (void *)(((char *)(op2->getVarAddress())) - ((char *)Interpreter::memory->SFB));	// offset
+		(*((void **)(code+26))) = (void *)(((char *)(dest->getVarAddress())) - ((char *)Interpreter::memory->SFB));	// offset
 		return code_len;
 	}
 	else if(op1->getItemType() == DataType::DOUBLE)
@@ -1370,9 +1456,9 @@ int JITCompiler::gen_sub(char *code, Variable *dest, const Variable *op1, const 
 								  "\xDD\x18";	//fstp qword ptr [eax]
 		memcpy(code, precompiled, code_len);
 		(*((void **)(code+1))) = &(Interpreter::memory->SFB);
-		(*((void **)(code+6))) = (void *)(((char *)(op1->getAddress())) - ((char *)Interpreter::memory->SFB));	// offset
-		(*((void **)(code+15))) = (void *)(((char *)(op2->getAddress())) - ((char *)Interpreter::memory->SFB));	// offset
-		(*((void **)(code+26))) = (void *)(((char *)(dest->getAddress())) - ((char *)Interpreter::memory->SFB));	// offset
+		(*((void **)(code+6))) = (void *)(((char *)(op1->getVarAddress())) - ((char *)Interpreter::memory->SFB));	// offset
+		(*((void **)(code+15))) = (void *)(((char *)(op2->getVarAddress())) - ((char *)Interpreter::memory->SFB));	// offset
+		(*((void **)(code+26))) = (void *)(((char *)(dest->getVarAddress())) - ((char *)Interpreter::memory->SFB));	// offset
 		return code_len;
 	}
 	else
@@ -1397,9 +1483,9 @@ int JITCompiler::gen_mul(char *code, Variable *dest, const Variable *op1, const 
 								  "\x89\x03";	//mov [ebx], eax
 		memcpy(code, precompiled, code_len);
 		(*((void **)(code+1))) = &(Interpreter::memory->SFB);
-		(*((void **)(code+6))) = (void *)(((char *)(op1->getAddress())) - ((char *)Interpreter::memory->SFB));	// offset
-		(*((void **)(code+15))) = (void *)(((char *)(op2->getAddress())) - ((char *)Interpreter::memory->SFB));	// offset
-		(*((void **)(code+26))) = (void *)(((char *)(dest->getAddress())) - ((char *)Interpreter::memory->SFB));	// offset
+		(*((void **)(code+6))) = (void *)(((char *)(op1->getVarAddress())) - ((char *)Interpreter::memory->SFB));	// offset
+		(*((void **)(code+15))) = (void *)(((char *)(op2->getVarAddress())) - ((char *)Interpreter::memory->SFB));	// offset
+		(*((void **)(code+26))) = (void *)(((char *)(dest->getVarAddress())) - ((char *)Interpreter::memory->SFB));	// offset
 		return code_len;
 	}
 	else if(op1->getItemType() == DataType::DOUBLE)
@@ -1418,9 +1504,9 @@ int JITCompiler::gen_mul(char *code, Variable *dest, const Variable *op1, const 
 								  "\xDD\x18";	//fstp qword ptr [eax]
 		memcpy(code, precompiled, code_len);
 		(*((void **)(code+1))) = &(Interpreter::memory->SFB);
-		(*((void **)(code+6))) = (void *)(((char *)(op1->getAddress())) - ((char *)Interpreter::memory->SFB));	// offset
-		(*((void **)(code+15))) = (void *)(((char *)(op2->getAddress())) - ((char *)Interpreter::memory->SFB));	// offset
-		(*((void **)(code+26))) = (void *)(((char *)(dest->getAddress())) - ((char *)Interpreter::memory->SFB));	// offset
+		(*((void **)(code+6))) = (void *)(((char *)(op1->getVarAddress())) - ((char *)Interpreter::memory->SFB));	// offset
+		(*((void **)(code+15))) = (void *)(((char *)(op2->getVarAddress())) - ((char *)Interpreter::memory->SFB));	// offset
+		(*((void **)(code+26))) = (void *)(((char *)(dest->getVarAddress())) - ((char *)Interpreter::memory->SFB));	// offset
 		return code_len;
 	}
 	else
@@ -1450,10 +1536,10 @@ int JITCompiler::gen_div(char *code, Variable *dest, const Variable *op1, const 
 								  "\x89\x03";	//			mov [ebx], eax
 		memcpy(code, precompiled, code_len);
 		(*((void **)(code+1))) = &(Interpreter::memory->SFB);
-		(*((void **)(code+6))) = (void *)(((char *)(op2->getAddress())) - ((char *)Interpreter::memory->SFB));	// offset
+		(*((void **)(code+6))) = (void *)(((char *)(op2->getVarAddress())) - ((char *)Interpreter::memory->SFB));	// offset
 		(*((void **)(code+20))) = divByZeroEx;
-		(*((void **)(code+27))) = (void *)(((char *)(op1->getAddress())) - ((char *)Interpreter::memory->SFB));	// offset
-		(*((void **)(code+40))) = (void *)(((char *)(dest->getAddress())) - ((char *)Interpreter::memory->SFB));	// offset
+		(*((void **)(code+27))) = (void *)(((char *)(op1->getVarAddress())) - ((char *)Interpreter::memory->SFB));	// offset
+		(*((void **)(code+40))) = (void *)(((char *)(dest->getVarAddress())) - ((char *)Interpreter::memory->SFB));	// offset
 		return code_len;
 	}
 	else if(op1->getItemType() == DataType::DOUBLE)
@@ -1472,9 +1558,9 @@ int JITCompiler::gen_div(char *code, Variable *dest, const Variable *op1, const 
 								  "\xDD\x18";	//fstp qword ptr [eax]
 		memcpy(code, precompiled, code_len);
 		(*((void **)(code+1))) = &(Interpreter::memory->SFB);
-		(*((void **)(code+6))) = (void *)(((char *)(op1->getAddress())) - ((char *)Interpreter::memory->SFB));	// offset
-		(*((void **)(code+15))) = (void *)(((char *)(op2->getAddress())) - ((char *)Interpreter::memory->SFB));	// offset
-		(*((void **)(code+26))) = (void *)(((char *)(dest->getAddress())) - ((char *)Interpreter::memory->SFB));	// offset
+		(*((void **)(code+6))) = (void *)(((char *)(op1->getVarAddress())) - ((char *)Interpreter::memory->SFB));	// offset
+		(*((void **)(code+15))) = (void *)(((char *)(op2->getVarAddress())) - ((char *)Interpreter::memory->SFB));	// offset
+		(*((void **)(code+26))) = (void *)(((char *)(dest->getVarAddress())) - ((char *)Interpreter::memory->SFB));	// offset
 		return code_len;
 	}
 	else
@@ -1504,10 +1590,10 @@ int JITCompiler::gen_mod(char *code, Variable *dest, const Variable *op1, const 
 								  "\x89\x13";	//			mov [ebx], edx
 		memcpy(code, precompiled, code_len);
 		(*((void **)(code+1))) = &(Interpreter::memory->SFB);
-		(*((void **)(code+6))) = (void *)(((char *)(op2->getAddress())) - ((char *)Interpreter::memory->SFB));	// offset
+		(*((void **)(code+6))) = (void *)(((char *)(op2->getVarAddress())) - ((char *)Interpreter::memory->SFB));	// offset
 		(*((void **)(code+20))) = divByZeroEx;
-		(*((void **)(code+27))) = (void *)(((char *)(op1->getAddress())) - ((char *)Interpreter::memory->SFB));	// offset
-		(*((void **)(code+40))) = (void *)(((char *)(dest->getAddress())) - ((char *)Interpreter::memory->SFB));	// offset
+		(*((void **)(code+27))) = (void *)(((char *)(op1->getVarAddress())) - ((char *)Interpreter::memory->SFB));	// offset
+		(*((void **)(code+40))) = (void *)(((char *)(dest->getVarAddress())) - ((char *)Interpreter::memory->SFB));	// offset
 		return code_len;
 	}
 	else
@@ -1532,9 +1618,9 @@ int JITCompiler::gen_and(char *code, Variable *dest, const Variable *op1, const 
 								  "\x89\x03";	//mov [ebx], eax
 		memcpy(code, precompiled, code_len);
 		(*((void **)(code+1))) = &(Interpreter::memory->SFB);
-		(*((void **)(code+6))) = (void *)(((char *)(op1->getAddress())) - ((char *)Interpreter::memory->SFB));	// offset
-		(*((void **)(code+15))) = (void *)(((char *)(op2->getAddress())) - ((char *)Interpreter::memory->SFB));	// offset
-		(*((void **)(code+26))) = (void *)(((char *)(dest->getAddress())) - ((char *)Interpreter::memory->SFB));	// offset
+		(*((void **)(code+6))) = (void *)(((char *)(op1->getVarAddress())) - ((char *)Interpreter::memory->SFB));	// offset
+		(*((void **)(code+15))) = (void *)(((char *)(op2->getVarAddress())) - ((char *)Interpreter::memory->SFB));	// offset
+		(*((void **)(code+26))) = (void *)(((char *)(dest->getVarAddress())) - ((char *)Interpreter::memory->SFB));	// offset
 		return code_len;
 	}
 	else if((op1->getItemType() == DataType::BOOLEAN))
@@ -1553,9 +1639,9 @@ int JITCompiler::gen_and(char *code, Variable *dest, const Variable *op1, const 
 								  "\x88\x03";	//mov byte ptr [ebx],al
 		memcpy(code, precompiled, code_len);
 		(*((void **)(code+1))) = &(Interpreter::memory->SFB);
-		(*((void **)(code+6))) = (void *)(((char *)(op1->getAddress())) - ((char *)Interpreter::memory->SFB));	// offset
-		(*((void **)(code+15))) = (void *)(((char *)(op2->getAddress())) - ((char *)Interpreter::memory->SFB));	// offset
-		(*((void **)(code+26))) = (void *)(((char *)(dest->getAddress())) - ((char *)Interpreter::memory->SFB));	// offset
+		(*((void **)(code+6))) = (void *)(((char *)(op1->getVarAddress())) - ((char *)Interpreter::memory->SFB));	// offset
+		(*((void **)(code+15))) = (void *)(((char *)(op2->getVarAddress())) - ((char *)Interpreter::memory->SFB));	// offset
+		(*((void **)(code+26))) = (void *)(((char *)(dest->getVarAddress())) - ((char *)Interpreter::memory->SFB));	// offset
 		return code_len;
 	}
 	else
@@ -1580,9 +1666,9 @@ int JITCompiler::gen_or(char *code, Variable *dest, const Variable *op1, const V
 								  "\x89\x03";	//mov [ebx], eax
 		memcpy(code, precompiled, code_len);
 		(*((void **)(code+1))) = &(Interpreter::memory->SFB);
-		(*((void **)(code+6))) = (void *)(((char *)(op1->getAddress())) - ((char *)Interpreter::memory->SFB));	// offset
-		(*((void **)(code+15))) = (void *)(((char *)(op2->getAddress())) - ((char *)Interpreter::memory->SFB));	// offset
-		(*((void **)(code+26))) = (void *)(((char *)(dest->getAddress())) - ((char *)Interpreter::memory->SFB));	// offset
+		(*((void **)(code+6))) = (void *)(((char *)(op1->getVarAddress())) - ((char *)Interpreter::memory->SFB));	// offset
+		(*((void **)(code+15))) = (void *)(((char *)(op2->getVarAddress())) - ((char *)Interpreter::memory->SFB));	// offset
+		(*((void **)(code+26))) = (void *)(((char *)(dest->getVarAddress())) - ((char *)Interpreter::memory->SFB));	// offset
 		return code_len;
 	}
 	else if((op1->getItemType() == DataType::BOOLEAN))
@@ -1601,9 +1687,9 @@ int JITCompiler::gen_or(char *code, Variable *dest, const Variable *op1, const V
 								  "\x88\x03";	//mov byte ptr [ebx],al
 		memcpy(code, precompiled, code_len);
 		(*((void **)(code+1))) = &(Interpreter::memory->SFB);
-		(*((void **)(code+6))) = (void *)(((char *)(op1->getAddress())) - ((char *)Interpreter::memory->SFB));	// offset
-		(*((void **)(code+15))) = (void *)(((char *)(op2->getAddress())) - ((char *)Interpreter::memory->SFB));	// offset
-		(*((void **)(code+26))) = (void *)(((char *)(dest->getAddress())) - ((char *)Interpreter::memory->SFB));	// offset
+		(*((void **)(code+6))) = (void *)(((char *)(op1->getVarAddress())) - ((char *)Interpreter::memory->SFB));	// offset
+		(*((void **)(code+15))) = (void *)(((char *)(op2->getVarAddress())) - ((char *)Interpreter::memory->SFB));	// offset
+		(*((void **)(code+26))) = (void *)(((char *)(dest->getVarAddress())) - ((char *)Interpreter::memory->SFB));	// offset
 		return code_len;
 	}
 	else
@@ -1628,9 +1714,9 @@ int JITCompiler::gen_xor(char *code, Variable *dest, const Variable *op1, const 
 								  "\x89\x03";	//mov [ebx], eax
 		memcpy(code, precompiled, code_len);
 		(*((void **)(code+1))) = &(Interpreter::memory->SFB);
-		(*((void **)(code+6))) = (void *)(((char *)(op1->getAddress())) - ((char *)Interpreter::memory->SFB));	// offset
-		(*((void **)(code+15))) = (void *)(((char *)(op2->getAddress())) - ((char *)Interpreter::memory->SFB));	// offset
-		(*((void **)(code+26))) = (void *)(((char *)(dest->getAddress())) - ((char *)Interpreter::memory->SFB));	// offset
+		(*((void **)(code+6))) = (void *)(((char *)(op1->getVarAddress())) - ((char *)Interpreter::memory->SFB));	// offset
+		(*((void **)(code+15))) = (void *)(((char *)(op2->getVarAddress())) - ((char *)Interpreter::memory->SFB));	// offset
+		(*((void **)(code+26))) = (void *)(((char *)(dest->getVarAddress())) - ((char *)Interpreter::memory->SFB));	// offset
 		return code_len;
 	}
 	else if((op1->getItemType() == DataType::BOOLEAN))
@@ -1649,9 +1735,9 @@ int JITCompiler::gen_xor(char *code, Variable *dest, const Variable *op1, const 
 								  "\x88\x03";	//mov byte ptr [ebx],al
 		memcpy(code, precompiled, code_len);
 		(*((void **)(code+1))) = &(Interpreter::memory->SFB);
-		(*((void **)(code+6))) = (void *)(((char *)(op1->getAddress())) - ((char *)Interpreter::memory->SFB));	// offset
-		(*((void **)(code+15))) = (void *)(((char *)(op2->getAddress())) - ((char *)Interpreter::memory->SFB));	// offset
-		(*((void **)(code+26))) = (void *)(((char *)(dest->getAddress())) - ((char *)Interpreter::memory->SFB));	// offset
+		(*((void **)(code+6))) = (void *)(((char *)(op1->getVarAddress())) - ((char *)Interpreter::memory->SFB));	// offset
+		(*((void **)(code+15))) = (void *)(((char *)(op2->getVarAddress())) - ((char *)Interpreter::memory->SFB));	// offset
+		(*((void **)(code+26))) = (void *)(((char *)(dest->getVarAddress())) - ((char *)Interpreter::memory->SFB));	// offset
 		return code_len;
 	}
 	else
@@ -1676,9 +1762,9 @@ int JITCompiler::gen_lsh(char *code, Variable *dest, const Variable *op1, const 
 								  "\x89\x03";	//mov [ebx], eax
 		memcpy(code, precompiled, code_len);
 		(*((void **)(code+1))) = &(Interpreter::memory->SFB);
-		(*((void **)(code+6))) = (void *)(((char *)(op1->getAddress())) - ((char *)Interpreter::memory->SFB));	// offset
-		(*((void **)(code+15))) = (void *)(((char *)(op2->getAddress())) - ((char *)Interpreter::memory->SFB));	// offset
-		(*((void **)(code+26))) = (void *)(((char *)(dest->getAddress())) - ((char *)Interpreter::memory->SFB));	// offset
+		(*((void **)(code+6))) = (void *)(((char *)(op1->getVarAddress())) - ((char *)Interpreter::memory->SFB));	// offset
+		(*((void **)(code+15))) = (void *)(((char *)(op2->getVarAddress())) - ((char *)Interpreter::memory->SFB));	// offset
+		(*((void **)(code+26))) = (void *)(((char *)(dest->getVarAddress())) - ((char *)Interpreter::memory->SFB));	// offset
 		return code_len;
 	}
 	else
@@ -1703,9 +1789,9 @@ int JITCompiler::gen_rsh(char *code, Variable *dest, const Variable *op1, const 
 								  "\x89\x03";	//mov [ebx], eax
 		memcpy(code, precompiled, code_len);
 		(*((void **)(code+1))) = &(Interpreter::memory->SFB);
-		(*((void **)(code+6))) = (void *)(((char *)(op1->getAddress())) - ((char *)Interpreter::memory->SFB));	// offset
-		(*((void **)(code+15))) = (void *)(((char *)(op2->getAddress())) - ((char *)Interpreter::memory->SFB));	// offset
-		(*((void **)(code+26))) = (void *)(((char *)(dest->getAddress())) - ((char *)Interpreter::memory->SFB));	// offset
+		(*((void **)(code+6))) = (void *)(((char *)(op1->getVarAddress())) - ((char *)Interpreter::memory->SFB));	// offset
+		(*((void **)(code+15))) = (void *)(((char *)(op2->getVarAddress())) - ((char *)Interpreter::memory->SFB));	// offset
+		(*((void **)(code+26))) = (void *)(((char *)(dest->getVarAddress())) - ((char *)Interpreter::memory->SFB));	// offset
 		return code_len;
 	}
 	else
@@ -1723,7 +1809,7 @@ int JITCompiler::gen_inc(char *code, Variable *var)
 								  "\xFF\x00";	//inc dword ptr [eax]
 		memcpy(code, precompiled, code_len);
 		(*((void **)(code+1))) = &(Interpreter::memory->SFB);
-		(*((void **)(code+6))) = (void *)(((char *)(var->getAddress())) - ((char *)Interpreter::memory->SFB));  // offset
+		(*((void **)(code+6))) = (void *)(((char *)(var->getVarAddress())) - ((char *)Interpreter::memory->SFB));  // offset
 		return code_len;
 	}
 	else
@@ -1741,7 +1827,7 @@ int JITCompiler::gen_dec(char *code, Variable *var)
 								  "\xFF\x08";	//dec dword ptr [eax]
 		memcpy(code, precompiled, code_len);
 		(*((void **)(code+1))) = &(Interpreter::memory->SFB);
-		(*((void **)(code+6))) = (void *)(((char *)(var->getAddress())) - ((char *)Interpreter::memory->SFB));  // offset
+		(*((void **)(code+6))) = (void *)(((char *)(var->getVarAddress())) - ((char *)Interpreter::memory->SFB));  // offset
 		return code_len;
 	}
 	else
@@ -1768,8 +1854,8 @@ int JITCompiler::gen_not(char *code, Variable *dest, const Variable *src)
 								  "\x88\x03";	//mov byte ptr [ebx], al
 		memcpy(code, precompiled, code_len);
 		(*((void **)(code+1))) = &(Interpreter::memory->SFB);
-		(*((void **)(code+6))) = (void *)(((char *)(src->getAddress())) - ((char *)Interpreter::memory->SFB));  // offset
-		(*((void **)(code+19))) = (void *)(((char *)(dest->getAddress())) - ((char *)Interpreter::memory->SFB));  // offset
+		(*((void **)(code+6))) = (void *)(((char *)(src->getVarAddress())) - ((char *)Interpreter::memory->SFB));  // offset
+		(*((void **)(code+19))) = (void *)(((char *)(dest->getVarAddress())) - ((char *)Interpreter::memory->SFB));  // offset
 		(*((void **)(code+30))) = pZF;
 		return code_len;
 	}
@@ -1792,8 +1878,8 @@ int JITCompiler::gen_neg(char *code, Variable *dest, const Variable *src)
 								  "\x89\x03";	//mov [ebx], eax
 		memcpy(code, precompiled, code_len);
 		(*((void **)(code+1))) = &(Interpreter::memory->SFB);
-		(*((void **)(code+6))) = (void *)(((char *)(src->getAddress())) - ((char *)Interpreter::memory->SFB));  // offset
-		(*((void **)(code+17))) = (void *)(((char *)(dest->getAddress())) - ((char *)Interpreter::memory->SFB));  // offset
+		(*((void **)(code+6))) = (void *)(((char *)(src->getVarAddress())) - ((char *)Interpreter::memory->SFB));  // offset
+		(*((void **)(code+17))) = (void *)(((char *)(dest->getVarAddress())) - ((char *)Interpreter::memory->SFB));  // offset
 		return code_len;
 	}
 	else if(src->getItemType() == DataType::BOOLEAN)
@@ -1817,8 +1903,8 @@ int JITCompiler::gen_minus(char *code, Variable *dest, const Variable *src)
 								  "\x89\x03";	//mov [ebx], eax
 		memcpy(code, precompiled, code_len);
 		(*((void **)(code+1))) = &(Interpreter::memory->SFB);
-		(*((void **)(code+6))) = (void *)(((char *)(src->getAddress())) - ((char *)Interpreter::memory->SFB));  // offset
-		(*((void **)(code+17))) = (void *)(((char *)(dest->getAddress())) - ((char *)Interpreter::memory->SFB));  // offset
+		(*((void **)(code+6))) = (void *)(((char *)(src->getVarAddress())) - ((char *)Interpreter::memory->SFB));  // offset
+		(*((void **)(code+17))) = (void *)(((char *)(dest->getVarAddress())) - ((char *)Interpreter::memory->SFB));  // offset
 		return code_len;
 	}
 	else if(src->getItemType() == DataType::DOUBLE)
@@ -1834,8 +1920,8 @@ int JITCompiler::gen_minus(char *code, Variable *dest, const Variable *src)
 								  "\xDD\x18";	//fstp qword ptr [eax]
 		memcpy(code, precompiled, code_len);
 		(*((void **)(code+1))) = &(Interpreter::memory->SFB);
-		(*((void **)(code+6))) = (void *)(((char *)(src->getAddress())) - ((char *)Interpreter::memory->SFB));  // offset
-		(*((void **)(code+17))) = (void *)(((char *)(dest->getAddress())) - ((char *)Interpreter::memory->SFB));  // offset
+		(*((void **)(code+6))) = (void *)(((char *)(src->getVarAddress())) - ((char *)Interpreter::memory->SFB));  // offset
+		(*((void **)(code+17))) = (void *)(((char *)(dest->getVarAddress())) - ((char *)Interpreter::memory->SFB));  // offset
 		return code_len;
 	}
 	else
@@ -1854,7 +1940,7 @@ int JITCompiler::gen_ldci(char *code, Variable *var, Integer *constant)
 							  "\x89\x18";	//mov [eax], ebx  
 	memcpy(code, precompiled, code_len);
 	(*((void **)(code+1))) = &(Interpreter::memory->SFB);
-	(*((void **)(code+6))) = (void *)((char *)(var->getAddress()) - ((char *)Interpreter::memory->SFB));	// offset
+	(*((void **)(code+6))) = (void *)((char *)(var->getVarAddress()) - ((char *)Interpreter::memory->SFB));	// offset
 	(*((int *)(code+13))) = constant->getValue();
 	return code_len;
 }
@@ -1869,7 +1955,7 @@ int JITCompiler::gen_ldcb(char *code, Variable *var, Boolean *constant)
 							  "\x88\x18";	//mov byte ptr [eax], bl
 	memcpy(code, precompiled, code_len);
 	(*((void **)(code+1))) = &(Interpreter::memory->SFB);
-    (*((void **)(code+6))) = (void *)((char *)(var->getAddress()) - ((char *)Interpreter::memory->SFB));    // offset
+    (*((void **)(code+6))) = (void *)((char *)(var->getVarAddress()) - ((char *)Interpreter::memory->SFB));    // offset
 	(*((bool *)(code+13))) = constant->getValue();
 	return code_len;
 }
@@ -1888,7 +1974,7 @@ int JITCompiler::gen_ldcr(char *code, Variable *var, Double *constant)
 							  "\xDD\x18";	//			fstp qword ptr [eax]
 	memcpy(code, precompiled, code_len);
 	(*((double *)(code+2))) = constant->getValue();
-    (*((void **)(code+11))) = (void *)((char *)(var->getAddress()) - ((char *)Interpreter::memory->SFB));    // offset
+    (*((void **)(code+11))) = (void *)((char *)(var->getVarAddress()) - ((char *)Interpreter::memory->SFB));    // offset
 	(*((void **)(code+16))) = &(Interpreter::memory->SFB);
 	(*((void **)(code+24))) = (code+2);
 	return code_len;
@@ -1924,7 +2010,7 @@ int JITCompiler::gen_ldcs(char *code, Variable *var, String *constant)
 	(*((char **)(code+29))) = constant->getValue();
 	(*((void **)(code+36))) = strcpy;
 	(*((void **)(code+46))) = &(Interpreter::memory->SFB);
-    (*((void **)(code+51))) = (void *)((char *)(var->getAddress()) - ((char *)Interpreter::memory->SFB));    // offset
+    (*((void **)(code+51))) = (void *)((char *)(var->getVarAddress()) - ((char *)Interpreter::memory->SFB));    // offset
 	return code_len;
 }
 
@@ -1962,10 +2048,10 @@ int JITCompiler::gen_new(char *code, Variable *var, const Variable *size)
 		memcpy(code, precompiled, code_len);
 		(*((int *)(code+1))) = var->getItemTypeSize();
 		(*((void **)(code+6))) = &(Interpreter::memory->SFB);
-		(*((void **)(code+11))) = (void *)(((char *)(size->getAddress())) - ((char *)Interpreter::memory->SFB));        // offset
+		(*((void **)(code+11))) = (void *)(((char *)(size->getVarAddress())) - ((char *)Interpreter::memory->SFB));        // offset
 		(*((void **)(code+26))) = heapAlloc;
 		(*((void **)(code+36))) = &(Interpreter::memory->SFB);
-		(*((void **)(code+41))) = (void *)(((char *)(var->getAddress())) - ((char *)Interpreter::memory->SFB));        // offset
+		(*((void **)(code+41))) = (void *)(((char *)(var->getVarAddress())) - ((char *)Interpreter::memory->SFB));        // offset
 		(*((int *)(code+52))) = var->getItemDataType()->subtype->type;
 		return code_len;
 	}
@@ -1976,7 +2062,7 @@ int JITCompiler::gen_new(char *code, Variable *var, const Variable *size)
 								  "\x50"			//push eax
 								  "\xB8????"		//mov eax, address(heapAlloc)
 								  "\xFF\xD0"		//call eax
-								  "\x83\xC6\x04"	//add esi, 4	; pop function argument
+								  "\x83\xC4\x04"	//add esp, 4	; pop function argument
 								  "\xBA????"		//mov edx, address(SFB)
 								  "\xBB????"		//mov ebx, offset(var)
 								  "\x03\x1A"		//add ebx, [edx]	; absolute address of var
@@ -1985,7 +2071,7 @@ int JITCompiler::gen_new(char *code, Variable *var, const Variable *size)
 		(*((int *)(code+1))) = var->getItemTypeSize();
 		(*((void **)(code+7))) = heapAlloc;
 		(*((void **)(code+17))) = &(Interpreter::memory->SFB);
-		(*((void **)(code+22))) = (void *)(((char *)(var->getAddress())) - ((char *)Interpreter::memory->SFB));        // offset
+		(*((void **)(code+22))) = (void *)(((char *)(var->getVarAddress())) - ((char *)Interpreter::memory->SFB));        // offset
 		return code_len;
 	}
 }
@@ -2016,9 +2102,9 @@ int JITCompiler::gen_lt(char *code, Variable *dest, const Variable *op1, const V
 								  "\x88\x03";	//		mov byte ptr [ebx], al
 		memcpy(code, precompiled, code_len);
 		(*((void **)(code+1))) = &(Interpreter::memory->SFB);
-		(*((void **)(code+6))) = (void *)(((char *)(op2->getAddress())) - ((char *)Interpreter::memory->SFB));  // offset
-		(*((void **)(code+15))) = (void *)(((char *)(op1->getAddress())) - ((char *)Interpreter::memory->SFB)); // offset
-		(*((void **)(code+34))) = (void *)(((char *)(dest->getAddress())) - ((char *)Interpreter::memory->SFB));        // offset
+		(*((void **)(code+6))) = (void *)(((char *)(op2->getVarAddress())) - ((char *)Interpreter::memory->SFB));  // offset
+		(*((void **)(code+15))) = (void *)(((char *)(op1->getVarAddress())) - ((char *)Interpreter::memory->SFB)); // offset
+		(*((void **)(code+34))) = (void *)(((char *)(dest->getVarAddress())) - ((char *)Interpreter::memory->SFB));        // offset
 		(*((void **)(code+45))) = pZF;
 		return code_len;
 	}
@@ -2048,9 +2134,9 @@ int JITCompiler::gen_lt(char *code, Variable *dest, const Variable *op1, const V
 								  "\x88\x03";			//				mov byte ptr [ebx], al
 		memcpy(code, precompiled, code_len);
 		(*((void **)(code+1))) = &(Interpreter::memory->SFB);
-		(*((void **)(code+6))) = (void *)(((char *)(op2->getAddress())) - ((char *)Interpreter::memory->SFB));  // offset
-		(*((void **)(code+15))) = (void *)(((char *)(op1->getAddress())) - ((char *)Interpreter::memory->SFB)); // offset
-		(*((void **)(code+40))) = (void *)(((char *)(dest->getAddress())) - ((char *)Interpreter::memory->SFB));        // offset
+		(*((void **)(code+6))) = (void *)(((char *)(op2->getVarAddress())) - ((char *)Interpreter::memory->SFB));  // offset
+		(*((void **)(code+15))) = (void *)(((char *)(op1->getVarAddress())) - ((char *)Interpreter::memory->SFB)); // offset
+		(*((void **)(code+40))) = (void *)(((char *)(dest->getVarAddress())) - ((char *)Interpreter::memory->SFB));        // offset
 		(*((void **)(code+51))) = pZF;
 		return code_len;
 	}
@@ -2084,9 +2170,9 @@ int JITCompiler::gen_gt(char *code, Variable *dest, const Variable *op1, const V
 								  "\x88\x03";	//		mov byte ptr [ebx], al
 		memcpy(code, precompiled, code_len);
 		(*((void **)(code+1))) = &(Interpreter::memory->SFB);
-		(*((void **)(code+6))) = (void *)(((char *)(op2->getAddress())) - ((char *)Interpreter::memory->SFB));  // offset
-		(*((void **)(code+15))) = (void *)(((char *)(op1->getAddress())) - ((char *)Interpreter::memory->SFB)); // offset
-		(*((void **)(code+34))) = (void *)(((char *)(dest->getAddress())) - ((char *)Interpreter::memory->SFB));        // offset
+		(*((void **)(code+6))) = (void *)(((char *)(op2->getVarAddress())) - ((char *)Interpreter::memory->SFB));  // offset
+		(*((void **)(code+15))) = (void *)(((char *)(op1->getVarAddress())) - ((char *)Interpreter::memory->SFB)); // offset
+		(*((void **)(code+34))) = (void *)(((char *)(dest->getVarAddress())) - ((char *)Interpreter::memory->SFB));        // offset
 		(*((void **)(code+45))) = pZF;
 		return code_len;
 	}
@@ -2116,9 +2202,9 @@ int JITCompiler::gen_gt(char *code, Variable *dest, const Variable *op1, const V
 								  "\x88\x03";			//				mov byte ptr [ebx], al
 		memcpy(code, precompiled, code_len);
 		(*((void **)(code+1))) = &(Interpreter::memory->SFB);
-		(*((void **)(code+6))) = (void *)(((char *)(op2->getAddress())) - ((char *)Interpreter::memory->SFB));  // offset
-		(*((void **)(code+15))) = (void *)(((char *)(op1->getAddress())) - ((char *)Interpreter::memory->SFB)); // offset
-		(*((void **)(code+40))) = (void *)(((char *)(dest->getAddress())) - ((char *)Interpreter::memory->SFB));        // offset
+		(*((void **)(code+6))) = (void *)(((char *)(op2->getVarAddress())) - ((char *)Interpreter::memory->SFB));  // offset
+		(*((void **)(code+15))) = (void *)(((char *)(op1->getVarAddress())) - ((char *)Interpreter::memory->SFB)); // offset
+		(*((void **)(code+40))) = (void *)(((char *)(dest->getVarAddress())) - ((char *)Interpreter::memory->SFB));        // offset
 		(*((void **)(code+51))) = pZF;
 		return code_len;
 	}
@@ -2152,9 +2238,9 @@ int JITCompiler::gen_lte(char *code, Variable *dest, const Variable *op1, const 
 								  "\x88\x03";	//		mov byte ptr [ebx], al
 		memcpy(code, precompiled, code_len);
 		(*((void **)(code+1))) = &(Interpreter::memory->SFB);
-		(*((void **)(code+6))) = (void *)(((char *)(op2->getAddress())) - ((char *)Interpreter::memory->SFB));	// offset
-		(*((void **)(code+15))) = (void *)(((char *)(op1->getAddress())) - ((char *)Interpreter::memory->SFB));	// offset
-		(*((void **)(code+34))) = (void *)(((char *)(dest->getAddress())) - ((char *)Interpreter::memory->SFB));	// offset
+		(*((void **)(code+6))) = (void *)(((char *)(op2->getVarAddress())) - ((char *)Interpreter::memory->SFB));	// offset
+		(*((void **)(code+15))) = (void *)(((char *)(op1->getVarAddress())) - ((char *)Interpreter::memory->SFB));	// offset
+		(*((void **)(code+34))) = (void *)(((char *)(dest->getVarAddress())) - ((char *)Interpreter::memory->SFB));	// offset
 		(*((void **)(code+45))) = pZF;
 		return code_len;
 	}
@@ -2184,9 +2270,9 @@ int JITCompiler::gen_lte(char *code, Variable *dest, const Variable *op1, const 
 								  "\x88\x03";			//				mov byte ptr [ebx], al
 		memcpy(code, precompiled, code_len);
 		(*((void **)(code+1))) = &(Interpreter::memory->SFB);
-		(*((void **)(code+6))) = (void *)(((char *)(op2->getAddress())) - ((char *)Interpreter::memory->SFB));  // offset
-		(*((void **)(code+15))) = (void *)(((char *)(op1->getAddress())) - ((char *)Interpreter::memory->SFB)); // offset
-		(*((void **)(code+40))) = (void *)(((char *)(dest->getAddress())) - ((char *)Interpreter::memory->SFB));        // offset
+		(*((void **)(code+6))) = (void *)(((char *)(op2->getVarAddress())) - ((char *)Interpreter::memory->SFB));  // offset
+		(*((void **)(code+15))) = (void *)(((char *)(op1->getVarAddress())) - ((char *)Interpreter::memory->SFB)); // offset
+		(*((void **)(code+40))) = (void *)(((char *)(dest->getVarAddress())) - ((char *)Interpreter::memory->SFB));        // offset
 		(*((void **)(code+51))) = pZF;
 		return code_len;
 	}
@@ -2220,9 +2306,9 @@ int JITCompiler::gen_gte(char *code, Variable *dest, const Variable *op1, const 
 								  "\x88\x03";	//		mov byte ptr [ebx], al
 		memcpy(code, precompiled, code_len);
 		(*((void **)(code+1))) = &(Interpreter::memory->SFB);
-		(*((void **)(code+6))) = (void *)(((char *)(op2->getAddress())) - ((char *)Interpreter::memory->SFB));  // offset
-		(*((void **)(code+15))) = (void *)(((char *)(op1->getAddress())) - ((char *)Interpreter::memory->SFB)); // offset
-		(*((void **)(code+34))) = (void *)(((char *)(dest->getAddress())) - ((char *)Interpreter::memory->SFB));        // offset
+		(*((void **)(code+6))) = (void *)(((char *)(op2->getVarAddress())) - ((char *)Interpreter::memory->SFB));  // offset
+		(*((void **)(code+15))) = (void *)(((char *)(op1->getVarAddress())) - ((char *)Interpreter::memory->SFB)); // offset
+		(*((void **)(code+34))) = (void *)(((char *)(dest->getVarAddress())) - ((char *)Interpreter::memory->SFB));        // offset
 		(*((void **)(code+45))) = pZF;
 		return code_len;
 	}
@@ -2252,9 +2338,9 @@ int JITCompiler::gen_gte(char *code, Variable *dest, const Variable *op1, const 
 								  "\x88\x03";			//				mov byte ptr [ebx], al
 		memcpy(code, precompiled, code_len);
 		(*((void **)(code+1))) = &(Interpreter::memory->SFB);
-		(*((void **)(code+6))) = (void *)(((char *)(op2->getAddress())) - ((char *)Interpreter::memory->SFB));  // offset
-		(*((void **)(code+15))) = (void *)(((char *)(op1->getAddress())) - ((char *)Interpreter::memory->SFB)); // offset
-		(*((void **)(code+40))) = (void *)(((char *)(dest->getAddress())) - ((char *)Interpreter::memory->SFB));        // offset
+		(*((void **)(code+6))) = (void *)(((char *)(op2->getVarAddress())) - ((char *)Interpreter::memory->SFB));  // offset
+		(*((void **)(code+15))) = (void *)(((char *)(op1->getVarAddress())) - ((char *)Interpreter::memory->SFB)); // offset
+		(*((void **)(code+40))) = (void *)(((char *)(dest->getVarAddress())) - ((char *)Interpreter::memory->SFB));        // offset
 		(*((void **)(code+51))) = pZF;
 		return code_len;
 	}
@@ -2288,9 +2374,9 @@ int JITCompiler::gen_eq(char *code, Variable *dest, const Variable *op1, const V
 								  "\x88\x03";	//			mov byte ptr [ebx], al
 		memcpy(code, precompiled, code_len);
 		(*((void **)(code+1))) = &(Interpreter::memory->SFB);
-        (*((void **)(code+6))) = (void *)(((char *)(op2->getAddress())) - ((char *)Interpreter::memory->SFB));  // offset
-        (*((void **)(code+15))) = (void *)(((char *)(op1->getAddress())) - ((char *)Interpreter::memory->SFB)); // offset
-        (*((void **)(code+34))) = (void *)(((char *)(dest->getAddress())) - ((char *)Interpreter::memory->SFB));        // offset
+        (*((void **)(code+6))) = (void *)(((char *)(op2->getVarAddress())) - ((char *)Interpreter::memory->SFB));  // offset
+        (*((void **)(code+15))) = (void *)(((char *)(op1->getVarAddress())) - ((char *)Interpreter::memory->SFB)); // offset
+        (*((void **)(code+34))) = (void *)(((char *)(dest->getVarAddress())) - ((char *)Interpreter::memory->SFB));        // offset
 		(*((void **)(code+45))) = pZF;
 		return code_len;
 	}
@@ -2318,9 +2404,9 @@ int JITCompiler::gen_eq(char *code, Variable *dest, const Variable *op1, const V
 								  "\x88\x03";	//			mov byte ptr [ebx], al
 		memcpy(code, precompiled, code_len);
 		(*((void **)(code+1))) = &(Interpreter::memory->SFB);
-        (*((void **)(code+6))) = (void *)(((char *)(op2->getAddress())) - ((char *)Interpreter::memory->SFB));  // offset
-        (*((void **)(code+15))) = (void *)(((char *)(op1->getAddress())) - ((char *)Interpreter::memory->SFB)); // offset
-        (*((void **)(code+34))) = (void *)(((char *)(dest->getAddress())) - ((char *)Interpreter::memory->SFB));        // offset
+        (*((void **)(code+6))) = (void *)(((char *)(op2->getVarAddress())) - ((char *)Interpreter::memory->SFB));  // offset
+        (*((void **)(code+15))) = (void *)(((char *)(op1->getVarAddress())) - ((char *)Interpreter::memory->SFB)); // offset
+        (*((void **)(code+34))) = (void *)(((char *)(dest->getVarAddress())) - ((char *)Interpreter::memory->SFB));        // offset
 		(*((void **)(code+45))) = pZF;
 		return code_len;
 	}
@@ -2350,9 +2436,9 @@ int JITCompiler::gen_eq(char *code, Variable *dest, const Variable *op1, const V
 								  "\x88\x03";			//			mov byte ptr [ebx], al
 		memcpy(code, precompiled, code_len);
 		(*((void **)(code+1))) = &(Interpreter::memory->SFB);
-        (*((void **)(code+6))) = (void *)(((char *)(op2->getAddress())) - ((char *)Interpreter::memory->SFB));  // offset
-        (*((void **)(code+15))) = (void *)(((char *)(op1->getAddress())) - ((char *)Interpreter::memory->SFB)); // offset
-        (*((void **)(code+40))) = (void *)(((char *)(dest->getAddress())) - ((char *)Interpreter::memory->SFB));        // offset
+        (*((void **)(code+6))) = (void *)(((char *)(op2->getVarAddress())) - ((char *)Interpreter::memory->SFB));  // offset
+        (*((void **)(code+15))) = (void *)(((char *)(op1->getVarAddress())) - ((char *)Interpreter::memory->SFB)); // offset
+        (*((void **)(code+40))) = (void *)(((char *)(dest->getVarAddress())) - ((char *)Interpreter::memory->SFB));        // offset
 		(*((void **)(code+51))) = pZF;
 		return code_len;
 	}
@@ -2386,9 +2472,9 @@ int JITCompiler::gen_neq(char *code, Variable *dest, const Variable *op1, const 
 								  "\x88\x03";	//			mov byte ptr [ebx], al
 		memcpy(code, precompiled, code_len);
 		(*((void **)(code+1))) = &(Interpreter::memory->SFB);
-        (*((void **)(code+6))) = (void *)(((char *)(op2->getAddress())) - ((char *)Interpreter::memory->SFB));  // offset
-        (*((void **)(code+15))) = (void *)(((char *)(op1->getAddress())) - ((char *)Interpreter::memory->SFB)); // offset
-        (*((void **)(code+34))) = (void *)(((char *)(dest->getAddress())) - ((char *)Interpreter::memory->SFB));        // offset
+        (*((void **)(code+6))) = (void *)(((char *)(op2->getVarAddress())) - ((char *)Interpreter::memory->SFB));  // offset
+        (*((void **)(code+15))) = (void *)(((char *)(op1->getVarAddress())) - ((char *)Interpreter::memory->SFB)); // offset
+        (*((void **)(code+34))) = (void *)(((char *)(dest->getVarAddress())) - ((char *)Interpreter::memory->SFB));        // offset
 		(*((void **)(code+45))) = pZF;
 		return code_len;
 	}
@@ -2416,9 +2502,9 @@ int JITCompiler::gen_neq(char *code, Variable *dest, const Variable *op1, const 
 								  "\x88\x03";	//			mov byte ptr [ebx], al
 		memcpy(code, precompiled, code_len);
 		(*((void **)(code+1))) = &(Interpreter::memory->SFB);
-        (*((void **)(code+6))) = (void *)(((char *)(op2->getAddress())) - ((char *)Interpreter::memory->SFB));  // offset
-        (*((void **)(code+15))) = (void *)(((char *)(op1->getAddress())) - ((char *)Interpreter::memory->SFB)); // offset
-        (*((void **)(code+34))) = (void *)(((char *)(dest->getAddress())) - ((char *)Interpreter::memory->SFB));        // offset
+        (*((void **)(code+6))) = (void *)(((char *)(op2->getVarAddress())) - ((char *)Interpreter::memory->SFB));  // offset
+        (*((void **)(code+15))) = (void *)(((char *)(op1->getVarAddress())) - ((char *)Interpreter::memory->SFB)); // offset
+        (*((void **)(code+34))) = (void *)(((char *)(dest->getVarAddress())) - ((char *)Interpreter::memory->SFB));        // offset
 		(*((void **)(code+45))) = pZF;
 		return code_len;
 	}
@@ -2448,9 +2534,9 @@ int JITCompiler::gen_neq(char *code, Variable *dest, const Variable *op1, const 
 								  "\x88\x03";			//				mov byte ptr [ebx], al
 		memcpy(code, precompiled, code_len);
 		(*((void **)(code+1))) = &(Interpreter::memory->SFB);
-        (*((void **)(code+6))) = (void *)(((char *)(op2->getAddress())) - ((char *)Interpreter::memory->SFB));  // offset
-        (*((void **)(code+15))) = (void *)(((char *)(op1->getAddress())) - ((char *)Interpreter::memory->SFB)); // offset
-        (*((void **)(code+40))) = (void *)(((char *)(dest->getAddress())) - ((char *)Interpreter::memory->SFB));        // offset
+        (*((void **)(code+6))) = (void *)(((char *)(op2->getVarAddress())) - ((char *)Interpreter::memory->SFB));  // offset
+        (*((void **)(code+15))) = (void *)(((char *)(op1->getVarAddress())) - ((char *)Interpreter::memory->SFB)); // offset
+        (*((void **)(code+40))) = (void *)(((char *)(dest->getVarAddress())) - ((char *)Interpreter::memory->SFB));        // offset
 		(*((void **)(code+51))) = pZF;
 		return code_len;
 	}

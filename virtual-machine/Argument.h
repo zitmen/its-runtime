@@ -423,6 +423,8 @@ class File : public Argument
 
 class Variable : public Argument
 {
+	friend class JITCompiler;
+
 	private:
 		string m_name;
 		DataType *m_type;
@@ -454,6 +456,11 @@ class Variable : public Argument
 		DataType * getItemDataType() const;
 		int getItemType() const;
 		int getItemTypeSize() const;
+
+		void * getVarAddress() const
+		{
+			return ((m_base == NULL) ? m_address : m_base->getAddress());
+		}
 
 		void * getAddress() const;
 

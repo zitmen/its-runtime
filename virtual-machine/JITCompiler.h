@@ -35,6 +35,7 @@ class JITCompiler
 		}
 
 	protected:
+		int gen_operand(char *code, Variable *var, bool load_SFB);
 		int gen_prolog(char *code);
 		int gen_epilog(char *code);
 		int gen_call(char *code, FunctionSignature *fn, const vector<Argument *> &args);

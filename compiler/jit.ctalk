@@ -1,12 +1,26 @@
-void main()
+struct Result
 {
-	Array<int> arr;
-	while(true)
-		arr = foo(100);
+	int cost;
+	int weight;
 }
 
-Array<int> foo(int size)
+void main()
 {
-	Array<int> ptr = new[size];
-	return ptr;
+	Result result;
+	for(int i = 0; i < 10; i++)
+	{
+		result = computeSolution(i);
+		print("c=");
+		print(int2str(result.cost));
+		print(",w=");
+		println(int2str(result.weight));
+	}
+}
+
+Result computeSolution(int i)
+{
+	Result retval = new;
+	retval.cost = i*i;
+	retval.weight = i*i*i;
+	return retval;
 }

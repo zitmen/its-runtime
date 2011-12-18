@@ -11,7 +11,7 @@ int main()
 	// TODO: command line arguments!
 	try
 	{
-		ProgramLoader loader("01knapsack.run");
+		ProgramLoader loader("jit.run");
 		std::cout << ":: Program ::\n======================\n";
 		loader.printProgram(std::cout);
 		Interpreter interpreter(loader.getProgram(), loader.getStructures(), loader.getFunctions());

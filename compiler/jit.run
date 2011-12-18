@@ -1,13 +1,33 @@
-FUNCTION <ARRAY<INTEGER>> foo [ INTEGER var1 ] [ INTEGER var1 ARRAY<INTEGER> var2 ] @ 8
-FUNCTION <VOID> main [ ] [ ARRAY<INTEGER> var5 BOOL var3 INTEGER var4 ARRAY<INTEGER> var0 ] @ 0
+STRUCTURE Result [ INTEGER weight INTEGER cost ]
+FUNCTION <STRUCTURE<Result>> computeSolution [ INTEGER var2 ] [ INTEGER var15 INTEGER var14 INTEGER var13 INTEGER var12 STRUCTURE<Result> var3 INTEGER var2 ] @ 21
+FUNCTION <VOID> main [ ] [ STRING var9 STRING var8 STRUCTURE<Result> var7 INTEGER var5 BOOL var6 INTEGER var4 STRING var11 INTEGER var1 STRING var10 STRUCTURE<Result> var0 ] @ 0
 CODE
-000: LDCB var3 TRUE
-001: JZ 7
-002: LDCI var4 100
-003: CALL foo var4
-004: POP var5
-005: ST var0 var5
-006: JMP 0
-007: RET
-008: NEW var2 var1
-009: RETV var2
+000: LDCI var4 0
+001: ST var1 var4
+002: LDCI var5 10
+003: LT var6 var1 var5
+004: JZ 20
+005: CALL computeSolution var1
+006: POP var7
+007: ST var0 var7
+008: LDCS var8 "c="
+009: INVOKE print var8
+010: INVOKE int2str var0 [ @cost ]
+011: POP var9
+012: INVOKE print var9
+013: LDCS var10 ",w="
+014: INVOKE print var10
+015: INVOKE int2str var0 [ @weight ]
+016: POP var11
+017: INVOKE println var11
+018: INC var1
+019: JMP 2
+020: RET
+021: LDCI var12 1
+022: NEW var3 var12
+023: MUL var13 var2 var2
+024: ST var3 [ @cost ] var13
+025: MUL var14 var2 var2
+026: MUL var15 var2 var14
+027: ST var3 [ @weight ] var15
+028: RETV var3
