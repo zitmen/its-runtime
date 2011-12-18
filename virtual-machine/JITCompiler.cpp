@@ -1141,38 +1141,50 @@ int JITCompiler::gen_st(char *code, Variable *dest, Variable *src)
 {
 	if(src->getItemType() == DataType::DOUBLE)	// 8B, FPU
 	{
-		const int code_len = 14;
-		const char *precompiled = "\xB8????"	//mov eax, address(src)
+		const int code_len = 23;
+		const char *precompiled = "\xB9????"	//mov ecx, address(SFB)
+								  "\xB8????"	//mov eax, offset(src)
+								  "\x03\x01"	//add eax, [ecx]  ; absolute address of src
 								  "\xDD\x00"	//fld qword ptr [eax]
-								  "\xBB????"	//mov ebx, address(dest)
+								  "\xBB????"	//mov ebx, offset(dest)
+								  "\x03\x19"	//add ebx, [ecx]  ; absolute address of dest
 								  "\xDD\x1B";	//fstp qword ptr [ebx]
 		memcpy(code, precompiled, code_len);
-		(*((void **)(code+1))) = src->getAddress();
-		(*((void **)(code+8))) = dest->getAddress();
+		(*((void **)(code+1))) = &(Interpreter::memory->SFB);
+		(*((void **)(code+6))) = (void *)(((char *)(src->getAddress())) - ((char *)Interpreter::memory->SFB));  // offset
+		(*((void **)(code+15))) = (void *)(((char *)(dest->getAddress())) - ((char *)Interpreter::memory->SFB));  // offset
 		return code_len;
 	}
 	else if(src->getItemType() == DataType::BOOLEAN)	// 1B, ALU
 	{
-		const int code_len = 14;
-		const char *precompiled = "\xB8????"	//mov eax, address(src)
+		const int code_len = 23;
+		const char *precompiled = "\xB9????"	//mov ecx, address(SFB)
+								  "\xB8????"	//mov eax, offset(src)
+								  "\x03\x01"	//add eax, [ecx]  ; absolute address of src
 								  "\x8A\x00"	//mov al, byte ptr [eax]
-								  "\xBB????"	//mov ebx, address(dest)
+								  "\xBB????"	//mov ebx, offset(dest)
+								  "\x03\x19"	//add ebx, [ecx]  ; absolute address of dest
 								  "\x88\x03";	//mov byte ptr [ebx], al
 		memcpy(code, precompiled, code_len);
-		(*((void **)(code+1))) = src->getAddress();
-		(*((void **)(code+8))) = dest->getAddress();
+		(*((void **)(code+1))) = &(Interpreter::memory->SFB);
+		(*((void **)(code+6))) = (void *)(((char *)(src->getAddress())) - ((char *)Interpreter::memory->SFB));  // offset
+		(*((void **)(code+15))) = (void *)(((char *)(dest->getAddress())) - ((char *)Interpreter::memory->SFB));  // offset
 		return code_len;
 	}
 	else	// INTEGER, REFERENCE, ARRAY, STRUCTURE, STRING -- 4B, ALU
 	{
-		const int code_len = 14;
-		const char *precompiled = "\xB8????"	//mov eax, address(src)
+		const int code_len = 23;
+		const char *precompiled = "\xB9????"	//mov ecx, address(SFB)
+								  "\xB8????"	//mov eax, offset(src)
+								  "\x03\x01"	//add eax, [ecx]  ; absolute address of src
 								  "\x8B\x00"	//mov eax, dword ptr [eax]
-								  "\xBB????"	//mov ebx, address(dest)
+								  "\xBB????"	//mov ebx, offset(dest)
+								  "\x03\x19"	//add ebx, [ecx]  ; absolute address of dest
 								  "\x89\x03";	//mov [ebx], eax
 		memcpy(code, precompiled, code_len);
-		(*((void **)(code+1))) = src->getAddress();
-		(*((void **)(code+8))) = dest->getAddress();
+		(*((void **)(code+1))) = &(Interpreter::memory->SFB);
+		(*((void **)(code+6))) = (void *)(((char *)(src->getAddress())) - ((char *)Interpreter::memory->SFB));  // offset
+		(*((void **)(code+15))) = (void *)(((char *)(dest->getAddress())) - ((char *)Interpreter::memory->SFB));  // offset
 		return code_len;
 	}
 }
@@ -1183,17 +1195,20 @@ int JITCompiler::gen_ldzf_alu(char *code, Variable *dest)
 	if(dest->getItemType() != DataType::BOOLEAN) throw new std::exception("JITCompiler::gen_ldzf: invalid data type!");
 	//
 	// update Zero-Flag inside of the interpreter
-	const int code_len = 22;
+	const int code_len = 29;
 	// TODO: instead of pushf use lahf (Load Flags into AH Register - 1Byte)
 	const char *precompiled = "\x66\x9C"			//pushf
 							  "\x66\x58"			//pop ax	; flag register is only 2Bytes
 							  "\x66\xBB\x40\x00"	//mov bx, 64; mask for extracting ZF stored at bit 6
 							  "\x66\x23\xD8"		//and bx, ax
 							  "\x66\xC1\xEB\x06"	//shr bx, 6	; shift to the right to get 0 or 1
-							  "\xB8????"			//mov eax, address(dest)
+							  "\xB9????"			//mov ecx, address(SFB)
+							  "\xB8????"			//mov eax, offset(dest)
+							  "\x03\x01"			//add eax, [ecx]  ; absolute address of dest
 							  "\x88\x18";			//mov byte ptr [eax], bl
 	memcpy(code, precompiled, code_len);
-	(*((void **)(code+16))) = dest->getAddress();
+	(*((void **)(code+16))) = &(Interpreter::memory->SFB);
+	(*((void **)(code+21))) = (void *)(((char *)(dest->getAddress())) - ((char *)Interpreter::memory->SFB));  // offset
 	return code_len;
 }
 
