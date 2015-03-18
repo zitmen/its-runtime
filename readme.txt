@@ -1,3 +1,7 @@
+**This document is written in Czech as the course was originally taught in Czech and this was the language required for this submission protocol.**
+
+****
+
 Autor
 =====
 Martin Ovesny (ovesnmar@fit.cvut.cz)
